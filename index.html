@@ -16,7 +16,7 @@
         .font-rustic { font-family: 'Cinzel', serif; }
         .font-serif-custom { font-family: 'Playfair Display', serif; }
 
-        /* FONDO DEL SALOON ÉPOCA 1880 (CON SOPORTE DE MAYÚSCULAS/MINÚSCULAS Y FALLBACK) */
+        /* FONDO DEL SALOON ÉPOCA 1880 */
         body { 
             background-color: #0e0906;
             background-image: linear-gradient(rgba(14, 9, 6, 0.70), rgba(8, 5, 3, 0.85)), 
@@ -404,11 +404,12 @@
         };
 
         const bebidasIniciales = {
-            "1": { id: "1", nombre: "Johnycake de Maíz", categoria: "comida", pMin: 1.17, pMed: 1.235, pNorm: 1.30 },
-            "2": { id: "2", nombre: "Patatas con Bacon", categoria: "comida", pMin: 1.35, pMed: 1.425, pNorm: 1.50 },
-            "3": { id: "3", nombre: "Huevos con Tomate", categoria: "comida", pMin: 0.90, pMed: 0.95, pNorm: 1.00 },
-            "4": { id: "4", nombre: "Cerveza de Barril", categoria: "bebida", pMin: 0.50, pMed: 0.70, pNorm: 0.90 },
-            "5": { id: "5", nombre: "Whisky Bourbon", categoria: "bebida", pMin: 0.80, pMed: 1.10, pNorm: 1.40 }
+            "b1": { id: "b1", nombre: "Johnycake de Maíz", categoria: "comida", pMin: 1.17, pMed: 1.235, pNorm: 1.30 },
+            "b2": { id: "b2", nombre: "Patatas con Bacon", categoria: "comida", pMin: 1.35, pMed: 1.425, pNorm: 1.50 },
+            "b3": { id: "b3", nombre: "Huevos con Tomate", categoria: "comida", pMin: 0.90, pMed: 0.95, pNorm: 1.00 },
+            "b4": { id: "b4", nombre: "Zumo de Manzana", categoria: "bebida", pMin: 0.70, pMed: 0.74, pNorm: 0.78 },
+            "b5": { id: "b5", nombre: "Zumo Tomate", categoria: "bebida", pMin: 0.58, pMed: 0.61, pNorm: 0.64 },
+            "b6": { id: "b6", nombre: "Soda", categoria: "bebida", pMin: 0.54, pMed: 0.57, pNorm: 0.60 }
         };
 
         const menusIniciales = {
@@ -436,13 +437,26 @@
             document.getElementById('btn-tab-' + pantalla).classList.add('active');
         }
 
+        // AUTO-INICIALIZACIÓN Y SINCRONIZACIÓN CON FIREBASE
         database.ref('bebidas').on('value', (s) => {
-            bebidas = s.val() || bebidasIniciales;
+            const val = s.val();
+            if (!val) {
+                database.ref('bebidas').set(bebidasIniciales);
+                bebidas = bebidasIniciales;
+            } else {
+                bebidas = val;
+            }
             renderizarTodo();
         });
 
         database.ref('menus').on('value', (s) => {
-            menus = s.val() || menusIniciales;
+            const val = s.val();
+            if (!val) {
+                database.ref('menus').set(menusIniciales);
+                menus = menusIniciales;
+            } else {
+                menus = val;
+            }
             renderizarTodo();
         });
 
@@ -473,9 +487,14 @@
             const tbodyPedCom = document.getElementById('tabla-pedido-comida');
             const tbodyGestBeb = document.getElementById('tabla-gestion-bebidas');
             
+            if (!tbodyPedBeb || !tbodyPedCom || !tbodyGestBeb) return;
+
             tbodyPedBeb.innerHTML = '';
             tbodyPedCom.innerHTML = '';
             tbodyGestBeb.innerHTML = '';
+
+            let hayBebidas = false;
+            let hayComida = false;
 
             Object.values(bebidas).forEach(b => {
                 const est = pedidoBebidas[b.id] || { cantidad: 0, tipoPrecio: 'norm' };
@@ -501,30 +520,32 @@
 
                 if (cat === 'bebida') {
                     tbodyPedBeb.innerHTML += filaHTML;
+                    hayBebidas = true;
                 } else {
                     tbodyPedCom.innerHTML += filaHTML;
+                    hayComida = true;
                 }
 
                 tbodyGestBeb.innerHTML += `
                     <tr class="hover:bg-amber-900/20">
                         <td class="p-2 font-semibold text-amber-100">${b.nombre}</td>
-                        <td class="p-2 text-center uppercase text-[10px] text-amber-400">${cat === 'bebida' ? '🍺 Bebida' : '🥩 Comida'}</td>
+                        <td class="p-2 text-center uppercase text-[10px] text-amber-400 font-bold">${cat === 'bebida' ? '🍺 Bebida' : '🥩 Comida'}</td>
                         <td class="p-2 text-center text-[10px] text-amber-200/70">$${b.pMin.toFixed(2)} / $${b.pMed.toFixed(2)} / $${b.pNorm.toFixed(2)}</td>
                         <td class="p-2 text-center"><button onclick="eliminarBebida('${b.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
                     </tr>`;
             });
 
-            if (tbodyPedBeb.innerHTML === '') {
+            if (!hayBebidas) {
                 tbodyPedBeb.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-amber-200/40 italic">No hay bebidas en la carta</td></tr>';
             }
-            if (tbodyPedCom.innerHTML === '') {
+            if (!hayComida) {
                 tbodyPedCom.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-amber-200/40 italic">No hay platos de comida en la carta</td></tr>';
             }
 
             // Render Venta Menús
             const tbodyPedMen = document.getElementById('tabla-pedido-menus');
-            tbodyPedMen.innerHTML = '';
             const tbodyGestMen = document.getElementById('tabla-gestion-menus');
+            tbodyPedMen.innerHTML = '';
             tbodyGestMen.innerHTML = '';
 
             Object.values(menus).forEach(m => {
@@ -654,6 +675,7 @@
 
         function renderizarResumenVentas() {
             const contenedor = document.getElementById('lista-resumen');
+            if (!contenedor) return;
             contenedor.innerHTML = '';
             let totalAcc = 0, itemsAcc = 0, hay = false;
 
@@ -686,6 +708,7 @@
 
         function renderizarResumenCompras() {
             const contenedor = document.getElementById('lista-resumen-compras');
+            if (!contenedor) return;
             contenedor.innerHTML = '';
             let totalAcc = 0, itemsAcc = 0, hay = false;
 
