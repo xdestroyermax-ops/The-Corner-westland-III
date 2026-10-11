@@ -151,6 +151,21 @@
                             <tbody id="tabla-venta-menus" class="divide-y divide-amber-900/40"></tbody>
                         </table>
                     </div>
+
+                    <h2 class="text-base md:text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 pt-2 font-rustic">📦 Varios Productos</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs md:text-sm">
+                            <thead class="table-header uppercase font-rustic">
+                                <tr>
+                                    <th class="p-2">Producto</th>
+                                    <th class="p-2 text-center">Tarifa</th>
+                                    <th class="p-2 text-center w-16">Cant.</th>
+                                    <th class="p-2 text-right">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-venta-productos" class="divide-y divide-amber-900/40"></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- RESUMEN Y REGISTRO DE FACTURA -->
@@ -182,7 +197,7 @@
                 </div>
             </div>
 
-            <!-- HISTORIAL DE FACTURAS / VENTAS -->
+            <!-- HISTORIAL DE FACTURAS -->
             <div class="western-panel rounded-xl p-4 space-y-3">
                 <h2 class="text-base font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📋 Registro Histórico de Facturas</h2>
                 <div id="lista-historial-facturas" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-amber-200/80">
@@ -241,7 +256,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 3: COMIDA (GestiÓN) ================= -->
+        <!-- ================= PANTALLA 3: COMIDA (GESTIÓN) ================= -->
         <div id="pantalla-comida" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🥩 Gestión de Comida (3 Tarifas)</h2>
@@ -281,7 +296,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 4: BEBIDA (GestiÓN) ================= -->
+        <!-- ================= PANTALLA 4: BEBIDA (GESTIÓN) ================= -->
         <div id="pantalla-bebida" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🍺 Gestión de Bebidas (3 Tarifas)</h2>
@@ -321,7 +336,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 5: MENÚS (GestiÓN) ================= -->
+        <!-- ================= PANTALLA 5: MENÚS (GESTIÓN) ================= -->
         <div id="pantalla-menus" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🍲 Gestión de Menús (2 Tarifas)</h2>
@@ -357,21 +372,42 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 6: PRODUCTOS ================= -->
+        <!-- ================= PANTALLA 6: PRODUCTOS (GESTIÓN) ================= -->
         <div id="pantalla-productos" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
-                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📦 Catálogo General de Productos / Materias Primas</h2>
-                <p class="text-xs text-amber-200/70">Listado completo de materias primas agrícolas de EEUU y México disponibles para pedidos y crafteos en la taberna.</p>
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📦 Gestión de Productos Varios (3 Tarifas)</h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-stone-900/70 p-3 rounded-lg border border-amber-900/40">
-                        <h3 class="text-xs font-bold text-amber-300 mb-2 font-rustic">🇺🇸 Materias Primas EEUU</h3>
-                        <ul id="lista-cat-eeuu" class="text-xs space-y-1 text-amber-200/80"></ul>
+                <form id="form-nuevo-producto" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Nuevo Producto (Puros, Tabaco, Medicinas, etc.)</h3>
+                    <input type="text" id="producto-nombre" placeholder="Nombre del producto" required class="w-full p-2 rounded text-xs">
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Mín ($)</label>
+                            <input type="number" step="0.01" id="producto-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Med ($)</label>
+                            <input type="number" step="0.01" id="producto-med" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Máx ($)</label>
+                            <input type="number" step="0.01" id="producto-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
                     </div>
-                    <div class="bg-stone-900/70 p-3 rounded-lg border border-amber-900/40">
-                        <h3 class="text-xs font-bold text-amber-300 mb-2 font-rustic">🇲🇽 Materias Primas México</h3>
-                        <ul id="lista-cat-mex" class="text-xs space-y-1 text-amber-200/80"></ul>
-                    </div>
+                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Producto</button>
+                </form>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="table-header uppercase font-rustic">
+                            <tr>
+                                <th class="p-2">Producto</th>
+                                <th class="p-2 text-center">Mín / Med / Máx</th>
+                                <th class="p-2 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-gestion-productos" class="divide-y divide-amber-900/40"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -456,12 +492,21 @@
             "m2": { id: "m2", nombre: "Medio Muerto", pMin: 1.30, pNorm: 1.78 }
         };
 
+        const productosIniciales = {
+            "p1": { id: "p1", nombre: "Puros Premium", pMin: 1.00, pMed: 1.50, pNorm: 2.00 },
+            "p2": { id: "p2", nombre: "Tabaco de Mascar", pMin: 0.50, pMed: 0.75, pNorm: 1.00 }
+        };
+
         let comida = {};
         let bebida = {};
         let menus = {};
+        let productos = {};
+        
         let ventaComida = {};
         let ventaBebida = {};
         let ventaMenus = {};
+        let ventaProductos = {};
+        
         let pedidoEEUU = {};
         let pedidoMex = {};
 
@@ -496,9 +541,16 @@
             renderizarTodo();
         });
 
+        database.ref('productos_varios').on('value', (s) => {
+            productos = s.val() || productosIniciales;
+            if (!s.val()) database.ref('productos_varios').set(productosIniciales);
+            renderizarTodo();
+        });
+
         database.ref('facturas').limitToLast(15).on('value', (s) => {
             const data = s.val();
             const contenedor = document.getElementById('lista-historial-facturas');
+            if (!contenedor) return;
             contenedor.innerHTML = '';
             if (!data) {
                 contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay facturas registradas todavía.</p>';
@@ -522,18 +574,17 @@
             renderTablaVenta('tabla-venta-comida', comida, ventaComida, 'comida');
             renderTablaVenta('tabla-venta-bebida', bebida, ventaBebida, 'bebida');
             renderTablaVenta('tabla-venta-menus', menus, ventaMenus, 'menu');
+            renderTablaVenta('tabla-venta-productos', productos, ventaProductos, 'productos');
 
             // 2. Tablas de Gestión
             renderTablaGestion('tabla-gestion-comida', comida, 'comida');
             renderTablaGestion('tabla-gestion-bebida', bebida, 'bebida');
             renderTablaGestionMenu('tabla-gestion-menus', menus);
+            renderTablaGestion('tabla-gestion-productos', productos, 'productos_varios');
 
             // 3. Tablas de Pedidos (EEUU y México)
             renderTablaPedidos('tabla-pedidos-eeuu', productosEEUU, pedidoEEUU, 'eeuu');
             renderTablaPedidos('tabla-pedidos-mexico', productosMexico, pedidoMex, 'mex');
-
-            // 4. Catálogo Productos
-            renderCatGeneral();
 
             renderizarResumenVenta();
             renderizarResumenPedidos();
@@ -544,8 +595,13 @@
             if (!tbody) return;
             tbody.innerHTML = '';
 
+            if (Object.keys(items).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-amber-200/40 italic">No hay productos registrados</td></tr>';
+                return;
+            }
+
             Object.values(items).forEach(item => {
-                const est = estadoObj[item.id] || { cantidad: 0, tarifa: tipo === 'menu' ? 'norm' : 'norm' };
+                const est = estadoObj[item.id] || { cantidad: 0, tarifa: 'norm' };
                 let p = 0;
                 if (tipo === 'menu') {
                     p = est.tarifa === 'min' ? item.pMin : item.pNorm;
@@ -572,17 +628,22 @@
             });
         }
 
-        function renderTablaGestion(elementId, items, tipo) {
+        function renderTablaGestion(elementId, items, dbPath) {
             const tbody = document.getElementById(elementId);
             if (!tbody) return;
             tbody.innerHTML = '';
+
+            if (Object.keys(items).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay elementos guardados</td></tr>';
+                return;
+            }
 
             Object.values(items).forEach(item => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-amber-900/20">
                         <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
                         <td class="p-2 text-center text-[10px] text-amber-200/70">$${item.pMin.toFixed(2)} / $${item.pMed.toFixed(2)} / $${item.pNorm.toFixed(2)}</td>
-                        <td class="p-2 text-center"><button onclick="eliminarItem('${tipo}', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
+                        <td class="p-2 text-center"><button onclick="eliminarItem('${dbPath}', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
                     </tr>`;
             });
         }
@@ -591,6 +652,11 @@
             const tbody = document.getElementById(elementId);
             if (!tbody) return;
             tbody.innerHTML = '';
+
+            if (Object.keys(items).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay menús guardados</td></tr>';
+                return;
+            }
 
             Object.values(items).forEach(item => {
                 tbody.innerHTML += `
@@ -629,32 +695,15 @@
             });
         }
 
-        function renderCatGeneral() {
-            const ulEEUU = document.getElementById('lista-cat-eeuu');
-            const ulMex = document.getElementById('lista-cat-mex');
-            if (ulEEUU) {
-                ulEEUU.innerHTML = '';
-                Object.values(productosEEUU).forEach(i => {
-                    ulEEUU.innerHTML += `<li>• ${i.nombre} <span class="text-amber-400 font-mono">($${i.pMin.toFixed(2)} - $${i.pNorm.toFixed(2)})</span></li>`;
-                });
-            }
-            if (ulMex) {
-                ulMex.innerHTML = '';
-                Object.values(productosMexico).forEach(i => {
-                    ulMex.innerHTML += `<li>• ${i.nombre} <span class="text-amber-400 font-mono">($${i.pMin.toFixed(2)} - $${i.pNorm.toFixed(2)})</span></li>`;
-                });
-            }
-        }
-
         // MANEJO DE ESTADOS DE VENTA
         function cambiarCantVenta(tipo, id, val) {
-            let obj = tipo === 'comida' ? ventaComida : (tipo === 'bebida' ? ventaBebida : ventaMenus);
+            let obj = tipo === 'comida' ? ventaComida : (tipo === 'bebida' ? ventaBebida : (tipo === 'menu' ? ventaMenus : ventaProductos));
             if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' };
             obj[id].cantidad = Math.max(0, parseInt(val) || 0);
             renderizarTodo();
         }
         function cambiarTarifaVenta(tipo, id, tarifa) {
-            let obj = tipo === 'comida' ? ventaComida : (tipo === 'bebida' ? ventaBebida : ventaMenus);
+            let obj = tipo === 'comida' ? ventaComida : (tipo === 'bebida' ? ventaBebida : (tipo === 'menu' ? ventaMenus : ventaProductos));
             if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' };
             obj[id].tarifa = tarifa;
             renderizarTodo();
@@ -678,7 +727,7 @@
             const contenedor = document.getElementById('lista-resumen-venta');
             if (!contenedor) return;
             contenedor.innerHTML = '';
-            let totalAcc = 0, itemsAcc = 0, hay = false, resumenArray = [];
+            let totalAcc = 0, itemsAcc = 0, hay = false;
 
             // Procesar Comida
             Object.values(comida).forEach(item => {
@@ -688,7 +737,6 @@
                     let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
                     let sub = est.cantidad * p;
                     totalAcc += sub; itemsAcc += est.cantidad;
-                    resumenArray.push(`${est.cantidad}x ${item.nombre}`);
                     contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>${item.nombre} (${est.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
                 }
             });
@@ -701,7 +749,6 @@
                     let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
                     let sub = est.cantidad * p;
                     totalAcc += sub; itemsAcc += est.cantidad;
-                    resumenArray.push(`${est.cantidad}x ${item.nombre}`);
                     contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>${item.nombre} (${est.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
                 }
             });
@@ -714,7 +761,18 @@
                     let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
                     let sub = est.cantidad * p;
                     totalAcc += sub; itemsAcc += est.cantidad;
-                    resumenArray.push(`${est.cantidad}x ${item.nombre}`);
+                    contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>${item.nombre} (${est.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
+                }
+            });
+
+            // Procesar Productos Varios
+            Object.values(productos).forEach(item => {
+                const est = ventaProductos[item.id];
+                if (est && est.cantidad > 0) {
+                    hay = true;
+                    let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
+                    let sub = est.cantidad * p;
+                    totalAcc += sub; itemsAcc += est.cantidad;
                     contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>${item.nombre} (${est.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
                 }
             });
@@ -778,6 +836,14 @@
                     resumenArray.push(`${est.cantidad}x ${item.nombre}`);
                 }
             });
+            Object.values(productos).forEach(item => {
+                const est = ventaProductos[item.id];
+                if (est && est.cantidad > 0) {
+                    let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
+                    totalAcc += est.cantidad * p;
+                    resumenArray.push(`${est.cantidad}x ${item.nombre}`);
+                }
+            });
 
             if (totalAcc === 0) {
                 alert("No hay ningún producto en la venta actual.");
@@ -795,6 +861,7 @@
             ventaComida = {};
             ventaBebida = {};
             ventaMenus = {};
+            ventaProductos = {};
             renderizarTodo();
             alert("¡Venta registrada y factura generada con éxito!");
         });
@@ -803,6 +870,7 @@
             ventaComida = {};
             ventaBebida = {};
             ventaMenus = {};
+            ventaProductos = {};
             renderizarTodo();
         });
 
@@ -848,9 +916,23 @@
             alert("¡Menú añadido!");
         });
 
-        function eliminarItem(tipo, id) {
+        document.getElementById('form-nuevo-producto').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('productos_varios/' + id).set({
+                id,
+                nombre: document.getElementById('producto-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('producto-min').value),
+                pMed: parseFloat(document.getElementById('producto-med').value),
+                pNorm: parseFloat(document.getElementById('producto-norm').value)
+            });
+            this.reset();
+            alert("¡Producto añadido!");
+        });
+
+        function eliminarItem(dbPath, id) {
             if (confirm("¿Estás seguro de eliminar este elemento?")) {
-                database.ref(tipo + '/' + id).remove();
+                database.ref(dbPath + '/' + id).remove();
             }
         }
     </script>
