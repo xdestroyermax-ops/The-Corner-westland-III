@@ -213,3 +213,580 @@
                                     <th class="p-2">Ítem</th>
                                     <th class="p-2 text-center">Tarifa</th>
                                     <th class="p-2 text-center w-16">Cant.</th>
+                                    <th class="p-2 text-right">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-compras-mexico" class="divide-y divide-amber-900/40"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="western-panel rounded-xl p-4 flex flex-col justify-between h-fit border-amber-700 space-y-4">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-amber-400 mb-3 border-b border-amber-900/60 pb-2 font-rustic">🛒 Pedido de Compra</h2>
+                        <div id="lista-resumen-compras" class="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs">
+                            <p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-amber-900/60 space-y-2">
+                        <div class="flex justify-between items-center text-amber-200/70 text-xs">
+                            <span>Total Productos:</span>
+                            <span id="total-items-compras" class="font-bold text-amber-100">0</span>
+                        </div>
+                        <div class="flex justify-between items-center text-lg md:text-xl font-black text-amber-400 font-rustic">
+                            <span>Coste Total:</span>
+                            <span id="total-precio-compras">$0.00</span>
+                        </div>
+
+                        <button id="btn-limpiar-compras" class="w-full bg-stone-900 hover:bg-stone-800 text-amber-200/80 font-bold py-2 rounded border border-amber-900/50 transition text-xs font-rustic">
+                            🗑️ Limpiar Pedido de Compra
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 3: GESTIÓN DE CARTA (BEBIDAS Y COMIDA) ================= -->
+        <div id="pantalla-bebidas" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🍻 Gestión de Carta (Bebidas y Comida)</h2>
+                
+                <form id="form-nueva-bebida" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Producto a la Carta</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <input type="text" id="bebida-nombre" placeholder="Nombre del producto" required class="sm:col-span-2 p-2 rounded text-xs">
+                        <select id="bebida-categoria" class="p-2 rounded text-xs">
+                            <option value="comida">🥩 Comida</option>
+                            <option value="bebida">🍺 Bebida</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Mín ($)</label>
+                            <input type="number" step="0.01" id="bebida-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Med ($)</label>
+                            <input type="number" step="0.01" id="bebida-med" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Máx ($)</label>
+                            <input type="number" step="0.01" id="bebida-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Producto</button>
+                </form>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="table-header uppercase font-rustic">
+                            <tr>
+                                <th class="p-2">Producto</th>
+                                <th class="p-2 text-center">Categoría</th>
+                                <th class="p-2 text-center">Mín / Med / Máx</th>
+                                <th class="p-2 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-gestion-bebidas" class="divide-y divide-amber-900/40"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 4: MENÚS (2 TARIFAS) ================= -->
+        <div id="pantalla-menus" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🍲 Carta de Menús</h2>
+                
+                <form id="form-nuevo-menu" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Menú</h3>
+                    <input type="text" id="menu-nombre" placeholder="Nombre del menú" required class="w-full p-2 rounded text-xs">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Mínimo ($)</label>
+                            <input type="number" step="0.01" id="menu-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Máximo ($)</label>
+                            <input type="number" step="0.01" id="menu-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Menú</button>
+                </form>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="table-header uppercase font-rustic">
+                            <tr>
+                                <th class="p-2">Menú</th>
+                                <th class="p-2 text-center">Mín / Máx</th>
+                                <th class="p-2 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-gestion-menus" class="divide-y divide-amber-900/40"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 5: HISTORIAL DE VENTAS ================= -->
+        <div id="pantalla-ventas" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4">
+                <h2 class="text-lg font-extrabold text-amber-400 mb-3 border-b border-amber-900/60 pb-2 font-rustic">📋 Registro de Ventas Recientes</h2>
+                <div id="lista-ventas-globales" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-amber-200/80">
+                    <p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay ventas registradas todavía.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DE FIREBASE Y LÓGICA -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1zSOscA5Ub4IRPVC0H15Lh5oAiMw5XpI",
+            authDomain: "taberna-san-denis.firebaseapp.com",
+            databaseURL: "https://taberna-san-denis-default-rtdb.firebaseio.com",
+            projectId: "taberna-san-denis",
+            storageBucket: "taberna-san-denis.firebasestorage.app",
+            messagingSenderId: "717455184090",
+            appId: "1:717455184090:web:9e36950620203cf61515e3",
+            measurementId: "G-C27RZFHQ7D"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // PRODUCTOS DE CRAFTEO AGRÍCOLA
+        const productosEEUU = {
+            "e1": { id: "e1", nombre: "Ajo", pMin: 0.10, pNorm: 0.15 },
+            "e2": { id: "e2", nombre: "Manzana", pMin: 0.10, pNorm: 0.15 },
+            "e3": { id: "e3", nombre: "Cebolla", pMin: 0.10, pNorm: 0.15 },
+            "e4": { id: "e4", nombre: "Algodón", pMin: 0.10, pNorm: 0.15 },
+            "e5": { id: "e5", nombre: "Heno", pMin: 0.10, pNorm: 0.15 },
+            "e6": { id: "e6", nombre: "Maíz", pMin: 0.10, pNorm: 0.15 },
+            "e7": { id: "e7", nombre: "Melocotón", pMin: 0.10, pNorm: 0.15 },
+            "e8": { id: "e8", nombre: "Patata", pMin: 0.10, pNorm: 0.15 },
+            "e9": { id: "e9", nombre: "Fresa", pMin: 0.10, pNorm: 0.15 },
+            "e10": { id: "e10", nombre: "Trigo", pMin: 0.10, pNorm: 0.15 },
+            "e11": { id: "e11", nombre: "Zanahoria", pMin: 0.10, pNorm: 0.15 },
+            "e12": { id: "e12", nombre: "Guisantes", pMin: 0.10, pNorm: 0.15 },
+            "e13": { id: "e13", nombre: "Tejocote", pMin: 0.10, pNorm: 0.15 },
+            "e14": { id: "e14", nombre: "Caña de Azúcar", pMin: 0.10, pNorm: 0.15 },
+            "e15": { id: "e15", nombre: "Mermelada de Fresa", pMin: 0.30, pNorm: 0.42 },
+            "e16": { id: "e16", nombre: "Mermelada de Melocotón", pMin: 0.30, pNorm: 0.42 },
+            "e17": { id: "e17", nombre: "Zumo de Manzana", pMin: 1.60, pNorm: 2.24 },
+            "e18": { id: "e18", nombre: "Azúcar", pMin: 0.10, pNorm: 0.15 },
+            "e19": { id: "e19", nombre: "Tela", pMin: 0.50, pNorm: 0.70 }
+        };
+
+        const productosMexico = {
+            "m1": { id: "m1", nombre: "Café", pMin: 0.10, pNorm: 0.15 },
+            "m2": { id: "m2", nombre: "Arroz", pMin: 0.10, pNorm: 0.15 },
+            "m3": { id: "m3", nombre: "Cacao", pMin: 0.10, pNorm: 0.15 },
+            "m4": { id: "m4", nombre: "Plátano", pMin: 0.10, pNorm: 0.15 },
+            "m5": { id: "m5", nombre: "Limón", pMin: 0.10, pNorm: 0.15 },
+            "m6": { id: "m6", nombre: "Tomate", pMin: 0.10, pNorm: 0.15 },
+            "m7": { id: "m7", nombre: "Naranja", pMin: 0.10, pNorm: 0.15 },
+            "m8": { id: "m8", nombre: "Aloe", pMin: 0.10, pNorm: 0.15 },
+            "m9": { id: "m9", nombre: "Judías", pMin: 0.10, pNorm: 0.15 },
+            "m10": { id: "m10", nombre: "Calabaza", pMin: 0.10, pNorm: 0.15 },
+            "m11": { id: "m11", nombre: "Caña de Azúcar", pMin: 0.10, pNorm: 0.15 },
+            "m12": { id: "m12", nombre: "Sandía", pMin: 0.10, pNorm: 0.15 },
+            "m13": { id: "m13", nombre: "Chile", pMin: 0.10, pNorm: 0.15 },
+            "m14": { id: "m14", nombre: "Mango", pMin: 0.10, pNorm: 0.15 },
+            "m15": { id: "m15", nombre: "Barril Zumo Mango", pMin: 1.60, pNorm: 2.24 },
+            "m16": { id: "m16", nombre: "Barril Zumo Naranja", pMin: 1.60, pNorm: 2.24 },
+            "m17": { id: "m17", nombre: "Barril Zumo Sandía", pMin: 1.60, pNorm: 2.24 },
+            "m18": { id: "m18", nombre: "Azúcar", pMin: 0.10, pNorm: 0.15 },
+            "m19": { id: "m19", nombre: "Tela", pMin: 0.50, pNorm: 0.70 }
+        };
+
+        const bebidasIniciales = {
+            "1": { id: "1", nombre: "Johnycake de Maíz", categoria: "comida", pMin: 1.17, pMed: 1.235, pNorm: 1.30 },
+            "2": { id: "2", nombre: "Patatas con Bacon", categoria: "comida", pMin: 1.35, pMed: 1.425, pNorm: 1.50 },
+            "3": { id: "3", nombre: "Huevos con Tomate", categoria: "comida", pMin: 0.90, pMed: 0.95, pNorm: 1.00 },
+            "4": { id: "4", nombre: "Cerveza de Barril", categoria: "bebida", pMin: 0.50, pMed: 0.70, pNorm: 0.90 },
+            "5": { id: "5", nombre: "Whisky Bourbon", categoria: "bebida", pMin: 0.80, pMed: 1.10, pNorm: 1.40 }
+        };
+
+        const menusIniciales = {
+            "men1": { id: "men1", nombre: "Último Capricho", pMin: 1.50, pNorm: 1.94 },
+            "men2": { id: "men2", nombre: "Medio Muerto", pMin: 1.30, pNorm: 1.78 },
+            "men3": { id: "men3", nombre: "Pienso Humano", pMin: 1.60, pNorm: 2.10 }
+        };
+
+        let bebidas = {};
+        let menus = {};
+        let pedidoBebidas = {};
+        let pedidoMenus = {};
+        let pedidoComprasEEUU = {};
+        let pedidoComprasMex = {};
+
+        function cambiarPantalla(pantalla) {
+            ['pedidos', 'compras', 'bebidas', 'menus', 'ventas'].forEach(p => {
+                const el = document.getElementById('pantalla-' + p);
+                const btn = document.getElementById('btn-tab-' + p);
+                if (el) el.classList.add('hidden');
+                if (btn) btn.classList.remove('active');
+            });
+
+            document.getElementById('pantalla-' + pantalla).classList.remove('hidden');
+            document.getElementById('btn-tab-' + pantalla).classList.add('active');
+        }
+
+        database.ref('bebidas').on('value', (s) => {
+            bebidas = s.val() || bebidasIniciales;
+            renderizarTodo();
+        });
+
+        database.ref('menus').on('value', (s) => {
+            menus = s.val() || menusIniciales;
+            renderizarTodo();
+        });
+
+        database.ref('ventas').limitToLast(10).on('value', (s) => {
+            const data = s.val();
+            const contenedor = document.getElementById('lista-ventas-globales');
+            contenedor.innerHTML = '';
+            if (!data) {
+                contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay ventas registradas.</p>';
+                return;
+            }
+            Object.values(data).reverse().forEach(v => {
+                contenedor.innerHTML += `
+                    <div class="bg-stone-900/80 border border-amber-900/40 p-3 rounded-lg shadow">
+                        <div class="flex justify-between font-bold text-amber-300 mb-1">
+                            <span>Venta #${v.id.toString().slice(-4)}</span>
+                            <span>$${v.total.toFixed(2)}</span>
+                        </div>
+                        <div class="text-[11px] text-amber-200/60 leading-tight">${v.resumen}</div>
+                        <div class="text-[9px] text-amber-500/50 mt-1">${v.fecha}</div>
+                    </div>`;
+            });
+        });
+
+        function renderizarTodo() {
+            // Render Pedidos (Separado en Bebidas y Comida)
+            const tbodyPedBeb = document.getElementById('tabla-pedido-bebidas');
+            const tbodyPedCom = document.getElementById('tabla-pedido-comida');
+            const tbodyGestBeb = document.getElementById('tabla-gestion-bebidas');
+            
+            tbodyPedBeb.innerHTML = '';
+            tbodyPedCom.innerHTML = '';
+            tbodyGestBeb.innerHTML = '';
+
+            Object.values(bebidas).forEach(b => {
+                const est = pedidoBebidas[b.id] || { cantidad: 0, tipoPrecio: 'norm' };
+                let p = est.tipoPrecio === 'min' ? b.pMin : (est.tipoPrecio === 'med' ? b.pMed : b.pNorm);
+                let sub = est.cantidad * p;
+                let cat = b.categoria || 'comida';
+
+                const filaHTML = `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${b.nombre}</td>
+                        <td class="p-2 text-center">
+                            <select onchange="cambiarPrecioBebida('${b.id}', this.value)" class="rounded text-[11px] p-1">
+                                <option value="min" ${est.tipoPrecio === 'min' ? 'selected' : ''}>Mín ($${b.pMin.toFixed(2)})</option>
+                                <option value="med" ${est.tipoPrecio === 'med' ? 'selected' : ''}>Med ($${b.pMed.toFixed(2)})</option>
+                                <option value="norm" ${est.tipoPrecio === 'norm' ? 'selected' : ''}>Máx ($${b.pNorm.toFixed(2)})</option>
+                            </select>
+                        </td>
+                        <td class="p-2 text-center">
+                            <input type="number" min="0" value="${est.cantidad}" onchange="cambiarCantBebida('${b.id}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
+                        </td>
+                        <td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td>
+                    </tr>`;
+
+                if (cat === 'bebida') {
+                    tbodyPedBeb.innerHTML += filaHTML;
+                } else {
+                    tbodyPedCom.innerHTML += filaHTML;
+                }
+
+                tbodyGestBeb.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${b.nombre}</td>
+                        <td class="p-2 text-center uppercase text-[10px] text-amber-400">${cat === 'bebida' ? '🍺 Bebida' : '🥩 Comida'}</td>
+                        <td class="p-2 text-center text-[10px] text-amber-200/70">$${b.pMin.toFixed(2)} / $${b.pMed.toFixed(2)} / $${b.pNorm.toFixed(2)}</td>
+                        <td class="p-2 text-center"><button onclick="eliminarBebida('${b.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
+                    </tr>`;
+            });
+
+            if (tbodyPedBeb.innerHTML === '') {
+                tbodyPedBeb.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-amber-200/40 italic">No hay bebidas en la carta</td></tr>';
+            }
+            if (tbodyPedCom.innerHTML === '') {
+                tbodyPedCom.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-amber-200/40 italic">No hay platos de comida en la carta</td></tr>';
+            }
+
+            // Render Venta Menús
+            const tbodyPedMen = document.getElementById('tabla-pedido-menus');
+            tbodyPedMen.innerHTML = '';
+            const tbodyGestMen = document.getElementById('tabla-gestion-menus');
+            tbodyGestMen.innerHTML = '';
+
+            Object.values(menus).forEach(m => {
+                const est = pedidoMenus[m.id] || { cantidad: 0, tipoPrecio: 'norm' };
+                let p = est.tipoPrecio === 'min' ? m.pMin : m.pNorm;
+                let sub = est.cantidad * p;
+
+                tbodyPedMen.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${m.nombre}</td>
+                        <td class="p-2 text-center">
+                            <select onchange="cambiarPrecioMenu('${m.id}', this.value)" class="rounded text-[11px] p-1">
+                                <option value="min" ${est.tipoPrecio === 'min' ? 'selected' : ''}>Mín ($${m.pMin.toFixed(2)})</option>
+                                <option value="norm" ${est.tipoPrecio === 'norm' ? 'selected' : ''}>Máx ($${m.pNorm.toFixed(2)})</option>
+                            </select>
+                        </td>
+                        <td class="p-2 text-center">
+                            <input type="number" min="0" value="${est.cantidad}" onchange="cambiarCantMenu('${m.id}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
+                        </td>
+                        <td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td>
+                    </tr>`;
+
+                tbodyGestMen.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${m.nombre}</td>
+                        <td class="p-2 text-center text-[10px] text-amber-200/70">$${m.pMin.toFixed(2)} / $${m.pNorm.toFixed(2)}</td>
+                        <td class="p-2 text-center"><button onclick="eliminarMenu('${m.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
+                    </tr>`;
+            });
+
+            // Render Compras EEUU
+            const tbodyEEUU = document.getElementById('tabla-compras-eeuu');
+            tbodyEEUU.innerHTML = '';
+            Object.values(productosEEUU).forEach(item => {
+                const est = pedidoComprasEEUU[item.id] || { cantidad: 0, tipoPrecio: 'min' };
+                let p = est.tipoPrecio === 'min' ? item.pMin : item.pNorm;
+                let sub = est.cantidad * p;
+
+                tbodyEEUU.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
+                        <td class="p-2 text-center">
+                            <select onchange="cambiarPrecioCompraEEUU('${item.id}', this.value)" class="rounded text-[11px] p-1">
+                                <option value="min" ${est.tipoPrecio === 'min' ? 'selected' : ''}>Mín ($${item.pMin.toFixed(2)})</option>
+                                <option value="norm" ${est.tipoPrecio === 'norm' ? 'selected' : ''}>Máx ($${item.pNorm.toFixed(2)})</option>
+                            </select>
+                        </td>
+                        <td class="p-2 text-center">
+                            <input type="number" min="0" value="${est.cantidad}" onchange="cambiarCantCompraEEUU('${item.id}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
+                        </td>
+                        <td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td>
+                    </tr>`;
+            });
+
+            // Render Compras México
+            const tbodyMex = document.getElementById('tabla-compras-mexico');
+            tbodyMex.innerHTML = '';
+            Object.values(productosMexico).forEach(item => {
+                const est = pedidoComprasMex[item.id] || { cantidad: 0, tipoPrecio: 'min' };
+                let p = est.tipoPrecio === 'min' ? item.pMin : item.pNorm;
+                let sub = est.cantidad * p;
+
+                tbodyMex.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
+                        <td class="p-2 text-center">
+                            <select onchange="cambiarPrecioCompraMex('${item.id}', this.value)" class="rounded text-[11px] p-1">
+                                <option value="min" ${est.tipoPrecio === 'min' ? 'selected' : ''}>Mín ($${item.pMin.toFixed(2)})</option>
+                                <option value="norm" ${est.tipoPrecio === 'norm' ? 'selected' : ''}>Máx ($${item.pNorm.toFixed(2)})</option>
+                            </select>
+                        </td>
+                        <td class="p-2 text-center">
+                            <input type="number" min="0" value="${est.cantidad}" onchange="cambiarCantCompraMex('${item.id}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
+                        </td>
+                        <td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td>
+                    </tr>`;
+            });
+
+            renderizarResumenVentas();
+            renderizarResumenCompras();
+        }
+
+        // Manejo Ventas
+        function cambiarCantBebida(id, val) {
+            if (!pedidoBebidas[id]) pedidoBebidas[id] = { cantidad: 0, tipoPrecio: 'norm' };
+            pedidoBebidas[id].cantidad = Math.max(0, parseInt(val) || 0);
+            renderizarTodo();
+        }
+        function cambiarPrecioBebida(id, tipo) {
+            if (!pedidoBebidas[id]) pedidoBebidas[id] = { cantidad: 0, tipoPrecio: 'norm' };
+            pedidoBebidas[id].tipoPrecio = tipo;
+            renderizarTodo();
+        }
+        function cambiarCantMenu(id, val) {
+            if (!pedidoMenus[id]) pedidoMenus[id] = { cantidad: 0, tipoPrecio: 'norm' };
+            pedidoMenus[id].cantidad = Math.max(0, parseInt(val) || 0);
+            renderizarTodo();
+        }
+        function cambiarPrecioMenu(id, tipo) {
+            if (!pedidoMenus[id]) pedidoMenus[id] = { cantidad: 0, tipoPrecio: 'norm' };
+            pedidoMenus[id].tipoPrecio = tipo;
+            renderizarTodo();
+        }
+
+        // Manejo Compras
+        function cambiarCantCompraEEUU(id, val) {
+            if (!pedidoComprasEEUU[id]) pedidoComprasEEUU[id] = { cantidad: 0, tipoPrecio: 'min' };
+            pedidoComprasEEUU[id].cantidad = Math.max(0, parseInt(val) || 0);
+            renderizarTodo();
+        }
+        function cambiarPrecioCompraEEUU(id, tipo) {
+            if (!pedidoComprasEEUU[id]) pedidoComprasEEUU[id] = { cantidad: 0, tipoPrecio: 'min' };
+            pedidoComprasEEUU[id].tipoPrecio = tipo;
+            renderizarTodo();
+        }
+
+        function cambiarCantCompraMex(id, val) {
+            if (!pedidoComprasMex[id]) pedidoComprasMex[id] = { cantidad: 0, tipoPrecio: 'min' };
+            pedidoComprasMex[id].cantidad = Math.max(0, parseInt(val) || 0);
+            renderizarTodo();
+        }
+        function cambiarPrecioCompraMex(id, tipo) {
+            if (!pedidoComprasMex[id]) pedidoComprasMex[id] = { cantidad: 0, tipoPrecio: 'min' };
+            pedidoComprasMex[id].tipoPrecio = tipo;
+            renderizarTodo();
+        }
+
+        function renderizarResumenVentas() {
+            const contenedor = document.getElementById('lista-resumen');
+            contenedor.innerHTML = '';
+            let totalAcc = 0, itemsAcc = 0, hay = false;
+
+            Object.values(bebidas).forEach(b => {
+                const item = pedidoBebidas[b.id];
+                if (item && item.cantidad > 0) {
+                    hay = true;
+                    let p = item.tipoPrecio === 'min' ? b.pMin : (item.tipoPrecio === 'med' ? b.pMed : b.pNorm);
+                    let sub = item.cantidad * p;
+                    totalAcc += sub; itemsAcc += item.cantidad;
+                    contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>${b.nombre} (${item.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
+                }
+            });
+
+            Object.values(menus).forEach(m => {
+                const item = pedidoMenus[m.id];
+                if (item && item.cantidad > 0) {
+                    hay = true;
+                    let p = item.tipoPrecio === 'min' ? m.pMin : m.pNorm;
+                    let sub = item.cantidad * p;
+                    totalAcc += sub; itemsAcc += item.cantidad;
+                    contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>${m.nombre} (${item.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
+                }
+            });
+
+            if (!hay) contenedor.innerHTML = '<p class="text-amber-200/40 italic text-center py-3">El pedido está vacío.</p>';
+            document.getElementById('total-items').textContent = itemsAcc;
+            document.getElementById('total-precio').textContent = `$${totalAcc.toFixed(2)}`;
+        }
+
+        function renderizarResumenCompras() {
+            const contenedor = document.getElementById('lista-resumen-compras');
+            contenedor.innerHTML = '';
+            let totalAcc = 0, itemsAcc = 0, hay = false;
+
+            Object.values(productosEEUU).forEach(item => {
+                const est = pedidoComprasEEUU[item.id];
+                if (est && est.cantidad > 0) {
+                    hay = true;
+                    let p = est.tipoPrecio === 'min' ? item.pMin : item.pNorm;
+                    let sub = est.cantidad * p;
+                    totalAcc += sub; itemsAcc += est.cantidad;
+                    contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>🇺🇸 ${item.nombre} (${est.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
+                }
+            });
+
+            Object.values(productosMexico).forEach(item => {
+                const est = pedidoComprasMex[item.id];
+                if (est && est.cantidad > 0) {
+                    hay = true;
+                    let p = est.tipoPrecio === 'min' ? item.pMin : item.pNorm;
+                    let sub = est.cantidad * p;
+                    totalAcc += sub; itemsAcc += est.cantidad;
+                    contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>🇲🇽 ${item.nombre} (${est.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
+                }
+            });
+
+            if (!hay) contenedor.innerHTML = '<p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>';
+            document.getElementById('total-items-compras').textContent = itemsAcc;
+            document.getElementById('total-precio-compras').textContent = `$${totalAcc.toFixed(2)}`;
+        }
+
+        // Acciones Cobrar y Limpiar
+        document.getElementById('btn-cobrar').addEventListener('click', () => {
+            let totalAcc = 0, resumen = [];
+            Object.values(bebidas).forEach(b => {
+                const i = pedidoBebidas[b.id];
+                if (i && i.cantidad > 0) {
+                    let p = i.tipoPrecio === 'min' ? b.pMin : (i.tipoPrecio === 'med' ? b.pMed : b.pNorm);
+                    totalAcc += i.cantidad * p;
+                    resumen.push(`${i.cantidad}x ${b.nombre}`);
+                }
+            });
+            Object.values(menus).forEach(m => {
+                const i = pedidoMenus[m.id];
+                if (i && i.cantidad > 0) {
+                    let p = i.tipoPrecio === 'min' ? m.pMin : m.pNorm;
+                    totalAcc += i.cantidad * p;
+                    resumen.push(`${i.cantidad}x ${m.nombre}`);
+                }
+            });
+
+            if (totalAcc === 0) { alert("No hay nada que cobrar."); return; }
+
+            database.ref('ventas').push({
+                id: Date.now(), total: totalAcc, resumen: resumen.join(', '),
+                fecha: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            });
+
+            pedidoBebidas = {}; pedidoMenus = {};
+            renderizarTodo();
+            alert("¡Venta registrada con éxito!");
+            cambiarPantalla('ventas');
+        });
+
+        document.getElementById('btn-limpiar').addEventListener('click', () => {
+            pedidoBebidas = {}; pedidoMenus = {};
+            renderizarTodo();
+        });
+
+        document.getElementById('btn-limpiar-compras').addEventListener('click', () => {
+            pedidoComprasEEUU = {}; pedidoComprasMex = {};
+            renderizarTodo();
+        });
+
+        // Formularios
+        document.getElementById('form-nueva-bebida').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('bebidas/' + id).set({
+                id,
+                nombre: document.getElementById('bebida-nombre').value.trim(),
+                categoria: document.getElementById('bebida-categoria').value,
+                pMin: parseFloat(document.getElementById('bebida-min').value),
+                pMed: parseFloat(document.getElementById('bebida-med').value),
+                pNorm: parseFloat(document.getElementById('bebida-norm').value)
+            });
+            this.reset(); alert("¡Producto añadido a la carta!");
+        });
+
+        document.getElementById('form-nuevo-menu').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('menus/' + id).set({
+                id, nombre: document.getElementById('menu-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('menu-min').value),
+                pNorm: parseFloat(document.getElementById('menu-norm').value)
+            });
+            this.reset(); alert("¡Menú añadido!");
+        });
+
+        function eliminarBebida(id) { if (confirm("¿Borrar?")) database.ref('bebidas/' + id).remove(); }
+        function eliminarMenu(id) { if (confirm("¿Borrar?")) database.ref('menus/' + id).remove(); }
+    </script>
+</body>
+</html>
