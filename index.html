@@ -168,10 +168,17 @@
                     </div>
                 </div>
 
-                <!-- RESUMEN Y REGISTRO DE FACTURA -->
+                <!-- RESUMEN, USUARIO Y REGISTRO DE FACTURA -->
                 <div class="western-panel rounded-xl p-4 flex flex-col justify-between h-fit border-amber-700 space-y-4">
                     <div>
-                        <h2 class="text-lg font-extrabold text-amber-400 mb-3 border-b border-amber-900/60 pb-2 font-rustic">🧾 Factura / Ticket</h2>
+                        <h2 class="text-lg font-extrabold text-amber-400 mb-2 border-b border-amber-900/60 pb-2 font-rustic">🧾 Factura / Ticket</h2>
+                        
+                        <!-- SELECCIÓN / IDENTIFICACIÓN DE USUARIO -->
+                        <div class="bg-stone-900/80 p-2.5 rounded-lg border border-amber-800/60 mb-3 space-y-1">
+                            <label class="text-[10px] text-amber-300 font-bold uppercase tracking-wider font-rustic block">👤 Usuario / Atendido por:</label>
+                            <input type="text" id="usuario-activo" placeholder="Ej: Nano33" class="w-full p-2 rounded text-xs font-bold text-amber-200 border-amber-700" onchange="guardarUsuarioMemoria(this.value)">
+                        </div>
+
                         <div id="lista-resumen-venta" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs">
                             <p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>
                         </div>
@@ -510,6 +517,16 @@
         let pedidoEEUU = {};
         let pedidoMex = {};
 
+        // GESTIÓN DE USUARIOS
+        function CargarUsuarioMemoria() {
+            const usr = localStorage.getItem('usuario_the_corner') || 'Nano33';
+            document.getElementById('usuario-activo').value = usr;
+        }
+
+        function guardarUsuarioMemoria(val) {
+            localStorage.setItem('usuario_the_corner', val.trim() || 'Empleado');
+        }
+
         function cambiarPantalla(pantalla) {
             ['ventas', 'pedidos', 'comida', 'bebida', 'menus', 'productos'].forEach(p => {
                 const el = document.getElementById('pantalla-' + p);
@@ -557,14 +574,18 @@
                 return;
             }
             Object.values(data).reverse().forEach(f => {
+                const usr = f.usuario ? f.usuario : 'Sin registro';
                 contenedor.innerHTML += `
-                    <div class="bg-stone-900/85 border border-amber-900/50 p-3 rounded-lg shadow">
-                        <div class="flex justify-between font-bold text-amber-300 mb-1">
+                    <div class="bg-stone-900/85 border border-amber-900/50 p-3 rounded-lg shadow space-y-1">
+                        <div class="flex justify-between items-center font-bold text-amber-300">
                             <span>Factura #${f.id.toString().slice(-4)}</span>
-                            <span class="font-mono text-amber-400">$${f.total.toFixed(2)}</span>
+                            <span class="font-mono text-amber-400 text-sm">$${f.total.toFixed(2)}</span>
                         </div>
-                        <div class="text-[11px] text-amber-200/70 leading-tight">${f.resumen}</div>
-                        <div class="text-[9px] text-amber-500/50 mt-1">${f.fecha}</div>
+                        <div class="text-[10px] text-amber-400/90 font-bold font-rustic bg-stone-950/60 px-2 py-0.5 rounded w-fit border border-amber-900/40">
+                            👤 Atendido por: <span class="text-amber-200">${usr}</span>
+                        </div>
+                        <div class="text-[11px] text-amber-200/70 leading-tight pt-1">${f.resumen}</div>
+                        <div class="text-[9px] text-amber-500/50 pt-1 border-t border-amber-900/20">${f.fecha}</div>
                     </div>`;
             });
         });
@@ -808,9 +829,10 @@
             renderizarTodo();
         }
 
-        // REGISTRAR VENTA Y FACTURA EN FIREBASE
+        // REGISTRAR VENTA Y FACTURA EN FIREBASE CON USUARIO
         document.getElementById('btn-registrar-venta').addEventListener('click', () => {
             let totalAcc = 0, resumenArray = [];
+            const usuarioNombre = document.getElementById('usuario-activo').value.trim() || 'Empleado';
 
             Object.values(comida).forEach(item => {
                 const est = ventaComida[item.id];
@@ -852,6 +874,7 @@
 
             const facturaData = {
                 id: Date.now(),
+                usuario: usuarioNombre,
                 total: totalAcc,
                 resumen: resumenArray.join(', '),
                 fecha: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + new Date().toLocaleDateString()
@@ -863,7 +886,7 @@
             ventaMenus = {};
             ventaProductos = {};
             renderizarTodo();
-            alert("¡Venta registrada y factura generada con éxito!");
+            alert(`¡Venta registrada por ${usuarioNombre} y factura generada!`);
         });
 
         document.getElementById('btn-limpiar-venta').addEventListener('click', () => {
@@ -935,6 +958,9 @@
                 database.ref(dbPath + '/' + id).remove();
             }
         }
+
+        // INICIALIZACIÓN
+        CargarUsuarioMemoria();
     </script>
 </body>
 </html>
