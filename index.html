@@ -73,7 +73,7 @@
         <!-- CABECERA PRINCIPAL CON LOGOTIPO -->
         <header class="text-center py-3 px-4 rounded-xl western-header flex flex-col items-center justify-center space-y-2">
             <div class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-amber-600 shadow-xl bg-stone-900 flex items-center justify-center">
-                <img src="logo.jpg" onerror="this.onerror=null; this.src='https://i.ibb.co/6y4f3v2/the-corner-logo.jpg';" alt="The Corner Logo" class="w-full h-full object-cover">
+                <img src="logo.jpg" alt="Logo The Corner" class="w-full h-full object-cover">
             </div>
             <div>
                 <div class="text-[10px] md:text-xs tracking-widest text-amber-600 font-bold uppercase">✦ Saint Denis • Est. 1880 ✦</div>
@@ -204,9 +204,23 @@
                 </div>
             </div>
 
-            <!-- HISTORIAL DE FACTURAS -->
+            <!-- HISTORIAL Y BÚSQUEDA DE FACTURAS -->
             <div class="western-panel rounded-xl p-4 space-y-3">
-                <h2 class="text-base font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📋 Registro Histórico de Facturas</h2>
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-amber-900/60 pb-2">
+                    <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Facturas</h2>
+                    
+                    <!-- BOTÓN PURGAR HISTORIAL COMPLETO (SÓLO ADMIN) -->
+                    <button onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition">
+                        🧹 Purga de Tickets (Admin)
+                    </button>
+                </div>
+
+                <!-- BUSCADOR DE TICKETS -->
+                <div class="bg-stone-900/70 p-2 rounded-lg border border-amber-900/40 flex items-center space-x-2">
+                    <span class="text-sm">🔍</span>
+                    <input type="text" id="buscador-tickets" placeholder="Buscar por usuario (ej: Nano33), #ticket o producto..." class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarTickets()">
+                </div>
+
                 <div id="lista-historial-facturas" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-amber-200/80">
                     <p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay facturas registradas todavía.</p>
                 </div>
@@ -437,6 +451,9 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // CLAVE DE ADMINISTRADOR PARA BORRAR FACTURAS
+        const CLAVE_ADMIN = "Ernano3322";
+
         // DATOS INICIALES Y CATÁLOGO
         const productosEEUU = {
             "e1": { id: "e1", nombre: "Ajo", pMin: 0.10, pNorm: 0.15 },
@@ -517,6 +534,8 @@
         let pedidoEEUU = {};
         let pedidoMex = {};
 
+        let listaFacturasGlobal = [];
+
         // GESTIÓN DE USUARIOS
         function CargarUsuarioMemoria() {
             const usr = localStorage.getItem('usuario_the_corner') || 'Nano33';
@@ -564,22 +583,47 @@
             renderizarTodo();
         });
 
-        database.ref('facturas').limitToLast(15).on('value', (s) => {
+        database.ref('facturas').on('value', (s) => {
             const data = s.val();
+            listaFacturasGlobal = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    listaFacturasGlobal.push({ ...data[key], keyFirebase: key });
+                });
+                listaFacturasGlobal.reverse();
+            }
+            renderizarFacturas();
+        });
+
+        function renderizarFacturas() {
             const contenedor = document.getElementById('lista-historial-facturas');
             if (!contenedor) return;
+            const filtro = (document.getElementById('buscador-tickets')?.value || '').toLowerCase().trim();
+
             contenedor.innerHTML = '';
-            if (!data) {
-                contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay facturas registradas todavía.</p>';
+            
+            const facturasFiltradas = listaFacturasGlobal.filter(f => {
+                const usr = (f.usuario || '').toLowerCase();
+                const num = (f.id || '').toString().toLowerCase();
+                const res = (f.resumen || '').toLowerCase();
+                return usr.includes(filtro) || num.includes(filtro) || res.includes(filtro);
+            });
+
+            if (facturasFiltradas.length === 0) {
+                contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-2 text-center py-4">No se encontraron facturas.</p>';
                 return;
             }
-            Object.values(data).reverse().forEach(f => {
+
+            facturasFiltradas.forEach(f => {
                 const usr = f.usuario ? f.usuario : 'Sin registro';
                 contenedor.innerHTML += `
-                    <div class="bg-stone-900/85 border border-amber-900/50 p-3 rounded-lg shadow space-y-1">
+                    <div class="bg-stone-900/85 border border-amber-900/50 p-3 rounded-lg shadow space-y-1 relative">
                         <div class="flex justify-between items-center font-bold text-amber-300">
                             <span>Factura #${f.id.toString().slice(-4)}</span>
-                            <span class="font-mono text-amber-400 text-sm">$${f.total.toFixed(2)}</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-mono text-amber-400 text-sm">$${f.total.toFixed(2)}</span>
+                                <button onclick="eliminarFacturaAdmin('${f.keyFirebase}')" title="Borrar Ticket (Admin)" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                            </div>
                         </div>
                         <div class="text-[10px] text-amber-400/90 font-bold font-rustic bg-stone-950/60 px-2 py-0.5 rounded w-fit border border-amber-900/40">
                             👤 Atendido por: <span class="text-amber-200">${usr}</span>
@@ -588,22 +632,47 @@
                         <div class="text-[9px] text-amber-500/50 pt-1 border-t border-amber-900/20">${f.fecha}</div>
                     </div>`;
             });
-        });
+        }
+
+        function filtrarTickets() {
+            renderizarFacturas();
+        }
+
+        // ELIMINAR UN TICKET INDIVIDUAL (SÓLO ADMIN)
+        function eliminarFacturaAdmin(keyFirebase) {
+            const pass = prompt("🔐 Introduce la contraseña de Administrador para borrar este ticket:");
+            if (pass === CLAVE_ADMIN) {
+                database.ref('facturas/' + keyFirebase).remove();
+                alert("¡Ticket eliminado correctamente!");
+            } else if (pass !== null) {
+                alert("❌ Contraseña incorrecta. No tienes permisos de administrador.");
+            }
+        }
+
+        // PURGA COMPLETA DEL HISTORIAL (SÓLO ADMIN)
+        function purgaHistorialAdmin() {
+            const pass = prompt("⚠️ PURGA DE FACTURAS ⚠️\nIntroduce la contraseña de Administrador para BORRAR TODO EL HISTORIAL:");
+            if (pass === CLAVE_ADMIN) {
+                if (confirm("¿Estás 100% seguro de que deseas purgar y eliminar TODAS las facturas registradas? Esta acción no se puede deshacer.")) {
+                    database.ref('facturas').remove();
+                    alert("¡Purga completada! Historial limpio.");
+                }
+            } else if (pass !== null) {
+                alert("❌ Contraseña incorrecta. Solo el Administrador puede realizar una purga.");
+            }
+        }
 
         function renderizarTodo() {
-            // 1. Tablas de Venta (Caja)
             renderTablaVenta('tabla-venta-comida', comida, ventaComida, 'comida');
             renderTablaVenta('tabla-venta-bebida', bebida, ventaBebida, 'bebida');
             renderTablaVenta('tabla-venta-menus', menus, ventaMenus, 'menu');
             renderTablaVenta('tabla-venta-productos', productos, ventaProductos, 'productos');
 
-            // 2. Tablas de Gestión
             renderTablaGestion('tabla-gestion-comida', comida, 'comida');
             renderTablaGestion('tabla-gestion-bebida', bebida, 'bebida');
             renderTablaGestionMenu('tabla-gestion-menus', menus);
             renderTablaGestion('tabla-gestion-productos', productos, 'productos_varios');
 
-            // 3. Tablas de Pedidos (EEUU y México)
             renderTablaPedidos('tabla-pedidos-eeuu', productosEEUU, pedidoEEUU, 'eeuu');
             renderTablaPedidos('tabla-pedidos-mexico', productosMexico, pedidoMex, 'mex');
 
@@ -716,7 +785,6 @@
             });
         }
 
-        // MANEJO DE ESTADOS DE VENTA
         function cambiarCantVenta(tipo, id, val) {
             let obj = tipo === 'comida' ? ventaComida : (tipo === 'bebida' ? ventaBebida : (tipo === 'menu' ? ventaMenus : ventaProductos));
             if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' };
@@ -730,7 +798,6 @@
             renderizarTodo();
         }
 
-        // MANEJO DE ESTADOS DE PEDIDOS
         function cambiarCantPedido(region, id, val) {
             let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex;
             if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' };
@@ -750,7 +817,6 @@
             contenedor.innerHTML = '';
             let totalAcc = 0, itemsAcc = 0, hay = false;
 
-            // Procesar Comida
             Object.values(comida).forEach(item => {
                 const est = ventaComida[item.id];
                 if (est && est.cantidad > 0) {
@@ -762,7 +828,6 @@
                 }
             });
 
-            // Procesar Bebida
             Object.values(bebida).forEach(item => {
                 const est = ventaBebida[item.id];
                 if (est && est.cantidad > 0) {
@@ -774,7 +839,6 @@
                 }
             });
 
-            // Procesar Menús
             Object.values(menus).forEach(item => {
                 const est = ventaMenus[item.id];
                 if (est && est.cantidad > 0) {
@@ -786,7 +850,6 @@
                 }
             });
 
-            // Procesar Productos Varios
             Object.values(productos).forEach(item => {
                 const est = ventaProductos[item.id];
                 if (est && est.cantidad > 0) {
@@ -829,7 +892,6 @@
             renderizarTodo();
         }
 
-        // REGISTRAR VENTA Y FACTURA EN FIREBASE CON USUARIO
         document.getElementById('btn-registrar-venta').addEventListener('click', () => {
             let totalAcc = 0, resumenArray = [];
             const usuarioNombre = document.getElementById('usuario-activo').value.trim() || 'Empleado';
@@ -897,7 +959,6 @@
             renderizarTodo();
         });
 
-        // FORMULARIOS DE ALTA
         document.getElementById('form-nueva-comida').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = Date.now().toString();
@@ -927,6 +988,7 @@
         });
 
         document.getElementById('form-nuevo-menu').addEventListener('submit', function(e) {
+            e.Registry = true;
             e.preventDefault();
             const id = Date.now().toString();
             database.ref('menus/' + id).set({
