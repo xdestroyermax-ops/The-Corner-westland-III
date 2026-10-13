@@ -218,10 +218,21 @@
                 </div>
             </div>
 
+            <!-- PANEL VISUAL DE HISTORIAL DE FICHAJES (SOLO ADMIN) -->
+            <div id="panel-fichajes-admin" class="western-panel rounded-xl p-4 space-y-3 hidden">
+                <div class="flex justify-between items-center border-b border-amber-900/60 pb-2">
+                    <h2 class="text-base font-extrabold text-amber-400 font-rustic">⏱️ Historial de Fichajes y Horas de Empleados</h2>
+                    <button onclick="cerrarPanelFichajes()" class="text-xs bg-stone-900 hover:bg-stone-800 text-amber-200 px-2 py-1 rounded border border-amber-800">✖ Cerrar</button>
+                </div>
+                <div id="galeria-fichajes-admin" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                    <p class="italic text-amber-200/40 col-span-full text-center py-3">No hay turnos finalizados aún.</p>
+                </div>
+            </div>
+
             <!-- HISTORIAL Y BÚSQUEDA DE FACTURAS -->
             <div class="western-panel rounded-xl p-4 space-y-3">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-amber-900/60 pb-2">
-                    <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Facturas y Fichajes</h2>
+                    <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Facturas</h2>
                     
                     <div class="flex flex-wrap gap-2">
                         <button onclick="verHistorialFichajesAdmin()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 border border-amber-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition">
@@ -763,7 +774,9 @@
                 Object.keys(data).forEach(key => {
                     listaFichajesGlobal.push({ ...data[key], keyFirebase: key });
                 });
+                listaFichajesGlobal.reverse();
             }
+            renderizarFichajesAdmin();
         });
 
         // LICENCIAS REALTIME
@@ -850,6 +863,57 @@
             });
         }
 
+        function renderizarFichajesAdmin() {
+            const galeria = document.getElementById('galeria-fichajes-admin');
+            if (!galeria) return;
+            galeria.innerHTML = '';
+
+            if (listaFichajesGlobal.length === 0) {
+                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-3">No hay turnos finalizados aún.</p>';
+                return;
+            }
+
+            listaFichajesGlobal.forEach(t => {
+                galeria.innerHTML += `
+                    <div class="bg-stone-950/80 border border-amber-900/50 p-3 rounded-lg shadow space-y-1">
+                        <div class="flex justify-between items-center border-b border-amber-900/30 pb-1">
+                            <span class="font-bold text-amber-300 font-rustic">👤 ${t.usuario}</span>
+                            <span class="font-mono text-emerald-400 font-bold">${t.horas}h</span>
+                        </div>
+                        <div class="text-[10px] text-amber-200/70 space-y-0.5 pt-1">
+                            <div>⏰ Inicio: ${t.inicioStr}</div>
+                            <div>🏁 Fin: ${t.finStr}</div>
+                            <div>🧾 Tickets: <span class="text-amber-300 font-bold">${t.tickets || 0}</span></div>
+                            <div>💰 Recaudación: <span class="text-amber-400 font-bold">$${(t.ventas || 0).toFixed(2)}</span></div>
+                        </div>
+                        <div class="flex justify-end gap-1 pt-1">
+                            <button onclick="copiarFichajeIndividual('${t.usuario}', '${t.inicioStr}', '${t.finStr}', '${t.horas}', '${t.tickets||0}', '${t.ventas||0}')" class="bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-[10px] px-2 py-0.5 rounded border border-indigo-700">📋 Copiar Discord</button>
+                            <button onclick="eliminarFichajeAdmin('${t.keyFirebase}')" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function copiarFichajeIndividual(usr, inicio, fin, hrs, tickets, ventas) {
+            const textoDiscord = "```md\n" +
+                                 "⏱️ **CONTROL DE FICHAJE - THE CORNER**\n" +
+                                 "-----------------------------------\n" +
+                                 "👤 **Empleado:** " + usr + "\n" +
+                                 "⏰ **Inicio:** " + inicio + "\n" +
+                                 "🏁 **Fin:** " + fin + "\n" +
+                                 "⏳ **Horas Trabajadas:** " + hrs + "h\n" +
+                                 "🧾 **Tickets Emitidos:** " + tickets + "\n" +
+                                 "💰 **Beneficio Generado:** $" + parseFloat(ventas).toFixed(2) + "\n" +
+                                 "```";
+            copiarTextoPortapapeles(textoDiscord);
+        }
+
+        function eliminarFichajeAdmin(keyFirebase) {
+            if (confirm("¿Deseas eliminar este registro de fichaje?")) {
+                database.ref('fichajes_historial/' + keyFirebase).remove();
+            }
+        }
+
         function filtrarTickets() {
             renderizarFacturas();
         }
@@ -882,22 +946,18 @@
             copiarTextoPortapapeles(texto);
         }
 
-        // VER HISTORIAL DE FICHAJES (ADMIN)
+        // VER Y DESPLEGAR PANEL DE FICHAJES (ADMIN)
         function verHistorialFichajesAdmin() {
             const pass = prompt("🔐 Introduce la contraseña de Administrador (SuperAdmin) para ver los fichajes:");
             if (pass === CLAVE_ADMIN) {
-                if (listaFichajesGlobal.length === 0) {
-                    alert("No hay registros de fichajes todavía.");
-                    return;
-                }
-                let reporte = "⏱️ REGISTRO DE FICHAJES Y TURNOS:\n\n";
-                listaFichajesGlobal.forEach(t => {
-                    reporte += `• Empleado: ${t.usuario} | Horas: ${t.horas}h | Ventas: $${t.ventas.toFixed(2)} | Inicio: ${t.inicioStr}\n`;
-                });
-                prompt("Copia el registro de fichajes:", reporte);
+                document.getElementById('panel-fichajes-admin').classList.remove('hidden');
             } else if (pass !== null) {
                 alert("❌ Contraseña incorrecta.");
             }
+        }
+
+        function cerrarPanelFichajes() {
+            document.getElementById('panel-fichajes-admin').classList.add('hidden');
         }
 
         // REGISTRAR PEDIDO EN CONTABILIDAD
