@@ -81,16 +81,13 @@
             </div>
         </header>
 
-        <!-- MENÚ DE NAVEGACIÓN (PESTAÑAS) -->
+        <!-- MENÚ DE NAVEGACIÓN (PESTAÑAS CON LICENCIAS AL FINAL) -->
         <div class="grid grid-cols-3 md:grid-cols-7 gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
             <button onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>💰</span> <span>Ventas</span>
             </button>
             <button onclick="cambiarPantalla('pedidos')" id="btn-tab-pedidos" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🌾</span> <span>Pedidos</span>
-            </button>
-            <button onclick="cambiarPantalla('licencias')" id="btn-tab-licencias" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
-                <span>📜</span> <span>Licencias</span>
             </button>
             <button onclick="cambiarPantalla('comida')" id="btn-tab-comida" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🥩</span> <span>Comida</span>
@@ -103,6 +100,9 @@
             </button>
             <button onclick="cambiarPantalla('productos')" id="btn-tab-productos" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>📦</span> <span>Productos</span>
+            </button>
+            <button onclick="cambiarPantalla('licencias')" id="btn-tab-licencias" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+                <span>📜</span> <span>Licencias</span>
             </button>
         </div>
 
@@ -215,7 +215,6 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-amber-900/60 pb-2">
                     <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Facturas</h2>
                     
-                    <!-- BOTÓN PURGAR HISTORIAL COMPLETO (SÓLO ADMIN) -->
                     <button onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition">
                         🧹 Purga de Tickets (Admin)
                     </button>
@@ -283,44 +282,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 3: LICENCIAS (ARCHIVADOR DE ROL) ================= -->
-        <div id="pantalla-licencias" class="space-y-4 hidden">
-            <div class="western-panel rounded-xl p-4 space-y-4">
-                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📜 Archivador de Licencias</h2>
-                
-                <form id="form-nueva-licencia" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
-                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Archivar Nueva Licencia</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">Titular / Nombre del Personaje</label>
-                            <input type="text" id="licencia-titular" placeholder="Ej: Nano33 / John Doe" required class="w-full p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">Tipo de Licencia</label>
-                            <select id="licencia-tipo" required class="w-full p-2 rounded text-xs">
-                                <option value="Licencia de Alcohol y Saloon">🍺 Alcohol / Saloon</option>
-                                <option value="Licencia de Armas">🔫 Armas</option>
-                                <option value="Licencia de Comercio">💼 Comercio</option>
-                                <option value="Licencia Sanitaria">⚕️ Sanidad / Medicina</option>
-                                <option value="Otro">📜 Otra Licencia</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-amber-200/70">URL de la Imagen de la Licencia (Imgur, Discord, ImgBB, etc.)</label>
-                        <input type="url" id="licencia-url" placeholder="https://i.imgur.com/ejemplo.png" required class="w-full p-2 rounded text-xs">
-                    </div>
-                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Guardar Licencia</button>
-                </form>
-
-                <!-- GALERÍA DE LICENCIAS ARCHIVADAS -->
-                <div id="galeria-licencias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <p class="italic text-amber-200/40 col-span-full text-center py-4">No hay licencias archivadas todavía.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= PANTALLA 4: COMIDA (GESTIÓN) ================= -->
+        <!-- ================= PANTALLA 3: COMIDA (GESTIÓN) ================= -->
         <div id="pantalla-comida" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🥩 Gestión de Comida (3 Tarifas)</h2>
@@ -360,7 +322,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 5: BEBIDA (GESTIÓN) ================= -->
+        <!-- ================= PANTALLA 4: BEBIDA (GESTIÓN) ================= -->
         <div id="pantalla-bebida" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🍺 Gestión de Bebidas (3 Tarifas)</h2>
@@ -400,7 +362,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 6: MENÚS (GESTIÓN) ================= -->
+        <!-- ================= PANTALLA 5: MENÚS (GESTIÓN) ================= -->
         <div id="pantalla-menus" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🍲 Gestión de Menús (2 Tarifas)</h2>
@@ -436,7 +398,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 7: PRODUCTOS (GESTIÓN) ================= -->
+        <!-- ================= PANTALLA 6: PRODUCTOS (GESTIÓN) ================= -->
         <div id="pantalla-productos" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📦 Gestión de Productos Varios (3 Tarifas)</h2>
@@ -472,6 +434,43 @@
                         </thead>
                         <tbody id="tabla-gestion-productos" class="divide-y divide-amber-900/40"></tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 7: LICENCIAS (ARCHIVADOR DE ROL) ================= -->
+        <div id="pantalla-licencias" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📜 Archivador de Licencias</h2>
+                
+                <form id="form-nueva-licencia" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Archivar Nueva Licencia</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">Titular / Nombre del Personaje</label>
+                            <input type="text" id="licencia-titular" placeholder="Ej: Nano33 / John Doe" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">Tipo de Licencia</label>
+                            <select id="licencia-tipo" required class="w-full p-2 rounded text-xs">
+                                <option value="Licencia de Alcohol y Saloon">🍺 Alcohol / Saloon</option>
+                                <option value="Licencia de Armas">🔫 Armas</option>
+                                <option value="Licencia de Comercio">💼 Comercio</option>
+                                <option value="Licencia Sanitaria">⚕️ Sanidad / Medicina</option>
+                                <option value="Otro">📜 Otra Licencia</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-amber-200/70">URL de la Imagen de la Licencia (Imgur, Discord, ImgBB, etc.)</label>
+                        <input type="url" id="licencia-url" placeholder="https://i.imgur.com/ejemplo.png" required class="w-full p-2 rounded text-xs">
+                    </div>
+                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Guardar Licencia</button>
+                </form>
+
+                <!-- GALERÍA DE LICENCIAS ARCHIVADAS -->
+                <div id="galeria-licencias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <p class="italic text-amber-200/40 col-span-full text-center py-4">No hay licencias archivadas todavía.</p>
                 </div>
             </div>
         </div>
@@ -597,8 +596,10 @@
                 if (btn) btn.classList.remove('active');
             });
 
-            document.getElementById('pantalla-' + pantalla).classList.remove('hidden');
-            document.getElementById('btn-tab-' + pantalla).classList.add('active');
+            const pTarget = document.getElementById('pantalla-' + pantalla);
+            const btnTarget = document.getElementById('btn-tab-' + pantalla);
+            if (pTarget) pTarget.classList.remove('hidden');
+            if (btnTarget) btnTarget.classList.add('active');
         }
 
         // SINCRONIZACIÓN FIREBASE
@@ -696,22 +697,29 @@
             facturasFiltradas.forEach(f => {
                 const usr = f.usuario ? f.usuario : 'Sin registro';
                 const idMostrado = f.codigoTicket || f.id;
-                contenedor.innerHTML += `
-                    <div class="bg-stone-900/85 border border-amber-900/50 p-3 rounded-lg shadow space-y-1 relative">
-                        <div class="flex justify-between items-center font-bold text-amber-300">
-                            <span>Factura #${idMostrado}</span>
-                            <div class="flex items-center space-x-1.5">
-                                <span class="font-mono text-amber-400 text-sm">$${f.total.toFixed(2)}</span>
-                                <button onclick="copiarTicketDiscordTexto('${usr}', '${idMostrado}', '${f.resumen}', ${f.total})" title="Copiar para Discord" class="bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-xs px-1.5 py-0.5 rounded border border-indigo-700">📋</button>
-                                <button onclick="eliminarFacturaAdmin('${f.keyFirebase}')" title="Borrar Ticket (Admin)" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
-                            </div>
+
+                const card = document.createElement('div');
+                card.className = 'bg-stone-900/85 border border-amber-900/50 p-3 rounded-lg shadow space-y-1 relative';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center font-bold text-amber-300">
+                        <span>Factura #${idMostrado}</span>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="font-mono text-amber-400 text-sm">$${f.total.toFixed(2)}</span>
+                            <button class="btn-copiar-factura bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-xs px-1.5 py-0.5 rounded border border-indigo-700" title="Copiar para Discord">📋</button>
+                            <button onclick="eliminarFacturaAdmin('${f.keyFirebase}')" title="Borrar Ticket (Admin)" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
                         </div>
-                        <div class="text-[10px] text-amber-400/90 font-bold font-rustic bg-stone-950/60 px-2 py-0.5 rounded w-fit border border-amber-900/40">
-                            👤 Atendido por: <span class="text-amber-200">${usr}</span>
-                        </div>
-                        <div class="text-[11px] text-amber-200/70 leading-tight pt-1">${f.resumen}</div>
-                        <div class="text-[9px] text-amber-500/50 pt-1 border-t border-amber-900/20">${f.fecha}</div>
-                    </div>`;
+                    </div>
+                    <div class="text-[10px] text-amber-400/90 font-bold font-rustic bg-stone-950/60 px-2 py-0.5 rounded w-fit border border-amber-900/40">
+                        👤 Atendido por: <span class="text-amber-200">${usr}</span>
+                    </div>
+                    <div class="text-[11px] text-amber-200/70 leading-tight pt-1">${f.resumen}</div>
+                    <div class="text-[9px] text-amber-500/50 pt-1 border-t border-amber-900/20">${f.fecha}</div>`;
+
+                card.querySelector('.btn-copiar-factura').addEventListener('click', () => {
+                    copiarTicketDiscordTexto(usr, idMostrado, f.resumen, f.total);
+                });
+
+                contenedor.appendChild(card);
             });
         }
 
@@ -719,24 +727,24 @@
             renderizarFacturas();
         }
 
-        // FUNCIONES DE COPIADO PARA DISCORD (CORREGIDAS SIN ERRORES DE SINTAXIS)
+        // FUNCIONES DE COPIADO A DISCORD
         function copiarTextoPortapapeles(texto) {
             navigator.clipboard.writeText(texto).then(() => {
                 alert("📋 ¡Factura copiada al portapapeles! Ya puedes pegarla en Discord.");
-            }).catch(err => {
+            }).catch(() => {
                 prompt("Copia este texto manualmente:", texto);
             });
         }
 
         function generarFormatoDiscord(usuario, codigo, resumenItems, total) {
-            const itemsFormateados = resumenItems.split(', ').map(i => "• " + i).join('\n');
+            const lineas = resumenItems.split(', ').map(i => "• " + i).join('\n');
             return "```md\n" +
                    "🧾 **THE CORNER - SAINT DENIS**\n" +
                    "👤 **Atendido por:** " + usuario + "\n" +
                    "📅 **Ticket:** #" + codigo + "\n" +
                    "-----------------------------------\n" +
                    "📦 **Detalle:**\n" +
-                   itemsFormateados + "\n" +
+                   lineas + "\n" +
                    "-----------------------------------\n" +
                    "💰 **TOTAL:** $" + total.toFixed(2) + "\n" +
                    "```";
