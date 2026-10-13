@@ -334,6 +334,18 @@
                 </div>
             </div>
 
+            <!-- PANEL 1: EMPLEADOS EN DIRECTO (NUEVO) -->
+            <div id="panel-directo-admin" class="western-panel rounded-xl p-4 space-y-3 hidden">
+                <div class="flex justify-between items-center border-b border-amber-900/60 pb-2">
+                    <h2 class="text-base font-extrabold text-amber-400 font-rustic">🔴 Empleados Fichados en Directo</h2>
+                    <button onclick="cerrarPanelDirecto()" class="text-xs bg-stone-900 hover:bg-stone-800 text-amber-200 px-2 py-1 rounded border border-amber-800">✖ Cerrar</button>
+                </div>
+                <div id="galeria-directo-admin" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                    <p class="italic text-amber-200/40 col-span-full text-center py-3">Cargando datos en directo...</p>
+                </div>
+            </div>
+
+            <!-- PANEL 2: HISTORIAL DE FICHAJES -->
             <div id="panel-fichajes-admin" class="western-panel rounded-xl p-4 space-y-3 hidden">
                 <div class="flex justify-between items-center border-b border-amber-900/60 pb-2">
                     <h2 class="text-base font-extrabold text-amber-400 font-rustic">⏱️ Historial de Fichajes y Horas de Empleados</h2>
@@ -348,7 +360,8 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-amber-900/60 pb-2">
                     <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Facturas</h2>
                     <div class="flex flex-wrap gap-2">
-                        <button id="btn-admin-fichajes" onclick="verHistorialFichajesAdmin()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 border border-amber-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">⏱️ Ver Fichajes (Admin)</button>
+                        <button id="btn-admin-directo" onclick="verEmpleadosDirectoAdmin()" class="bg-emerald-900 hover:bg-emerald-800 text-emerald-100 border border-emerald-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🔴 En Directo (Admin)</button>
+                        <button id="btn-admin-fichajes" onclick="verHistorialFichajesAdmin()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 border border-amber-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">⏱️ Ver Historial (Admin)</button>
                         <button id="btn-admin-balance" onclick="generarBalanceSemanalAdmin()" class="bg-indigo-900 hover:bg-indigo-800 text-indigo-100 border border-indigo-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">📊 Balance Semanal (Admin)</button>
                         <button id="btn-admin-purga" onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🧹 Purga (Admin)</button>
                     </div>
@@ -873,13 +886,15 @@
 
                     if (usuarioActualData.rol === 'admin') {
                         document.getElementById('btn-tab-aprobaciones').classList.remove('hidden');
+                        document.getElementById('btn-admin-directo').classList.remove('hidden');
                         document.getElementById('btn-admin-fichajes').classList.remove('hidden');
                         document.getElementById('btn-admin-balance').classList.remove('hidden');
                         document.getElementById('btn-admin-purga').classList.remove('hidden');
                         escucharUsuariosPendientes();
+                        escucharEmpleadosDirectoAdmin();
                     }
 
-                    // Escuchar el estado del fichaje en tiempo real desde Firebase (sincronizado entre dispositivos)
+                    // Escuchar el estado del fichaje en tiempo real desde Firebase
                     database.ref('usuarios/' + user.uid + '/turnoActivo').on('value', snap => {
                         turnoActivo = snap.val();
                         actualizarEstadoFichajeUI();
@@ -1168,7 +1183,75 @@
 
         setInterval(() => {
             if (turnoActivo) actualizarEstadoFichajeUI();
+            renderizarEmpleadosDirectoUI();
         }, 1000);
+
+        // LÓGICA DE EMPLEADOS EN DIRECTO PARA ADMIN
+        let usuariosDirectoGlobal = {};
+
+        function escucharEmpleadosDirectoAdmin() {
+            database.ref('usuarios').on('value', snapshot => {
+                usuariosDirectoGlobal = snapshot.val() || {};
+                renderizarEmpleadosDirectoUI();
+            });
+        }
+
+        function renderizarEmpleadosDirectoUI() {
+            const galeria = document.getElementById('galeria-directo-admin');
+            if (!galeria) return;
+
+            let hayAlguien = false;
+            let html = '';
+
+            Object.values(usuariosDirectoGlobal).forEach(usr => {
+                if (usr.turnoActivo) {
+                    hayAlguien = true;
+                    const ahora = Date.now();
+                    const diffMs = ahora - usr.turnoActivo.inicio;
+                    const horas = Math.floor(diffMs / (1000 * 60 * 60));
+                    const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const segundos = Math.floor((diffMs % (1000 * 60)) / 1000);
+                    const tiempoStr = `${String(horas).padStart(2,'0')}:${String(minutos).padStart(2,'0')}:${String(segundos).padStart(2,'0')}`;
+
+                    html += `
+                        <div class="bg-stone-950/80 border border-emerald-600/60 p-3 rounded-lg shadow space-y-2">
+                            <div class="flex justify-between items-center border-b border-amber-900/30 pb-1">
+                                <span class="font-bold text-amber-300 font-rustic text-xs">🟢 ${usr.nombre}</span>
+                                <span class="bg-emerald-950 text-emerald-400 font-mono text-[10px] px-1.5 py-0.5 rounded border border-emerald-700 font-bold">EN SERVICIO</span>
+                            </div>
+                            <div class="text-[10px] text-amber-200/70 space-y-1">
+                                <div>⏰ Entró a las: <span class="text-amber-300 font-bold">${usr.turnoActivo.fechaInicioStr}</span></div>
+                                <div>⏳ Tiempo Fichado: <span class="font-mono text-emerald-400 font-bold">${tiempoStr}</span></div>
+                            </div>
+                            <button onclick="forzarSalidaAdmin('${usr.uid}', '${usr.nombre}')" class="w-full bg-red-950 hover:bg-red-900 text-red-200 text-[10px] py-1 rounded border border-red-800 font-rustic font-bold transition">
+                                🛑 Forzar Salida / Desfichar
+                            </button>
+                        </div>`;
+                }
+            });
+
+            if (!hayAlguien) {
+                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-3">⚪ No hay ningún empleado en servicio en este momento.</p>';
+            } else {
+                galeria.innerHTML = html;
+            }
+        }
+
+        function verEmpleadosDirectoAdmin() {
+            document.getElementById('panel-directo-admin').classList.remove('hidden');
+        }
+
+        function cerrarPanelDirecto() {
+            document.getElementById('panel-directo-admin').classList.add('hidden');
+        }
+
+        function forzarSalidaAdmin(uid, nombre) {
+            if (confirm(`¿Estás seguro de forzar la salida de turno para ${nombre}?`)) {
+                database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => {
+                    alert(`🔴 Se ha sacado de servicio a ${nombre}.`);
+                });
+            }
+        }
 
         function renderizarFacturas() {
             const contenedor = document.getElementById('lista-historial-facturas');
