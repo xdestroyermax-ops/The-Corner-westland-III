@@ -137,7 +137,7 @@
             <div class="flex flex-wrap items-center justify-center md:justify-end gap-3">
                 <div class="bg-stone-950/90 border border-amber-600 px-3 py-1.5 rounded-lg text-center shadow-inner">
                     <span class="text-[9px] text-amber-400/80 uppercase font-bold font-rustic block">🪙 Dinero en Caja Total:</span>
-                    <span id="caja-total-display" class="text-base md:text-lg font-black text-emerald-400 font-mono tracking-wider">$118.20</span>
+                    <span id="caja-total-display" class="text-base md:text-lg font-black text-emerald-400 font-mono tracking-wider">$0.00</span>
                 </div>
 
                 <div class="flex items-center space-x-3 bg-stone-900/90 px-3 py-1.5 rounded-lg border border-amber-900/60 text-xs">
@@ -355,7 +355,8 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-amber-900/60 pb-2">
                     <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Facturas</h2>
                     <div class="flex flex-wrap gap-2">
-                        <button id="btn-admin-fichajes" onclick="verHistorialFichajesAdmin()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 border border-amber-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">⏱️ Ver Historial Turnos (Admin)</button>
+                        <button id="btn-admin-caja-base" onclick="modalAjustarCajaBase()" class="bg-emerald-900 hover:bg-emerald-800 text-emerald-100 border border-emerald-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🪙 Ajustar Base Caja (Admin)</button>
+                        <button id="btn-admin-fichajes" onclick="verHistorialFichajesAdmin()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 border border-amber-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">⏱️ Ver Turnos (Admin)</button>
                         <button id="btn-admin-balance" onclick="generarBalanceSemanalAdmin()" class="bg-indigo-900 hover:bg-indigo-800 text-indigo-100 border border-indigo-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">📊 Balance Semanal (Admin)</button>
                         <button id="btn-admin-purga" onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🧹 Purga (Admin)</button>
                     </div>
@@ -831,7 +832,7 @@
         const database = firebase.database();
 
         let usuarioActualData = null;
-        const CAJA_INICIAL_BASE = 194.88;
+        let CAJA_INICIAL_BASE = 0.00;
 
         const productosEEUUInicial = {
             "e1": { id: "e1", nombre: "Ajo", pMin: 0.10, pNorm: 0.15 },
@@ -1015,6 +1016,7 @@
                     if (usuarioActualData.rol === 'admin') {
                         document.getElementById('btn-tab-plantilla').classList.remove('hidden');
                         document.getElementById('btn-tab-aprobaciones').classList.remove('hidden');
+                        document.getElementById('btn-admin-caja-base').classList.remove('hidden');
                         document.getElementById('btn-admin-fichajes').classList.remove('hidden');
                         document.getElementById('btn-admin-balance').classList.remove('hidden');
                         document.getElementById('btn-admin-purga').classList.remove('hidden');
@@ -1092,6 +1094,20 @@
             if (btnTarget) btnTarget.classList.add('active');
         }
 
+        function modalAjustarCajaBase() {
+            const nuevoMonto = prompt("🪙 Ajustar saldo base inicial de la caja fuerte ($):", CAJA_INICIAL_BASE);
+            if (nuevoMonto !== null && nuevoMonto.trim() !== "") {
+                const val = parseFloat(nuevoMonto);
+                if (!isNaN(val)) {
+                    database.ref('configuracion/caja_base').set(val).then(() => {
+                        alert("¡Saldo base de caja actualizado correctamente!");
+                    });
+                } else {
+                    alert("Por favor, introduce un número válido.");
+                }
+            }
+        }
+
         function actualizarCajaTotalDisplay() {
             let totalVentas = 0;
             listaFacturasGlobal.forEach(f => { totalVentas += f.total; });
@@ -1112,6 +1128,16 @@
         }
 
         function iniciarSincronizacionApp() {
+            database.ref('configuracion/caja_base').on('value', (s) => {
+                const val = s.val();
+                if (val !== null && val !== undefined) {
+                    CAJA_INICIAL_BASE = parseFloat(val);
+                } else {
+                    database.ref('configuracion/caja_base').set(0.00);
+                }
+                actualizarCajaTotalDisplay();
+            });
+
             database.ref('comida').on('value', (s) => {
                 comida = s.val() || comidaInicial;
                 if (!s.val()) database.ref('comida').set(comidaInicial);
