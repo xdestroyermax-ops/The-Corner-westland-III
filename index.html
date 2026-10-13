@@ -68,7 +68,7 @@
 </head>
 <body class="p-2 md:p-8 min-h-screen font-serif-custom">
 
-    <!-- ================= PANTALLA DE AUTENTICACIÓN (LOGIN / REGISTRO) ================= -->
+    <!-- ================= PANTALLA DE AUTENTICACIÓN ================= -->
     <div id="seccion-auth" class="max-w-md mx-auto my-12 western-panel p-6 rounded-2xl space-y-6 shadow-2xl">
         <div class="text-center space-y-2">
             <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-amber-600 shadow-lg bg-stone-900 flex items-center justify-center">
@@ -133,15 +133,23 @@
                 </div>
             </div>
 
-            <div class="flex items-center space-x-3 bg-stone-900/90 px-3 py-1.5 rounded-lg border border-amber-900/60 text-xs">
-                <div>
-                    <span class="text-[10px] text-amber-400/70 block">Sesión activa:</span>
-                    <span id="user-display-name" class="font-bold text-amber-200 font-rustic">Cargando...</span>
-                    <span id="user-display-role" class="text-[9px] bg-amber-900/60 px-1 rounded text-amber-300 ml-1">Empleado</span>
+            <!-- BLOQUE DE CAJA TOTAL EN TIEMPO REAL & USUARIO -->
+            <div class="flex flex-wrap items-center justify-center md:justify-end gap-3">
+                <div class="bg-stone-950/90 border border-amber-600 px-3 py-1.5 rounded-lg text-center shadow-inner">
+                    <span class="text-[9px] text-amber-400/80 uppercase font-bold font-rustic block">🪙 Dinero en Caja Total:</span>
+                    <span id="caja-total-display" class="text-base md:text-lg font-black text-emerald-400 font-mono tracking-wider">$116.20</span>
                 </div>
-                <button onclick="cerrarSesion()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-800 text-[10px] px-2 py-1 rounded font-rustic">
-                    🚪 Salir
-                </button>
+
+                <div class="flex items-center space-x-3 bg-stone-900/90 px-3 py-1.5 rounded-lg border border-amber-900/60 text-xs">
+                    <div>
+                        <span class="text-[10px] text-amber-400/70 block">Sesión activa:</span>
+                        <span id="user-display-name" class="font-bold text-amber-200 font-rustic">Cargando...</span>
+                        <span id="user-display-role" class="text-[9px] bg-amber-900/60 px-1 rounded text-amber-300 ml-1">Empleado</span>
+                    </div>
+                    <button onclick="cerrarSesion()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-800 text-[10px] px-2 py-1 rounded font-rustic">
+                        🚪 Salir
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -696,6 +704,7 @@
         const database = firebase.database();
 
         let usuarioActualData = null;
+        const CAJA_INICIAL_BASE = 116.20;
 
         const productosEEUUInicial = {
             "e1": { id: "e1", nombre: "Ajo", pMin: 0.10, pNorm: 0.15 },
@@ -934,6 +943,25 @@
             if (btnTarget) btnTarget.classList.add('active');
         }
 
+        function actualizarCajaTotalDisplay() {
+            let totalVentas = 0;
+            listaFacturasGlobal.forEach(f => { totalVentas += f.total; });
+
+            let totalPedidos = 0;
+            listaPedidosGlobal.forEach(p => { totalPedidos += p.total; });
+
+            const dineroActual = CAJA_INICIAL_BASE + totalVentas - totalPedidos;
+            const el = document.getElementById('caja-total-display');
+            if (el) {
+                el.textContent = `$${dineroActual.toFixed(2)}`;
+                if (dineroActual < 0) {
+                    el.className = "text-base md:text-lg font-black text-red-400 font-mono tracking-wider";
+                } else {
+                    el.className = "text-base md:text-lg font-black text-emerald-400 font-mono tracking-wider";
+                }
+            }
+        }
+
         function iniciarSincronizacionApp() {
             database.ref('comida').on('value', (s) => {
                 comida = s.val() || comidaInicial;
@@ -987,6 +1015,7 @@
                     listaFacturasGlobal.reverse();
                 }
                 renderizarFacturas();
+                actualizarCajaTotalDisplay();
             });
 
             database.ref('pedidos_historial').on('value', (s) => {
@@ -999,6 +1028,7 @@
                     listaPedidosGlobal.reverse();
                 }
                 renderizarPedidosHistorial();
+                actualizarCajaTotalDisplay();
             });
 
             database.ref('fichajes_historial').on('value', (s) => {
@@ -1179,7 +1209,6 @@
             });
         }
 
-        // RENDERIZAR HISTORIAL DE PEDIDOS
         function renderizarPedidosHistorial() {
             const contenedor = document.getElementById('lista-historial-pedidos');
             if (!contenedor) return;
@@ -1222,9 +1251,7 @@
             });
         }
 
-        function filtrarPedidosHistorial() {
-            renderizarPedidosHistorial();
-        }
+        function filtrarPedidosHistorial() { renderizarPedidosHistorial(); }
 
         function eliminarPedidoAdmin(keyFirebase) {
             if (confirm("¿Estás seguro de eliminar este registro de pedido?")) {
@@ -1376,7 +1403,6 @@
         }
 
         function generarBalanceSemanalAdmin() {
-            const cajaInicial = 116.20;
             let totalVentas = 0;
             listaFacturasGlobal.forEach(f => { totalVentas += f.total; });
 
@@ -1386,12 +1412,12 @@
             let totalHorasTrabajadas = 0;
             listaFichajesGlobal.forEach(t => { totalHorasTrabajadas += parseFloat(t.horas || 0); });
 
-            const dineroEnCaja = cajaInicial + totalVentas - totalPedidos;
+            const dineroEnCaja = CAJA_INICIAL_BASE + totalVentas - totalPedidos;
 
             const textoDiscord = "```md\n" +
                                  "📊 **BALANCE SEMANAL - THE CORNER**\n" +
                                  "-----------------------------------\n" +
-                                 "🪙 **Caja Inicial:** $" + cajaInicial.toFixed(2) + "\n" +
+                                 "🪙 **Caja Inicial:** $" + CAJA_INICIAL_BASE.toFixed(2) + "\n" +
                                  "💰 **Total Ventas:** $" + totalVentas.toFixed(2) + "\n" +
                                  "📦 **Total Pedidos:** $" + totalPedidos.toFixed(2) + "\n" +
                                  "⏳ **Horas Totales:** " + totalHorasTrabajadas.toFixed(2) + "h\n" +
