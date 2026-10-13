@@ -81,7 +81,7 @@
             </div>
         </header>
 
-        <!-- MENÚ DE NAVEGACIÓN (PESTAÑAS CON LICENCIAS AL FINAL) -->
+        <!-- MENÚ DE NAVEGACIÓN (PESTAÑAS) -->
         <div class="grid grid-cols-3 md:grid-cols-7 gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
             <button onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>💰</span> <span>Ventas</span>
@@ -215,9 +215,14 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-amber-900/60 pb-2">
                     <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Facturas</h2>
                     
-                    <button onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition">
-                        🧹 Purga de Tickets (Admin)
-                    </button>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="generarBalanceSemanalAdmin()" class="bg-indigo-900 hover:bg-indigo-800 text-indigo-100 border border-indigo-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition">
+                            📊 Balance Semanal (Admin)
+                        </button>
+                        <button onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition">
+                            🧹 Purga (Admin)
+                        </button>
+                    </div>
                 </div>
 
                 <!-- BUSCADOR DE TICKETS -->
@@ -277,7 +282,10 @@
                     <div class="text-sm font-rustic font-bold text-amber-300">
                         Coste Total de Pedido: <span id="total-coste-pedidos" class="text-amber-400 font-mono text-base">$0.00</span>
                     </div>
-                    <button onclick="limpiarPedidos()" class="bg-stone-950 hover:bg-stone-800 text-amber-200 px-4 py-2 rounded border border-amber-900 text-xs font-rustic">🗑️ Limpiar Pedido</button>
+                    <div class="flex gap-2">
+                        <button onclick="registrarPedidoContabilidad()" class="bg-emerald-800 hover:bg-emerald-700 text-emerald-100 px-3 py-2 rounded border border-emerald-600 text-xs font-rustic font-bold">💾 Registrar Pedido</button>
+                        <button onclick="limpiarPedidos()" class="bg-stone-950 hover:bg-stone-800 text-amber-200 px-3 py-2 rounded border border-amber-900 text-xs font-rustic">🗑️ Limpiar</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -493,8 +501,8 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // CLAVE DE ADMINISTRADOR
-        const CLAVE_ADMIN = "Ernano3322";
+        // NUEVA CLAVE DE ADMINISTRADOR
+        const CLAVE_ADMIN = "SuperAdmin";
 
         // DATOS INICIALES Y CATÁLOGO
         const productosEEUU = {
@@ -577,6 +585,7 @@
         let pedidoMex = {};
 
         let listaFacturasGlobal = [];
+        let listaPedidosGlobal = [];
 
         // GESTIÓN DE USUARIOS
         function CargarUsuarioMemoria() {
@@ -637,6 +646,16 @@
                 listaFacturasGlobal.reverse();
             }
             renderizarFacturas();
+        });
+
+        database.ref('pedidos_historial').on('value', (s) => {
+            const data = s.val();
+            listaPedidosGlobal = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    listaPedidosGlobal.push({ ...data[key], keyFirebase: key });
+                });
+            }
         });
 
         // LICENCIAS REALTIME
@@ -730,7 +749,7 @@
         // FUNCIONES DE COPIADO A DISCORD
         function copiarTextoPortapapeles(texto) {
             navigator.clipboard.writeText(texto).then(() => {
-                alert("📋 ¡Factura copiada al portapapeles! Ya puedes pegarla en Discord.");
+                alert("📋 ¡Copiado al portapapeles con éxito! Ya puedes pegarlo en Discord.");
             }).catch(() => {
                 prompt("Copia este texto manualmente:", texto);
             });
@@ -809,19 +828,88 @@
             copiarTextoPortapapeles(texto);
         }
 
+        // REGISTRAR PEDIDO EN CONTABILIDAD
+        function registrarPedidoContabilidad() {
+            let totalCoste = 0, resumenArray = [];
+            Object.values(productosEEUU).forEach(item => {
+                const est = pedidoEEUU[item.id];
+                if (est && est.cantidad > 0) {
+                    let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                    totalCoste += est.cantidad * p;
+                    resumenArray.push(est.cantidad + "x " + item.nombre + " (EEUU)");
+                }
+            });
+            Object.values(productosMexico).forEach(item => {
+                const est = pedidoMex[item.id];
+                if (est && est.cantidad > 0) {
+                    let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                    totalCoste += est.cantidad * p;
+                    resumenArray.push(est.cantidad + "x " + item.nombre + " (Mex)");
+                }
+            });
+
+            if (totalCoste === 0) {
+                alert("No hay ningún producto en el pedido actual.");
+                return;
+            }
+
+            const ahora = new Date();
+            const pedidoData = {
+                id: Date.now(),
+                total: totalCoste,
+                resumen: resumenArray.join(', '),
+                fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
+            };
+
+            database.ref('pedidos_historial').push(pedidoData);
+            alert("¡Pedido registrado en la contabilidad correctamente!");
+            limpiarPedidos();
+        }
+
+        // BALANCE SEMANAL / CONTABILIDAD ADMIN
+        function generarBalanceSemanalAdmin() {
+            const pass = prompt("🔐 Introduce la contraseña de Administrador (SuperAdmin) para generar el balance:");
+            if (pass === CLAVE_ADMIN) {
+                let totalVentas = 0;
+                listaFacturasGlobal.forEach(f => {
+                    totalVentas += f.total;
+                });
+
+                let totalPedidos = 0;
+                listaPedidosGlobal.forEach(p => {
+                    totalPedidos += p.total;
+                });
+
+                const beneficioNeto = totalVentas - totalPedidos;
+
+                const textoDiscord = "```md\n" +
+                                     "📊 **BALANCE SEMANAL - THE CORNER**\n" +
+                                     "-----------------------------------\n" +
+                                     "💰 **Total Ventas:** $" + totalVentas.toFixed(2) + "\n" +
+                                     "📦 **Total Pedidos:** $" + totalPedidos.toFixed(2) + "\n" +
+                                     "-----------------------------------\n" +
+                                     "📈 **BENEFICIO NETO:** $" + beneficioNeto.toFixed(2) + "\n" +
+                                     "```";
+
+                copiarTextoPortapapeles(textoDiscord);
+            } else if (pass !== null) {
+                alert("❌ Contraseña incorrecta.");
+            }
+        }
+
         // BORRADO ADMIN
         function eliminarFacturaAdmin(keyFirebase) {
-            const pass = prompt("🔐 Introduce la contraseña de Administrador para borrar este ticket:");
+            const pass = prompt("🔐 Introduce la contraseña de Administrador (SuperAdmin) para borrar este ticket:");
             if (pass === CLAVE_ADMIN) {
                 database.ref('facturas/' + keyFirebase).remove();
                 alert("¡Ticket eliminado correctamente!");
             } else if (pass !== null) {
-                alert("❌ Contraseña incorrecta. No tienes permisos de administrador.");
+                alert("❌ Contraseña incorrecta.");
             }
         }
 
         function eliminarLicenciaAdmin(keyFirebase) {
-            const pass = prompt("🔐 Introduce la contraseña de Administrador para eliminar esta licencia:");
+            const pass = prompt("🔐 Introduce la contraseña de Administrador (SuperAdmin) para eliminar esta licencia:");
             if (pass === CLAVE_ADMIN) {
                 database.ref('licencias/' + keyFirebase).remove();
                 alert("¡Licencia eliminada correctamente!");
@@ -831,14 +919,14 @@
         }
 
         function purgaHistorialAdmin() {
-            const pass = prompt("⚠️ PURGA DE FACTURAS ⚠️\nIntroduce la contraseña de Administrador para BORRAR TODO EL HISTORIAL:");
+            const pass = prompt("⚠️ PURGA DE FACTURAS ⚠️\nIntroduce la contraseña de Administrador (SuperAdmin) para BORRAR TODO EL HISTORIAL:");
             if (pass === CLAVE_ADMIN) {
                 if (confirm("¿Estás 100% seguro de que deseas purgar y eliminar TODAS las facturas registradas? Esta acción no se puede deshacer.")) {
                     database.ref('facturas').remove();
                     alert("¡Purga completada! Historial limpio.");
                 }
             } else if (pass !== null) {
-                alert("❌ Contraseña incorrecta. Solo el Administrador puede realizar una purga.");
+                alert("❌ Contraseña incorrecta.");
             }
         }
 
