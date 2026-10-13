@@ -831,7 +831,7 @@
         const database = firebase.database();
 
         let usuarioActualData = null;
-        const CAJA_INICIAL_BASE = 194,88;
+        const CAJA_INICIAL_BASE = 118.20;
 
         const productosEEUUInicial = {
             "e1": { id: "e1", nombre: "Ajo", pMin: 0.10, pNorm: 0.15 },
@@ -1320,7 +1320,6 @@
             renderizarPlantillaAdminUI();
         }, 1000);
 
-        // LÓGICA PESTAÑA PLANTILLA (EXCLUSIVO ADMIN)
         let usuariosPlantillaGlobal = {};
 
         function escucharPlantillaAdmin() {
@@ -1405,7 +1404,6 @@
             }
         }
 
-        // ================= LÓGICA PESTAÑA CONVENIOS =================
         function actualizarSelectCategoriasConvenio() {
             const select = document.getElementById('select-categoria-convenio');
             if (!select) return;
@@ -1610,7 +1608,6 @@
             limpiarVentaConvenio();
         });
 
-        // ================= RENDERS GENERALES =================
         function renderizarFacturas() {
             const contenedor = document.getElementById('lista-historial-facturas');
             if (!contenedor) return;
