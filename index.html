@@ -482,11 +482,14 @@
                             </div>
                         </div>
 
-                        <!-- FORMULARIO CREAR NUEVO PRODUCTO EN CONVENIO -->
+                        <!-- FORMULARIO CREAR NUEVO PRODUCTO EN CONVENIO & BORRAR CATEGORÍA -->
                         <form id="form-nuevo-convenio-item" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
-                            <div class="flex justify-between items-center">
+                            <div class="flex flex-wrap justify-between items-center gap-2">
                                 <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Servicio/Producto a <span id="label-convenio-actual" class="text-amber-400">Médicos</span></h3>
-                                <button type="button" onclick="crearNuevaCategoriaConvenio()" class="text-[10px] bg-stone-950 hover:bg-stone-800 text-amber-300 px-2 py-1 rounded border border-amber-800">➕ Crear Nueva Categoria</button>
+                                <div class="flex gap-2">
+                                    <button type="button" onclick="crearNuevaCategoriaConvenio()" class="text-[10px] bg-stone-950 hover:bg-stone-800 text-amber-300 px-2 py-1 rounded border border-amber-800 font-rustic">➕ Crear Colectivo</button>
+                                    <button type="button" onclick="eliminarCategoriaConvenioActual()" class="text-[10px] bg-red-950 hover:bg-red-900 text-red-200 px-2 py-1 rounded border border-red-800 font-rustic">🗑️ Eliminar Colectivo</button>
+                                </div>
                             </div>
                             <div class="grid grid-cols-3 gap-2">
                                 <input type="text" id="convenio-item-nombre" placeholder="Nombre del servicio" required class="col-span-2 p-2 rounded text-xs">
@@ -1095,12 +1098,14 @@
         }
 
         function modalAjustarCajaBase() {
-            const nuevoMonto = prompt("🪙 Ajustar saldo base inicial de la caja fuerte ($):", CAJA_INICIAL_BASE);
-            if (nuevoMonto !== null && nuevoMonto.trim() !== "") {
-                const val = parseFloat(nuevoMonto);
+            const entrada = prompt("🪙 Ajustar saldo base inicial de la caja fuerte ($):", CAJA_INICIAL_BASE);
+            if (entrada !== null && entrada.trim() !== "") {
+                // Reemplazar comas por puntos para evitar fallos de parseo
+                const entradaLimpia = entrada.replace(',', '.').trim();
+                const val = parseFloat(entradaLimpia);
                 if (!isNaN(val)) {
                     database.ref('configuracion/caja_base').set(val).then(() => {
-                        alert("¡Saldo base de caja actualizado correctamente!");
+                        alert("¡Saldo base de caja actualizado correctamente a $" + val.toFixed(2) + "!");
                     });
                 } else {
                     alert("Por favor, introduce un número válido.");
@@ -1374,6 +1379,9 @@
             }
 
             listaUsuarios.forEach(usr => {
+                const esAdminActual = usuarioActualData && usuarioActualData.rol === 'admin';
+                const botonEliminarHTML = esAdminActual ? `<button onclick="eliminarEmpleadoAdmin('${usr.uid}', '${usr.nombre}')" class="w-full bg-red-950/80 hover:bg-red-900 text-red-200 text-[10px] py-1 rounded border border-red-800 font-rustic font-bold transition">🗑️ Eliminar Empleado</button>` : '';
+
                 if (usr.turnoActivo) {
                     enServicioCount++;
                     const ahora = Date.now();
@@ -1396,22 +1404,26 @@
                                 <div>⏰ Fichado desde: <span class="text-amber-300 font-bold">${usr.turnoActivo.fechaInicioStr}</span></div>
                                 <div>⏳ Tiempo Transcurrido: <span class="font-mono text-emerald-400 font-bold text-xs">${tiempoStr}</span></div>
                             </div>
-                            <button onclick="forzarSalidaAdmin('${usr.uid}', '${usr.nombre}')" class="w-full bg-red-950 hover:bg-red-900 text-red-200 text-[10px] py-1 rounded border border-red-800 font-rustic font-bold transition">
-                                🛑 Forzar Salida / Desfichar
-                            </button>
+                            <div class="flex flex-col gap-1">
+                                <button onclick="forzarSalidaAdmin('${usr.uid}', '${usr.nombre}')" class="w-full bg-amber-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-rustic font-bold transition">
+                                    🛑 Forzar Salida / Desfichar
+                                </button>
+                                ${botonEliminarHTML}
+                            </div>
                         </div>`;
                 } else {
                     fueraServicioCount++;
                     htmlFueraServicio += `
-                        <div class="bg-stone-900/60 border border-amber-900/40 p-3 rounded-xl space-y-2 opacity-80">
+                        <div class="bg-stone-900/60 border border-amber-900/40 p-3 rounded-xl space-y-2 opacity-90">
                             <div class="flex justify-between items-center border-b border-amber-900/30 pb-1">
                                 <div>
-                                    <span class="font-bold text-amber-200/80 font-rustic text-xs block">${usr.nombre}</span>
+                                    <span class="font-bold text-amber-200/90 font-rustic text-xs block">${usr.nombre}</span>
                                     <span class="text-[9px] text-amber-500/70">${usr.email}</span>
                                 </div>
                                 <span class="bg-stone-950 text-amber-200/40 font-mono text-[9px] px-2 py-0.5 rounded-full border border-amber-900/50">⚪ FUERA</span>
                             </div>
                             <div class="text-[10px] text-amber-200/40 italic">Empleado fuera de servicio actualmente.</div>
+                            ${botonEliminarHTML}
                         </div>`;
                 }
             });
@@ -1426,6 +1438,14 @@
             if (confirm(`¿Estás seguro de forzar la salida de turno para ${nombre}?`)) {
                 database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => {
                     alert(`🔴 Se ha sacado de servicio a ${nombre}.`);
+                });
+            }
+        }
+
+        function eliminarEmpleadoAdmin(uid, nombre) {
+            if (confirm(`⚠️ ¿Estás seguro de eliminar permanentemente al empleado "${nombre}" de la plantilla?`)) {
+                database.ref('usuarios/' + uid).remove().then(() => {
+                    alert(`🗑️ Se ha eliminado a ${nombre} de la plantilla.`);
                 });
             }
         }
@@ -1469,10 +1489,22 @@
                         categoriaConvenioActual = catFormateada;
                         actualizarSelectCategoriasConvenio();
                         renderizarTablaConvenio();
+                        alert(`¡Colectivo "${catFormateada}" creado con éxito!`);
                     });
                 } else {
                     alert("Esa categoría ya existe.");
                 }
+            }
+        }
+
+        function eliminarCategoriaConvenioActual() {
+            if (confirm(`⚠️ ¿Estás seguro de eliminar el colectivo completo "${categoriaConvenioActual}" y todos sus productos?`)) {
+                database.ref('convenios/' + categoriaConvenioActual).remove().then(() => {
+                    alert(`🗑️ Colectivo "${categoriaConvenioActual}" eliminado.`);
+                    categoriaConvenioActual = Object.keys(conveniosData).find(c => c !== categoriaConvenioActual) || "Médicos";
+                    actualizarSelectCategoriasConvenio();
+                    renderizarTablaConvenio();
+                });
             }
         }
 
