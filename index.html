@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Corner - Saint Denis | Calculadora en Tiempo Real</title>
+    <title>The Corner - Saint Denis | Sistema Integrado</title>
     <!-- Tailwind CSS desde CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase App & Realtime Database SDKs -->
+    <!-- Firebase App, Auth & Database SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
@@ -16,7 +17,6 @@
         .font-rustic { font-family: 'Cinzel', serif; }
         .font-serif-custom { font-family: 'Playfair Display', serif; }
 
-        /* FONDO DEL SALOON ÉPOCA 1880 */
         body { 
             background-color: #0e0906;
             background-image: linear-gradient(rgba(14, 9, 6, 0.70), rgba(8, 5, 3, 0.85)), 
@@ -68,21 +68,89 @@
 </head>
 <body class="p-2 md:p-8 min-h-screen font-serif-custom">
 
-    <div class="max-w-6xl mx-auto space-y-4">
-        
-        <!-- CABECERA PRINCIPAL CON LOGOTIPO -->
-        <header class="text-center py-3 px-4 rounded-xl western-header flex flex-col items-center justify-center space-y-2">
-            <div class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-amber-600 shadow-xl bg-stone-900 flex items-center justify-center">
+    <!-- ================= PANTALLA DE AUTENTICACIÓN (LOGIN / REGISTRO) ================= -->
+    <div id="seccion-auth" class="max-w-md mx-auto my-12 western-panel p-6 rounded-2xl space-y-6 shadow-2xl">
+        <div class="text-center space-y-2">
+            <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-amber-600 shadow-lg bg-stone-900 flex items-center justify-center">
                 <img src="logo.jpg" alt="Logo The Corner" class="w-full h-full object-cover">
             </div>
+            <h1 class="text-2xl font-black text-amber-500 font-rustic tracking-widest">THE CORNER</h1>
+            <p class="text-xs text-amber-200/70">Acceso Privado a la Gestión del Saloon</p>
+        </div>
+
+        <!-- TABS LOGIN / REGISTRO -->
+        <div class="flex border-b border-amber-900/60 text-xs font-rustic text-center">
+            <button onclick="switchAuthTab('login')" id="tab-auth-login" class="w-1/2 py-2 font-bold text-amber-400 border-b-2 border-amber-500">Iniciar Sesión</button>
+            <button onclick="switchAuthTab('registro')" id="tab-auth-registro" class="w-1/2 py-2 font-bold text-amber-200/50 border-b-2 border-transparent">Registrarse</button>
+        </div>
+
+        <!-- FORMULARIO LOGIN -->
+        <form id="form-login" class="space-y-4">
             <div>
-                <div class="text-[10px] md:text-xs tracking-widest text-amber-600 font-bold uppercase">✦ Saint Denis • Est. 1880 ✦</div>
-                <h1 class="text-2xl md:text-4xl font-black text-amber-500 font-rustic tracking-widest drop-shadow-md">THE CORNER</h1>
+                <label class="block text-[10px] uppercase font-bold text-amber-300 font-rustic mb-1">Correo Electrónico</label>
+                <input type="email" id="login-email" required placeholder="tuemail@ejemplo.com" class="w-full p-2.5 rounded text-xs">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-amber-300 font-rustic mb-1">Contraseña</label>
+                <input type="password" id="login-password" required placeholder="••••••••" class="w-full p-2.5 rounded text-xs">
+            </div>
+            <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2.5 rounded text-xs font-rustic border border-amber-600 shadow-md">
+                🔑 Iniciar Sesión
+            </button>
+        </form>
+
+        <!-- FORMULARIO REGISTRO -->
+        <form id="form-registro" class="space-y-3 hidden">
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-amber-300 font-rustic mb-1">Nombre de Personaje / Usuario</label>
+                <input type="text" id="reg-nombre" required placeholder="Ej: John Doe" class="w-full p-2.5 rounded text-xs">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-amber-300 font-rustic mb-1">Correo Electrónico</label>
+                <input type="email" id="reg-email" required placeholder="tuemail@ejemplo.com" class="w-full p-2.5 rounded text-xs">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-amber-300 font-rustic mb-1">Contraseña</label>
+                <input type="password" id="reg-password" required placeholder="Mínimo 6 caracteres" class="w-full p-2.5 rounded text-xs">
+            </div>
+            <p class="text-[10px] text-amber-400/80 italic text-center">⏳ Tras registrarte, tu cuenta deberá ser aprobada por un Administrador.</p>
+            <button type="submit" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2.5 rounded text-xs font-rustic border border-emerald-600 shadow-md">
+                📝 Enviar Solicitud de Registro
+            </button>
+        </form>
+
+        <div id="auth-mensaje" class="text-center text-xs font-bold py-1 hidden"></div>
+    </div>
+
+    <!-- ================= APLICACIÓN PRINCIPAL (RESTRINGIDA TRAS LOGIN) ================= -->
+    <div id="seccion-app" class="max-w-6xl mx-auto space-y-4 hidden">
+        
+        <!-- CABECERA PRINCIPAL CON LOGOTIPO Y PERFIL -->
+        <header class="py-3 px-4 rounded-xl western-header flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-600 shadow-xl bg-stone-900">
+                    <img src="logo.jpg" alt="Logo The Corner" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <div class="text-[9px] tracking-widest text-amber-600 font-bold uppercase">✦ Saint Denis • Est. 1880 ✦</div>
+                    <h1 class="text-xl md:text-2xl font-black text-amber-500 font-rustic tracking-widest">THE CORNER</h1>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3 bg-stone-900/90 px-3 py-1.5 rounded-lg border border-amber-900/60 text-xs">
+                <div>
+                    <span class="text-[10px] text-amber-400/70 block">Sesión activa:</span>
+                    <span id="user-display-name" class="font-bold text-amber-200 font-rustic">Cargando...</span>
+                    <span id="user-display-role" class="text-[9px] bg-amber-900/60 px-1 rounded text-amber-300 ml-1">Empleado</span>
+                </div>
+                <button onclick="cerrarSesion()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-800 text-[10px] px-2 py-1 rounded font-rustic">
+                    🚪 Salir
+                </button>
             </div>
         </header>
 
         <!-- MENÚ DE NAVEGACIÓN (PESTAÑAS) -->
-        <div class="grid grid-cols-3 md:grid-cols-7 gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
+        <div class="grid grid-cols-3 md:grid-cols-8 gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
             <button onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>💰</span> <span>Ventas</span>
             </button>
@@ -104,97 +172,131 @@
             <button onclick="cambiarPantalla('licencias')" id="btn-tab-licencias" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>📜</span> <span>Licencias</span>
             </button>
+            <button id="btn-tab-aprobaciones" onclick="cambiarPantalla('aprobaciones')" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
+                <span>👥</span> <span>Aprobar</span>
+            </button>
         </div>
 
         <!-- ================= PANTALLA 1: VENTAS / CAJA & FACTURA ================= -->
         <div id="pantalla-ventas" class="space-y-4">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div class="lg:col-span-2 western-panel rounded-xl p-3 md:p-5 space-y-4">
-                    <h2 class="text-base md:text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🥩 Comida y Platos</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs md:text-sm">
-                            <thead class="table-header uppercase font-rustic">
-                                <tr>
-                                    <th class="p-2">Plato</th>
-                                    <th class="p-2 text-center">Tarifa</th>
-                                    <th class="p-2 text-center w-16">Cant.</th>
-                                    <th class="p-2 text-right">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-venta-comida" class="divide-y divide-amber-900/40"></tbody>
-                        </table>
+                <div class="lg:col-span-2 space-y-4">
+                    
+                    <!-- BLOQUE COMIDA (MINIMIZABLE) -->
+                    <div class="western-panel rounded-xl p-3 md:p-4">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-comida')">
+                            <h2 class="text-base font-extrabold text-amber-400 font-rustic">🥩 Comida y Platos</h2>
+                            <button id="btn-sec-comida" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
+                        </div>
+                        <div id="sec-comida" class="overflow-x-auto pt-3">
+                            <table class="w-full text-left text-xs md:text-sm">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Plato</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-venta-comida" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <h2 class="text-base md:text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 pt-2 font-rustic">🍺 Bebidas</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs md:text-sm">
-                            <thead class="table-header uppercase font-rustic">
-                                <tr>
-                                    <th class="p-2">Bebida</th>
-                                    <th class="p-2 text-center">Tarifa</th>
-                                    <th class="p-2 text-center w-16">Cant.</th>
-                                    <th class="p-2 text-right">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-venta-bebida" class="divide-y divide-amber-900/40"></tbody>
-                        </table>
+                    <!-- BLOQUE BEBIDAS (MINIMIZABLE) -->
+                    <div class="western-panel rounded-xl p-3 md:p-4">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-bebida')">
+                            <h2 class="text-base font-extrabold text-amber-400 font-rustic">🍺 Bebidas</h2>
+                            <button id="btn-sec-bebida" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
+                        </div>
+                        <div id="sec-bebida" class="overflow-x-auto pt-3">
+                            <table class="w-full text-left text-xs md:text-sm">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Bebida</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-venta-bebida" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <h2 class="text-base md:text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 pt-2 font-rustic">🍲 Menús</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs md:text-sm">
-                            <thead class="table-header uppercase font-rustic">
-                                <tr>
-                                    <th class="p-2">Menú</th>
-                                    <th class="p-2 text-center">Tarifa</th>
-                                    <th class="p-2 text-center w-16">Cant.</th>
-                                    <th class="p-2 text-right">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-venta-menus" class="divide-y divide-amber-900/40"></tbody>
-                        </table>
+                    <!-- BLOQUE MENÚS (MINIMIZABLE) -->
+                    <div class="western-panel rounded-xl p-3 md:p-4">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-menus')">
+                            <h2 class="text-base font-extrabold text-amber-400 font-rustic">🍲 Menús</h2>
+                            <button id="btn-sec-menus" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
+                        </div>
+                        <div id="sec-menus" class="overflow-x-auto pt-3">
+                            <table class="w-full text-left text-xs md:text-sm">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Menú</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-venta-menus" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <h2 class="text-base md:text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 pt-2 font-rustic">📦 Varios Productos</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs md:text-sm">
-                            <thead class="table-header uppercase font-rustic">
-                                <tr>
-                                    <th class="p-2">Producto</th>
-                                    <th class="p-2 text-center">Tarifa</th>
-                                    <th class="p-2 text-center w-16">Cant.</th>
-                                    <th class="p-2 text-right">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-venta-productos" class="divide-y divide-amber-900/40"></tbody>
-                        </table>
+                    <!-- BLOQUE PRODUCTOS VARIOS (MINIMIZABLE) -->
+                    <div class="western-panel rounded-xl p-3 md:p-4">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-productos')">
+                            <h2 class="text-base font-extrabold text-amber-400 font-rustic">📦 Varios Productos</h2>
+                            <button id="btn-sec-productos" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
+                        </div>
+                        <div id="sec-productos" class="overflow-x-auto pt-3">
+                            <table class="w-full text-left text-xs md:text-sm">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Producto</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-venta-productos" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
                     </div>
+
                 </div>
 
                 <!-- RESUMEN, USUARIO, FICHAJE Y REGISTRO DE FACTURA -->
                 <div class="western-panel rounded-xl p-4 flex flex-col justify-between h-fit border-amber-700 space-y-4">
                     <div class="space-y-3">
-                        <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🧾 Factura / Ticket</h2>
-                        
-                        <!-- SELECCIÓN / IDENTIFICACIÓN DE USUARIO -->
-                        <div class="bg-stone-900/80 p-2.5 rounded-lg border border-amber-800/60 space-y-1">
-                            <label class="text-[10px] text-amber-300 font-bold uppercase tracking-wider font-rustic block">👤 Usuario / Atendido por:</label>
-                            <input type="text" id="usuario-activo" placeholder="Ej: Nano33" class="w-full p-2 rounded text-xs font-bold text-amber-200 border-amber-700" onchange="guardarUsuarioMemoria(this.value)">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-ticket')">
+                            <h2 class="text-lg font-extrabold text-amber-400 font-rustic">🧾 Factura / Ticket</h2>
+                            <button id="btn-sec-ticket" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
                         </div>
 
-                        <!-- SISTEMA DE FICHAJE DE SERVICIO -->
-                        <div class="bg-stone-950/80 p-3 rounded-lg border border-amber-900/60 space-y-2">
-                            <div class="flex justify-between items-center text-xs">
-                                <span class="font-bold text-amber-300 font-rustic">⏱️ Control de Fichaje:</span>
-                                <span id="estado-fichaje-text" class="text-[10px] text-amber-200/70">⚪ Fuera de servicio</span>
+                        <div id="sec-ticket" class="space-y-3">
+                            <!-- IDENTIFICACIÓN DE USUARIO -->
+                            <div class="bg-stone-900/80 p-2.5 rounded-lg border border-amber-800/60 space-y-1">
+                                <label class="text-[10px] text-amber-300 font-bold uppercase tracking-wider font-rustic block">👤 Usuario / Atendido por:</label>
+                                <input type="text" id="usuario-activo" readonly class="w-full p-2 rounded text-xs font-bold text-amber-200 border-amber-700 bg-stone-950/60">
                             </div>
-                            <button id="btn-fichaje" onclick="toggleFichaje()" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2 rounded text-xs border border-emerald-600 transition font-rustic shadow">
-                                🟢 Entrar de Servicio
-                            </button>
-                        </div>
 
-                        <div id="lista-resumen-venta" class="space-y-2 max-h-40 overflow-y-auto pr-1 text-xs">
-                            <p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>
+                            <!-- CONTROL DE FICHAJE -->
+                            <div class="bg-stone-950/80 p-3 rounded-lg border border-amber-900/60 space-y-2">
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="font-bold text-amber-300 font-rustic">⏱️ Control de Fichaje:</span>
+                                    <span id="estado-fichaje-text" class="text-[10px] text-amber-200/70">⚪ Fuera de servicio</span>
+                                </div>
+                                <button id="btn-fichaje" onclick="toggleFichaje()" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2 rounded text-xs border border-emerald-600 transition font-rustic shadow">
+                                    🟢 Entrar de Servicio
+                                </button>
+                            </div>
+
+                            <div id="lista-resumen-venta" class="space-y-2 max-h-40 overflow-y-auto pr-1 text-xs">
+                                <p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>
+                            </div>
                         </div>
                     </div>
 
@@ -235,13 +337,13 @@
                     <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Facturas</h2>
                     
                     <div class="flex flex-wrap gap-2">
-                        <button onclick="verHistorialFichajesAdmin()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 border border-amber-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition">
+                        <button id="btn-admin-fichajes" onclick="verHistorialFichajesAdmin()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 border border-amber-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">
                             ⏱️ Ver Fichajes (Admin)
                         </button>
-                        <button onclick="generarBalanceSemanalAdmin()" class="bg-indigo-900 hover:bg-indigo-800 text-indigo-100 border border-indigo-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition">
+                        <button id="btn-admin-balance" onclick="generarBalanceSemanalAdmin()" class="bg-indigo-900 hover:bg-indigo-800 text-indigo-100 border border-indigo-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">
                             📊 Balance Semanal (Admin)
                         </button>
-                        <button onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition">
+                        <button id="btn-admin-purga" onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">
                             🧹 Purga (Admin)
                         </button>
                     </div>
@@ -264,7 +366,6 @@
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🌾 Pedidos de Materia Prima (EEUU y México)</h2>
                 
-                <!-- FORMULARIOS PARA AÑADIR NUEVA MATERIA PRIMA -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-stone-900/60 p-3 rounded-xl border border-amber-900/40">
                     <form id="form-nuevo-pedido-eeuu" class="space-y-2">
                         <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Producto a EEUU</h3>
@@ -503,7 +604,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                         <div>
                             <label class="text-[10px] text-amber-200/70">Titular / Nombre del Personaje</label>
-                            <input type="text" id="licencia-titular" placeholder="Ej: Nano33 / John Doe" required class="w-full p-2 rounded text-xs">
+                            <input type="text" id="licencia-titular" placeholder="Ej: John Doe" required class="w-full p-2 rounded text-xs">
                         </div>
                         <div>
                             <label class="text-[10px] text-amber-200/70">Tipo de Licencia</label>
@@ -523,9 +624,18 @@
                     <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Guardar Licencia</button>
                 </form>
 
-                <!-- GALERÍA DE LICENCIAS ARCHIVADAS -->
                 <div id="galeria-licencias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <p class="italic text-amber-200/40 col-span-full text-center py-4">No hay licencias archivadas todavía.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 8: APROBACIONES (SOLO ADMIN) ================= -->
+        <div id="pantalla-aprobaciones" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">👥 Solicitudes de Aprobación de Usuarios</h2>
+                <div id="lista-usuarios-pendientes" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <p class="italic text-amber-200/40 col-span-full text-center py-4">No hay usuarios pendientes de aprobación.</p>
                 </div>
             </div>
         </div>
@@ -546,12 +656,12 @@
         };
 
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const database = firebase.database();
 
-        // CLAVE DE ADMINISTRADOR
-        const CLAVE_ADMIN = "SuperAdmin";
+        let usuarioActualData = null;
 
-        // DATOS INICIALES Y CATÁLOGO
+        // CATÁLOGOS INICIALES
         const productosEEUUInicial = {
             "e1": { id: "e1", nombre: "Ajo", pMin: 0.10, pNorm: 0.15 },
             "e2": { id: "e2", nombre: "Manzana", pMin: 0.10, pNorm: 0.15 },
@@ -618,38 +728,304 @@
             "p2": { id: "p2", nombre: "Tabaco de Mascar", pMin: 0.50, pMed: 0.75, pNorm: 1.00 }
         };
 
-        let comida = {};
-        let bebida = {};
-        let menus = {};
-        let productos = {};
-        let productosEEUU = {};
-        let productosMexico = {};
-        
-        let ventaComida = {};
-        let ventaBebida = {};
-        let ventaMenus = {};
-        let ventaProductos = {};
-        
-        let pedidoEEUU = {};
-        let pedidoMex = {};
+        let comida = {}, bebida = {}, menus = {}, productos = {}, productosEEUU = {}, productosMexico = {};
+        let ventaComida = {}, ventaBebida = {}, ventaMenus = {}, ventaProductos = {};
+        let pedidoEEUU = {}, pedidoMex = {};
+        let listaFacturasGlobal = [], listaPedidosGlobal = [], listaFichajesGlobal = [];
 
-        let listaFacturasGlobal = [];
-        let listaPedidosGlobal = [];
-        let listaFichajesGlobal = [];
-
-        // GESTIÓN DE USUARIOS Y FICHAJE
+        // FICHAJE
         let turnoActivo = JSON.parse(localStorage.getItem('turno_activo_the_corner')) || null;
 
-        function CargarUsuarioMemoria() {
-            const usr = localStorage.getItem('usuario_the_corner') || 'Nano33';
-            document.getElementById('usuario-activo').value = usr;
+        // FUNCIONES DE MINIMIZAR SECCIONES (ACORDEÓN)
+        function toggleSeccion(idSeccion) {
+            const sec = document.getElementById(idSeccion);
+            const btn = document.getElementById('btn-' + idSeccion);
+            if (!sec || !btn) return;
+
+            if (sec.classList.contains('hidden')) {
+                sec.classList.remove('hidden');
+                btn.textContent = '➖ Plegar';
+            } else {
+                sec.classList.add('hidden');
+                btn.textContent = '➕ Desplegar';
+            }
+        }
+
+        // SISTEMA DE AUTENTICACIÓN
+        function switchAuthTab(tab) {
+            const fLogin = document.getElementById('form-login');
+            const fReg = document.getElementById('form-registro');
+            const tLogin = document.getElementById('tab-auth-login');
+            const tReg = document.getElementById('tab-auth-registro');
+
+            if (tab === 'login') {
+                fLogin.classList.remove('hidden');
+                fReg.classList.add('hidden');
+                tLogin.className = 'w-1/2 py-2 font-bold text-amber-400 border-b-2 border-amber-500';
+                tReg.className = 'w-1/2 py-2 font-bold text-amber-200/50 border-b-2 border-transparent';
+            } else {
+                fLogin.classList.add('hidden');
+                fReg.classList.remove('hidden');
+                tReg.className = 'w-1/2 py-2 font-bold text-amber-400 border-b-2 border-amber-500';
+                tLogin.className = 'w-1/2 py-2 font-bold text-amber-200/50 border-b-2 border-transparent';
+            }
+        }
+
+        function mostrarMensajeAuth(msg, esError = false) {
+            const el = document.getElementById('auth-mensaje');
+            el.textContent = msg;
+            el.className = `text-center text-xs font-bold py-1 ${esError ? 'text-red-400' : 'text-emerald-400'}`;
+            el.classList.remove('hidden');
+        }
+
+        document.getElementById('form-login').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-password').value;
+            mostrarMensajeAuth("Verificando acceso...", false);
+
+            auth.signInWithEmailAndPassword(email, pass).catch(err => {
+                mostrarMensajeAuth("❌ Error de acceso: " + err.message, true);
+            });
+        });
+
+        document.getElementById('form-registro').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById('reg-nombre').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const pass = document.getElementById('reg-password').value;
+
+            auth.createUserWithEmailAndPassword(email, pass).then(cred => {
+                const uid = cred.user.uid;
+                database.ref('usuarios/' + uid).set({
+                    uid,
+                    nombre,
+                    email,
+                    aprobado: false,
+                    rol: 'empleado'
+                }).then(() => {
+                    auth.signOut();
+                    mostrarMensajeAuth("✅ Registro enviado. Espera a que un Administrador apruebe tu cuenta.", false);
+                    switchAuthTab('login');
+                });
+            }).catch(err => {
+                mostrarMensajeAuth("❌ Error al registrar: " + err.message, true);
+            });
+        });
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                database.ref('usuarios/' + user.uid).once('value', snapshot => {
+                    usuarioActualData = snapshot.val();
+                    if (!usuarioActualData) {
+                        auth.signOut();
+                        mostrarMensajeAuth("❌ Cuenta no encontrada en la base de datos.", true);
+                        return;
+                    }
+
+                    if (!usuarioActualData.aprobado && usuarioActualData.rol !== 'admin') {
+                        auth.signOut();
+                        mostrarMensajeAuth("⏳ Tu cuenta aún no ha sido aprobada por un Administrador.", true);
+                        return;
+                    }
+
+                    // ACCESO CONCEDIDO
+                    document.getElementById('seccion-auth').classList.add('hidden');
+                    document.getElementById('seccion-app').classList.remove('hidden');
+
+                    document.getElementById('user-display-name').textContent = usuarioActualData.nombre;
+                    document.getElementById('user-display-role').textContent = usuarioActualData.rol.toUpperCase();
+                    document.getElementById('usuario-activo').value = usuarioActualData.nombre;
+
+                    if (usuarioActualData.rol === 'admin') {
+                        document.getElementById('btn-tab-aprobaciones').classList.remove('hidden');
+                        document.getElementById('btn-admin-fichajes').classList.remove('hidden');
+                        document.getElementById('btn-admin-balance').classList.remove('hidden');
+                        document.getElementById('btn-admin-purga').classList.remove('hidden');
+                        escucharUsuariosPendientes();
+                    }
+
+                    iniciarSincronizacionApp();
+                });
+            } else {
+                document.getElementById('seccion-app').classList.add('hidden');
+                document.getElementById('seccion-auth').classList.remove('hidden');
+            }
+        });
+
+        function cerrarSesion() {
+            auth.signOut().then(() => {
+                location.reload();
+            });
+        }
+
+        function escucharUsuariosPendientes() {
+            database.ref('usuarios').on('value', s => {
+                const data = s.val();
+                const contenedor = document.getElementById('lista-usuarios-pendientes');
+                if (!contenedor) return;
+                contenedor.innerHTML = '';
+
+                if (!data) return;
+
+                let hay = false;
+                Object.values(data).forEach(u => {
+                    if (!u.aprobado && u.rol !== 'admin') {
+                        hay = true;
+                        contenedor.innerHTML += `
+                            <div class="bg-stone-900 border border-amber-900/60 p-3 rounded-lg flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-amber-300 font-rustic">${u.nombre}</div>
+                                    <div class="text-[10px] text-amber-500">${u.email}</div>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button onclick="aprobarUsuario('${u.uid}')" class="bg-emerald-800 hover:bg-emerald-700 text-emerald-100 px-2.5 py-1 rounded font-bold text-[10px]">🟢 Aprobar</button>
+                                    <button onclick="rechazarUsuario('${u.uid}')" class="bg-red-950 hover:bg-red-900 text-red-200 px-2 py-1 rounded text-[10px]">🔴 Rechazar</button>
+                                </div>
+                            </div>`;
+                    }
+                });
+
+                if (!hay) {
+                    contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay usuarios pendientes de aprobación.</p>';
+                }
+            });
+        }
+
+        function aprobarUsuario(uid) {
+            database.ref('usuarios/' + uid + '/aprobado').set(true);
+            alert("¡Usuario aprobado correctamente!");
+        }
+
+        function rechazarUsuario(uid) {
+            if (confirm("¿Rechazar y eliminar la solicitud de este usuario?")) {
+                database.ref('usuarios/' + uid).remove();
+            }
+        }
+
+        function cambiarPantalla(pantalla) {
+            ['ventas', 'pedidos', 'licencias', 'comida', 'bebida', 'menus', 'productos', 'aprobaciones'].forEach(p => {
+                const el = document.getElementById('pantalla-' + p);
+                const btn = document.getElementById('btn-tab-' + p);
+                if (el) el.classList.add('hidden');
+                if (btn) btn.classList.remove('active');
+            });
+
+            const pTarget = document.getElementById('pantalla-' + pantalla);
+            const btnTarget = document.getElementById('btn-tab-' + pantalla);
+            if (pTarget) pTarget.classList.remove('hidden');
+            if (btnTarget) btnTarget.classList.add('active');
+        }
+
+        function iniciarSincronizacionApp() {
+            database.ref('comida').on('value', (s) => {
+                comida = s.val() || comidaInicial;
+                if (!s.val()) database.ref('comida').set(comidaInicial);
+                renderizarTodo();
+            });
+
+            database.ref('bebida').on('value', (s) => {
+                bebida = s.val() || bebidaInicial;
+                if (!s.val()) database.ref('bebida').set(bebidaInicial);
+                renderizarTodo();
+            });
+
+            database.ref('menus').on('value', (s) => {
+                menus = s.val() || menusIniciales;
+                if (!s.val()) database.ref('menus').set(menusIniciales);
+                renderizarTodo();
+            });
+
+            database.ref('productos_varios').on('value', (s) => {
+                productos = s.val() || productosIniciales;
+                if (!s.val()) database.ref('productos_varios').set(productosIniciales);
+                renderizarTodo();
+            });
+
+            database.ref('pedidos_eeuu').on('value', (s) => {
+                productosEEUU = s.val() || productosEEUUInicial;
+                if (!s.val()) database.ref('pedidos_eeuu').set(productosEEUUInicial);
+                renderizarTodo();
+            });
+
+            database.ref('pedidos_mexico').on('value', (s) => {
+                productosMexico = s.val() || productosMexicoInicial;
+                if (!s.val()) database.ref('pedidos_mexico').set(productosMexicoInicial);
+                renderizarTodo();
+            });
+
+            database.ref('facturas').on('value', (s) => {
+                const data = s.val();
+                listaFacturasGlobal = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        listaFacturasGlobal.push({ ...data[key], keyFirebase: key });
+                    });
+                    listaFacturasGlobal.reverse();
+                }
+                renderizarFacturas();
+            });
+
+            database.ref('pedidos_historial').on('value', (s) => {
+                const data = s.val();
+                listaPedidosGlobal = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        listaPedidosGlobal.push({ ...data[key], keyFirebase: key });
+                    });
+                }
+            });
+
+            database.ref('fichajes_historial').on('value', (s) => {
+                const data = s.val();
+                listaFichajesGlobal = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        listaFichajesGlobal.push({ ...data[key], keyFirebase: key });
+                    });
+                    listaFichajesGlobal.reverse();
+                }
+                renderizarFichajesAdmin();
+            });
+
+            database.ref('licencias').on('value', (s) => {
+                const data = s.val();
+                const galeria = document.getElementById('galeria-licencias');
+                if (!galeria) return;
+                galeria.innerHTML = '';
+
+                if (!data) {
+                    galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay licencias archivadas todavía.</p>';
+                    return;
+                }
+
+                Object.keys(data).reverse().forEach(key => {
+                    const lic = data[key];
+                    galeria.innerHTML += `
+                        <div class="bg-stone-900/85 border border-amber-900/60 rounded-xl overflow-hidden shadow-lg flex flex-col justify-between">
+                            <div class="p-3 bg-stone-950/80 border-b border-amber-900/40 flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-amber-300 text-sm font-rustic">${lic.titular}</h4>
+                                    <span class="text-[10px] text-amber-500 font-semibold uppercase">${lic.tipo}</span>
+                                </div>
+                                <button onclick="eliminarLicenciaAdmin('${key}')" title="Borrar Licencia" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                            </div>
+                            <div class="p-2 bg-stone-900 flex justify-center items-center">
+                                <a href="${lic.url}" target="_blank">
+                                    <img src="${lic.url}" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x180?text=Error+al+cargar+imagen';" class="max-h-48 w-full object-contain rounded border border-amber-900/40 hover:opacity-90 transition">
+                                </a>
+                            </div>
+                            <div class="p-2 bg-stone-950/40 text-center border-t border-amber-900/30">
+                                <a href="${lic.url}" target="_blank" class="text-[10px] text-amber-400 hover:underline font-rustic">🔗 Ver Imagen Completa</a>
+                            </div>
+                        </div>`;
+                });
+            });
+
             actualizarEstadoFichajeUI();
         }
 
-        function guardarUsuarioMemoria(val) {
-            localStorage.setItem('usuario_the_corner', val.trim() || 'Empleado');
-        }
-
+        // CONTROL DE FICHAJE
         function actualizarEstadoFichajeUI() {
             const btnFichaje = document.getElementById('btn-fichaje');
             const estadoFichajeText = document.getElementById('estado-fichaje-text');
@@ -674,7 +1050,7 @@
         }
 
         function toggleFichaje() {
-            const usuarioNombre = document.getElementById('usuario-activo').value.trim() || 'Empleado';
+            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
             if (!turnoActivo) {
                 turnoActivo = {
                     usuario: usuarioNombre,
@@ -688,8 +1064,7 @@
                 const diffMs = fin - turnoActivo.inicio;
                 const totalHoras = (diffMs / (1000 * 60 * 60)).toFixed(2);
                 
-                let ventasTurno = 0;
-                let cantidadTickets = 0;
+                let ventasTurno = 0, cantidadTickets = 0;
                 listaFacturasGlobal.forEach(f => {
                     if (f.usuario.toLowerCase() === turnoActivo.usuario.toLowerCase() && f.id >= turnoActivo.inicio) {
                         ventasTurno += f.total;
@@ -733,126 +1108,6 @@
             if (turnoActivo) actualizarEstadoFichajeUI();
         }, 1000);
 
-        function cambiarPantalla(pantalla) {
-            ['ventas', 'pedidos', 'licencias', 'comida', 'bebida', 'menus', 'productos'].forEach(p => {
-                const el = document.getElementById('pantalla-' + p);
-                const btn = document.getElementById('btn-tab-' + p);
-                if (el) el.classList.add('hidden');
-                if (btn) btn.classList.remove('active');
-            });
-
-            const pTarget = document.getElementById('pantalla-' + pantalla);
-            const btnTarget = document.getElementById('btn-tab-' + pantalla);
-            if (pTarget) pTarget.classList.remove('hidden');
-            if (btnTarget) btnTarget.classList.add('active');
-        }
-
-        // SINCRONIZACIÓN FIREBASE
-        database.ref('comida').on('value', (s) => {
-            comida = s.val() || comidaInicial;
-            if (!s.val()) database.ref('comida').set(comidaInicial);
-            renderizarTodo();
-        });
-
-        database.ref('bebida').on('value', (s) => {
-            bebida = s.val() || bebidaInicial;
-            if (!s.val()) database.ref('bebida').set(bebidaInicial);
-            renderizarTodo();
-        });
-
-        database.ref('menus').on('value', (s) => {
-            menus = s.val() || menusIniciales;
-            if (!s.val()) database.ref('menus').set(menusIniciales);
-            renderizarTodo();
-        });
-
-        database.ref('productos_varios').on('value', (s) => {
-            productos = s.val() || productosIniciales;
-            if (!s.val()) database.ref('productos_varios').set(productosIniciales);
-            renderizarTodo();
-        });
-
-        database.ref('pedidos_eeuu').on('value', (s) => {
-            productosEEUU = s.val() || productosEEUUInicial;
-            if (!s.val()) database.ref('pedidos_eeuu').set(productosEEUUInicial);
-            renderizarTodo();
-        });
-
-        database.ref('pedidos_mexico').on('value', (s) => {
-            productosMexico = s.val() || productosMexicoInicial;
-            if (!s.val()) database.ref('pedidos_mexico').set(productosMexicoInicial);
-            renderizarTodo();
-        });
-
-        database.ref('facturas').on('value', (s) => {
-            const data = s.val();
-            listaFacturasGlobal = [];
-            if (data) {
-                Object.keys(data).forEach(key => {
-                    listaFacturasGlobal.push({ ...data[key], keyFirebase: key });
-                });
-                listaFacturasGlobal.reverse();
-            }
-            renderizarFacturas();
-        });
-
-        database.ref('pedidos_historial').on('value', (s) => {
-            const data = s.val();
-            listaPedidosGlobal = [];
-            if (data) {
-                Object.keys(data).forEach(key => {
-                    listaPedidosGlobal.push({ ...data[key], keyFirebase: key });
-                });
-            }
-        });
-
-        database.ref('fichajes_historial').on('value', (s) => {
-            const data = s.val();
-            listaFichajesGlobal = [];
-            if (data) {
-                Object.keys(data).forEach(key => {
-                    listaFichajesGlobal.push({ ...data[key], keyFirebase: key });
-                });
-                listaFichajesGlobal.reverse();
-            }
-            renderizarFichajesAdmin();
-        });
-
-        // LICENCIAS REALTIME
-        database.ref('licencias').on('value', (s) => {
-            const data = s.val();
-            const galeria = document.getElementById('galeria-licencias');
-            if (!galeria) return;
-            galeria.innerHTML = '';
-
-            if (!data) {
-                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay licencias archivadas todavía.</p>';
-                return;
-            }
-
-            Object.keys(data).reverse().forEach(key => {
-                const lic = data[key];
-                galeria.innerHTML += `
-                    <div class="bg-stone-900/85 border border-amber-900/60 rounded-xl overflow-hidden shadow-lg flex flex-col justify-between">
-                        <div class="p-3 bg-stone-950/80 border-b border-amber-900/40 flex justify-between items-center">
-                            <div>
-                                <h4 class="font-bold text-amber-300 text-sm font-rustic">${lic.titular}</h4>
-                                <span class="text-[10px] text-amber-500 font-semibold uppercase">${lic.tipo}</span>
-                            </div>
-                            <button onclick="eliminarLicenciaAdmin('${key}')" title="Borrar Licencia" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
-                        </div>
-                        <div class="p-2 bg-stone-900 flex justify-center items-center">
-                            <a href="${lic.url}" target="_blank" title="Haz clic para ver imagen completa">
-                                <img src="${lic.url}" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x180?text=Error+al+cargar+imagen';" class="max-h-48 w-full object-contain rounded border border-amber-900/40 hover:opacity-90 transition">
-                            </a>
-                        </div>
-                        <div class="p-2 bg-stone-950/40 text-center border-t border-amber-900/30">
-                            <a href="${lic.url}" target="_blank" class="text-[10px] text-amber-400 hover:underline font-rustic">🔗 Ver Imagen Completa</a>
-                        </div>
-                    </div>`;
-            });
-        });
-
         function renderizarFacturas() {
             const contenedor = document.getElementById('lista-historial-facturas');
             if (!contenedor) return;
@@ -885,7 +1140,7 @@
                         <div class="flex items-center space-x-1.5">
                             <span class="font-mono text-amber-400 text-sm">$${f.total.toFixed(2)}</span>
                             <button class="btn-copiar-factura bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-xs px-1.5 py-0.5 rounded border border-indigo-700" title="Copiar para Discord">📋</button>
-                            <button onclick="eliminarFacturaAdmin('${f.keyFirebase}')" title="Borrar Ticket (Admin)" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                            ${usuarioActualData && usuarioActualData.rol === 'admin' ? `<button onclick="eliminarFacturaAdmin('${f.keyFirebase}')" title="Borrar Ticket" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>` : ''}
                         </div>
                     </div>
                     <div class="text-[10px] text-amber-400/90 font-bold font-rustic bg-stone-950/60 px-2 py-0.5 rounded w-fit border border-amber-900/40">
@@ -957,7 +1212,6 @@
             renderizarFacturas();
         }
 
-        // FUNCIONES DE COPIADO A DISCORD
         function copiarTextoPortapapeles(texto) {
             navigator.clipboard.writeText(texto).then(() => {
                 alert("📋 ¡Copiado al portapapeles con éxito! Ya puedes pegarlo en Discord.");
@@ -985,21 +1239,14 @@
             copiarTextoPortapapeles(texto);
         }
 
-        // VER Y DESPLEGAR PANEL DE FICHAJES (ADMIN)
         function verHistorialFichajesAdmin() {
-            const pass = prompt("🔐 Introduce la contraseña de Administrador (SuperAdmin) para ver los fichajes:");
-            if (pass === CLAVE_ADMIN) {
-                document.getElementById('panel-fichajes-admin').classList.remove('hidden');
-            } else if (pass !== null) {
-                alert("❌ Contraseña incorrecta.");
-            }
+            document.getElementById('panel-fichajes-admin').classList.remove('hidden');
         }
 
         function cerrarPanelFichajes() {
             document.getElementById('panel-fichajes-admin').classList.add('hidden');
         }
 
-        // REGISTRAR PEDIDO EN CONTABILIDAD
         function registrarPedidoContabilidad() {
             let totalCoste = 0, resumenArray = [];
             Object.values(productosEEUU).forEach(item => {
@@ -1037,73 +1284,47 @@
             limpiarPedidos();
         }
 
-        // BALANCE SEMANAL / CONTABILIDAD ADMIN
         function generarBalanceSemanalAdmin() {
-            const pass = prompt("🔐 Introduce la contraseña de Administrador (SuperAdmin) para generar el balance:");
-            if (pass === CLAVE_ADMIN) {
-                let totalVentas = 0;
-                listaFacturasGlobal.forEach(f => {
-                    totalVentas += f.total;
-                });
+            let totalVentas = 0;
+            listaFacturasGlobal.forEach(f => { totalVentas += f.total; });
 
-                let totalPedidos = 0;
-                listaPedidosGlobal.forEach(p => {
-                    totalPedidos += p.total;
-                });
+            let totalPedidos = 0;
+            listaPedidosGlobal.forEach(p => { totalPedidos += p.total; });
 
-                let totalHorasTrabajadas = 0;
-                listaFichajesGlobal.forEach(t => {
-                    totalHorasTrabajadas += parseFloat(t.horas || 0);
-                });
+            let totalHorasTrabajadas = 0;
+            listaFichajesGlobal.forEach(t => { totalHorasTrabajadas += parseFloat(t.horas || 0); });
 
-                const beneficioNeto = totalVentas - totalPedidos;
+            const beneficioNeto = totalVentas - totalPedidos;
 
-                const textoDiscord = "```md\n" +
-                                     "📊 **BALANCE SEMANAL - THE CORNER**\n" +
-                                     "-----------------------------------\n" +
-                                     "💰 **Total Ventas:** $" + totalVentas.toFixed(2) + "\n" +
-                                     "📦 **Total Pedidos:** $" + totalPedidos.toFixed(2) + "\n" +
-                                     "⏳ **Horas Totales:** " + totalHorasTrabajadas.toFixed(2) + "h\n" +
-                                     "-----------------------------------\n" +
-                                     "📈 **BENEFICIO NETO:** $" + beneficioNeto.toFixed(2) + "\n" +
-                                     "```";
+            const textoDiscord = "```md\n" +
+                                 "📊 **BALANCE SEMANAL - THE CORNER**\n" +
+                                 "-----------------------------------\n" +
+                                 "💰 **Total Ventas:** $" + totalVentas.toFixed(2) + "\n" +
+                                 "📦 **Total Pedidos:** $" + totalPedidos.toFixed(2) + "\n" +
+                                 "⏳ **Horas Totales:** " + totalHorasTrabajadas.toFixed(2) + "h\n" +
+                                 "-----------------------------------\n" +
+                                 "📈 **BENEFICIO NETO:** $" + beneficioNeto.toFixed(2) + "\n" +
+                                 "```";
 
-                copiarTextoPortapapeles(textoDiscord);
-            } else if (pass !== null) {
-                alert("❌ Contraseña incorrecta.");
-            }
+            copiarTextoPortapapeles(textoDiscord);
         }
 
-        // BORRADO ADMIN
         function eliminarFacturaAdmin(keyFirebase) {
-            const pass = prompt("🔐 Introduce la contraseña de Administrador (SuperAdmin) para borrar este ticket:");
-            if (pass === CLAVE_ADMIN) {
+            if (confirm("¿Estás seguro de eliminar este ticket?")) {
                 database.ref('facturas/' + keyFirebase).remove();
-                alert("¡Ticket eliminado correctamente!");
-            } else if (pass !== null) {
-                alert("❌ Contraseña incorrecta.");
             }
         }
 
         function eliminarLicenciaAdmin(keyFirebase) {
-            const pass = prompt("🔐 Introduce la contraseña de Administrador (SuperAdmin) para eliminar esta licencia:");
-            if (pass === CLAVE_ADMIN) {
+            if (confirm("¿Estás seguro de eliminar esta licencia?")) {
                 database.ref('licencias/' + keyFirebase).remove();
-                alert("¡Licencia eliminada correctamente!");
-            } else if (pass !== null) {
-                alert("❌ Contraseña incorrecta.");
             }
         }
 
         function purgaHistorialAdmin() {
-            const pass = prompt("⚠️ PURGA DE FACTURAS ⚠️\nIntroduce la contraseña de Administrador (SuperAdmin) para BORRAR TODO EL HISTORIAL:");
-            if (pass === CLAVE_ADMIN) {
-                if (confirm("¿Estás 100% seguro de que deseas purgar y eliminar TODAS las facturas registradas? Esta acción no se puede deshacer.")) {
-                    database.ref('facturas').remove();
-                    alert("¡Purga completada! Historial limpio.");
-                }
-            } else if (pass !== null) {
-                alert("❌ Contraseña incorrecta.");
+            if (confirm("⚠️ ¿Estás 100% seguro de que deseas purgar y eliminar TODAS las facturas registradas?")) {
+                database.ref('facturas').remove();
+                alert("¡Purga completada! Historial limpio.");
             }
         }
 
@@ -1337,15 +1558,13 @@
         }
 
         function limpiarPedidos() {
-            pedidoEEUU = {};
-            pedidoMex = {};
+            pedidoEEUU = {}; pedidoMex = {};
             renderizarTodo();
         }
 
-        // REGISTRAR VENTA Y COPIAR
         document.getElementById('btn-registrar-venta').addEventListener('click', () => {
             let totalAcc = 0, resumenArray = [];
-            const usuarioNombre = document.getElementById('usuario-activo').value.trim() || 'Empleado';
+            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
 
             Object.values(comida).forEach(item => {
                 const est = ventaComida[item.id];
@@ -1404,26 +1623,18 @@
 
             database.ref('facturas').push(facturaData);
 
-            // Copiar a Discord automáticamente
             const textoDiscord = generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), totalAcc);
             copiarTextoPortapapeles(textoDiscord);
 
-            ventaComida = {};
-            ventaBebida = {};
-            ventaMenus = {};
-            ventaProductos = {};
+            ventaComida = {}; ventaBebida = {}; ventaMenus = {}; ventaProductos = {};
             renderizarTodo();
         });
 
         document.getElementById('btn-limpiar-venta').addEventListener('click', () => {
-            ventaComida = {};
-            ventaBebida = {};
-            ventaMenus = {};
-            ventaProductos = {};
+            ventaComida = {}; ventaBebida = {}; ventaMenus = {}; ventaProductos = {};
             renderizarTodo();
         });
 
-        // FORMULARIOS ALTA MATERIA PRIMA (PEDIDOS EEUU / MEX)
         document.getElementById('form-nuevo-pedido-eeuu').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = 'e_' + Date.now().toString();
@@ -1450,7 +1661,6 @@
             alert("¡Producto añadido a México!");
         });
 
-        // FORMULARIO DE LICENCIAS
         document.getElementById('form-nueva-licencia').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = Date.now().toString();
@@ -1464,7 +1674,6 @@
             alert("¡Licencia archivada correctamente!");
         });
 
-        // FORMULARIOS DE ALTA PRODUCTOS EN VENTA
         document.getElementById('form-nueva-comida').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = Date.now().toString();
@@ -1525,9 +1734,6 @@
                 database.ref(dbPath + '/' + id).remove();
             }
         }
-
-        // INICIALIZACIÓN
-        CargarUsuarioMemoria();
     </script>
 </body>
 </html>
