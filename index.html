@@ -137,7 +137,7 @@
             <div class="flex flex-wrap items-center justify-center md:justify-end gap-3">
                 <div class="bg-stone-950/90 border border-amber-600 px-3 py-1.5 rounded-lg text-center shadow-inner">
                     <span class="text-[9px] text-amber-400/80 uppercase font-bold font-rustic block">🪙 Dinero en Caja Total:</span>
-                    <span id="caja-total-display" class="text-base md:text-lg font-black text-emerald-400 font-mono tracking-wider">$116.20</span>
+                    <span id="caja-total-display" class="text-base md:text-lg font-black text-emerald-400 font-mono tracking-wider">$118.20</span>
                 </div>
 
                 <div class="flex items-center space-x-3 bg-stone-900/90 px-3 py-1.5 rounded-lg border border-amber-900/60 text-xs">
@@ -704,7 +704,7 @@
         const database = firebase.database();
 
         let usuarioActualData = null;
-        const CAJA_INICIAL_BASE = 120.10;
+        const CAJA_INICIAL_BASE = 118.20;
 
         const productosEEUUInicial = {
             "e1": { id: "e1", nombre: "Ajo", pMin: 0.10, pNorm: 0.15 },
@@ -779,7 +779,7 @@
         let ventaComida = {}, ventaBebidaNormal = {}, ventaBebidaAlcohol = {}, ventaMenus = {}, ventaProductos = {};
         let pedidoEEUU = {}, pedidoMex = {};
         let listaFacturasGlobal = [], listaPedidosGlobal = [], listaFichajesGlobal = [];
-        let turnoActivo = JSON.parse(localStorage.getItem('turno_activo_the_corner')) || null;
+        let turnoActivo = null;
 
         function toggleSeccion(idSeccion) {
             const sec = document.getElementById(idSeccion);
@@ -878,6 +878,13 @@
                         document.getElementById('btn-admin-purga').classList.remove('hidden');
                         escucharUsuariosPendientes();
                     }
+
+                    // Escuchar el estado del fichaje en tiempo real desde Firebase (sincronizado entre dispositivos)
+                    database.ref('usuarios/' + user.uid + '/turnoActivo').on('value', snap => {
+                        turnoActivo = snap.val();
+                        actualizarEstadoFichajeUI();
+                    });
+
                     iniciarSincronizacionApp();
                 });
             } else {
@@ -1104,15 +1111,19 @@
         }
 
         function toggleFichaje() {
+            if (!auth.currentUser) return;
+            const uid = auth.currentUser.uid;
             const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
+
             if (!turnoActivo) {
-                turnoActivo = {
+                const nuevoTurno = {
                     usuario: usuarioNombre,
                     inicio: Date.now(),
                     fechaInicioStr: new Date().toLocaleString()
                 };
-                localStorage.setItem('turno_activo_the_corner', JSON.stringify(turnoActivo));
-                alert(`🟢 ¡Has entrado de servicio, ${usuarioNombre}! Buen turno.`);
+                database.ref('usuarios/' + uid + '/turnoActivo').set(nuevoTurno).then(() => {
+                    alert(`🟢 ¡Has entrado de servicio, ${usuarioNombre}! Buen turno.`);
+                });
             } else {
                 const fin = Date.now();
                 const diffMs = fin - turnoActivo.inicio;
@@ -1137,25 +1148,22 @@
                 };
 
                 database.ref('fichajes_historial').push(turnoResumen);
+                database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => {
+                    const textoDiscord = "```md\n" +
+                                         "⏱️ **CONTROL DE FICHAJE - THE CORNER**\n" +
+                                         "-----------------------------------\n" +
+                                         "👤 **Empleado:** " + turnoResumen.usuario + "\n" +
+                                         "⏰ **Inicio:** " + turnoResumen.inicioStr + "\n" +
+                                         "🏁 **Fin:** " + turnoResumen.finStr + "\n" +
+                                         "⏳ **Horas Trabajadas:** " + turnoResumen.horas + "h\n" +
+                                         "🧾 **Tickets Emitidos:** " + turnoResumen.tickets + "\n" +
+                                         "💰 **Beneficio Generado:** $" + turnoResumen.ventas.toFixed(2) + "\n" +
+                                         "```";
 
-                const textoDiscord = "```md\n" +
-                                     "⏱️ **CONTROL DE FICHAJE - THE CORNER**\n" +
-                                     "-----------------------------------\n" +
-                                     "👤 **Empleado:** " + turnoResumen.usuario + "\n" +
-                                     "⏰ **Inicio:** " + turnoResumen.inicioStr + "\n" +
-                                     "🏁 **Fin:** " + turnoResumen.finStr + "\n" +
-                                     "⏳ **Horas Trabajadas:** " + turnoResumen.horas + "h\n" +
-                                     "🧾 **Tickets Emitidos:** " + turnoResumen.tickets + "\n" +
-                                     "💰 **Beneficio Generado:** $" + turnoResumen.ventas.toFixed(2) + "\n" +
-                                     "```";
-
-                copiarTextoPortapapeles(textoDiscord);
-                alert(`🔴 Turno finalizado para ${turnoResumen.usuario}.\nHoras: ${turnoResumen.horas}h | Ventas: $${turnoResumen.ventas.toFixed(2)}\n(Resumen copiado para Discord).`);
-
-                localStorage.removeItem('turno_activo_the_corner');
-                turnoActivo = null;
+                    copiarTextoPortapapeles(textoDiscord);
+                    alert(`🔴 Turno finalizado para ${turnoResumen.usuario}.\nHoras: ${turnoResumen.horas}h | Ventas: $${turnoResumen.ventas.toFixed(2)}\n(Resumen copiado para Discord).`);
+                });
             }
-            actualizarEstadoFichajeUI();
         }
 
         setInterval(() => {
