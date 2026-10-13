@@ -264,6 +264,29 @@
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🌾 Pedidos de Materia Prima (EEUU y México)</h2>
                 
+                <!-- FORMULARIOS PARA AÑADIR NUEVA MATERIA PRIMA -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-stone-900/60 p-3 rounded-xl border border-amber-900/40">
+                    <form id="form-nuevo-pedido-eeuu" class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Producto a EEUU</h3>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="text" id="p-eeuu-nombre" placeholder="Nombre" required class="col-span-1 p-1.5 rounded text-xs">
+                            <input type="number" step="0.01" id="p-eeuu-min" placeholder="P. Mín ($)" required class="p-1.5 rounded text-xs">
+                            <input type="number" step="0.01" id="p-eeuu-norm" placeholder="P. Máx ($)" required class="p-1.5 rounded text-xs">
+                        </div>
+                        <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-1 rounded text-xs border border-amber-600 font-rustic">Añadir a EEUU</button>
+                    </form>
+
+                    <form id="form-nuevo-pedido-mex" class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Producto a México</h3>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="text" id="p-mex-nombre" placeholder="Nombre" required class="col-span-1 p-1.5 rounded text-xs">
+                            <input type="number" step="0.01" id="p-mex-min" placeholder="P. Mín ($)" required class="p-1.5 rounded text-xs">
+                            <input type="number" step="0.01" id="p-mex-norm" placeholder="P. Máx ($)" required class="p-1.5 rounded text-xs">
+                        </div>
+                        <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-1 rounded text-xs border border-amber-600 font-rustic">Añadir a México</button>
+                    </form>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div>
                         <h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🇺🇸 Agricultura EEUU</h3>
@@ -275,6 +298,7 @@
                                         <th class="p-2 text-center">Tarifa</th>
                                         <th class="p-2 text-center w-16">Cant.</th>
                                         <th class="p-2 text-right">Subtotal</th>
+                                        <th class="p-2 text-center">Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tabla-pedidos-eeuu" class="divide-y divide-amber-900/40"></tbody>
@@ -292,6 +316,7 @@
                                         <th class="p-2 text-center">Tarifa</th>
                                         <th class="p-2 text-center w-16">Cant.</th>
                                         <th class="p-2 text-right">Subtotal</th>
+                                        <th class="p-2 text-center">Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tabla-pedidos-mexico" class="divide-y divide-amber-900/40"></tbody>
@@ -527,7 +552,7 @@
         const CLAVE_ADMIN = "SuperAdmin";
 
         // DATOS INICIALES Y CATÁLOGO
-        const productosEEUU = {
+        const productosEEUUInicial = {
             "e1": { id: "e1", nombre: "Ajo", pMin: 0.10, pNorm: 0.15 },
             "e2": { id: "e2", nombre: "Manzana", pMin: 0.10, pNorm: 0.15 },
             "e3": { id: "e3", nombre: "Cebolla", pMin: 0.10, pNorm: 0.15 },
@@ -547,10 +572,9 @@
             "e17": { id: "e17", nombre: "Zumo de Manzana", pMin: 1.60, pNorm: 2.24 },
             "e18": { id: "e18", nombre: "Azúcar", pMin: 0.10, pNorm: 0.15 },
             "e19": { id: "e19", nombre: "Tela", pMin: 0.50, pNorm: 0.70 }
-        
         };
 
-        const productosMexico = {
+        const productosMexicoInicial = {
             "m1": { id: "m1", nombre: "Café", pMin: 0.10, pNorm: 0.15 },
             "m2": { id: "m2", nombre: "Arroz", pMin: 0.10, pNorm: 0.15 },
             "m3": { id: "m3", nombre: "Cacao", pMin: 0.10, pNorm: 0.15 },
@@ -598,6 +622,8 @@
         let bebida = {};
         let menus = {};
         let productos = {};
+        let productosEEUU = {};
+        let productosMexico = {};
         
         let ventaComida = {};
         let ventaBebida = {};
@@ -743,6 +769,18 @@
         database.ref('productos_varios').on('value', (s) => {
             productos = s.val() || productosIniciales;
             if (!s.val()) database.ref('productos_varios').set(productosIniciales);
+            renderizarTodo();
+        });
+
+        database.ref('pedidos_eeuu').on('value', (s) => {
+            productosEEUU = s.val() || productosEEUUInicial;
+            if (!s.val()) database.ref('pedidos_eeuu').set(productosEEUUInicial);
+            renderizarTodo();
+        });
+
+        database.ref('pedidos_mexico').on('value', (s) => {
+            productosMexico = s.val() || productosMexicoInicial;
+            if (!s.val()) database.ref('pedidos_mexico').set(productosMexicoInicial);
             renderizarTodo();
         });
 
@@ -1170,6 +1208,8 @@
             if (!tbody) return;
             tbody.innerHTML = '';
 
+            const dbPath = region === 'eeuu' ? 'pedidos_eeuu' : 'pedidos_mexico';
+
             Object.values(items).forEach(item => {
                 const est = estadoObj[item.id] || { cantidad: 0, tarifa: 'min' };
                 let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
@@ -1188,6 +1228,9 @@
                             <input type="number" min="0" value="${est.cantidad}" onchange="cambiarCantPedido('${region}', '${item.id}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
                         </td>
                         <td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td>
+                        <td class="p-2 text-center">
+                            <button onclick="eliminarItem('${dbPath}', '${item.id}')" title="Eliminar Producto" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                        </td>
                     </tr>`;
             });
         }
@@ -1380,6 +1423,33 @@
             renderizarTodo();
         });
 
+        // FORMULARIOS ALTA MATERIA PRIMA (PEDIDOS EEUU / MEX)
+        document.getElementById('form-nuevo-pedido-eeuu').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = 'e_' + Date.now().toString();
+            database.ref('pedidos_eeuu/' + id).set({
+                id,
+                nombre: document.getElementById('p-eeuu-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('p-eeuu-min').value),
+                pNorm: parseFloat(document.getElementById('p-eeuu-norm').value)
+            });
+            this.reset();
+            alert("¡Producto añadido a EEUU!");
+        });
+
+        document.getElementById('form-nuevo-pedido-mex').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = 'm_' + Date.now().toString();
+            database.ref('pedidos_mexico/' + id).set({
+                id,
+                nombre: document.getElementById('p-mex-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('p-mex-min').value),
+                pNorm: parseFloat(document.getElementById('p-mex-norm').value)
+            });
+            this.reset();
+            alert("¡Producto añadido a México!");
+        });
+
         // FORMULARIO DE LICENCIAS
         document.getElementById('form-nueva-licencia').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -1394,7 +1464,7 @@
             alert("¡Licencia archivada correctamente!");
         });
 
-        // FORMULARIOS DE ALTA PRODUCTOS
+        // FORMULARIOS DE ALTA PRODUCTOS EN VENTA
         document.getElementById('form-nueva-comida').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = Date.now().toString();
