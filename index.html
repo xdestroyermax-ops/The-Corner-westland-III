@@ -1098,14 +1098,26 @@
         }
 
         function modalAjustarCajaBase() {
-            const entrada = prompt("🪙 Ajustar saldo base inicial de la caja fuerte ($):", CAJA_INICIAL_BASE);
+            const entrada = prompt("🪙 Ajustar saldo total deseado para la caja fuerte ($):", CAJA_INICIAL_BASE);
             if (entrada !== null && entrada.trim() !== "") {
-                // Reemplazar comas por puntos para evitar fallos de parseo
                 const entradaLimpia = entrada.replace(',', '.').trim();
-                const val = parseFloat(entradaLimpia);
-                if (!isNaN(val)) {
-                    database.ref('configuracion/caja_base').set(val).then(() => {
-                        alert("¡Saldo base de caja actualizado correctamente a $" + val.toFixed(2) + "!");
+                const nuevoMontoTotal = parseFloat(entradaLimpia);
+                if (!isNaN(nuevoMontoTotal)) {
+                    // Calculamos las ventas y pedidos para reajustar la base exacta
+                    let totalVentas = 0;
+                    listaFacturasGlobal.forEach(f => { totalVentas += f.total; });
+                    let totalPedidos = 0;
+                    listaPedidosGlobal.forEach(p => { totalPedidos += p.total; });
+
+                    const baseCalculada = nuevoMontoTotal - totalVentas + totalPedidos;
+                    CAJA_INICIAL_BASE = baseCalculada;
+
+                    database.ref('configuracion/caja_base').set(baseCalculada).then(() => {
+                        actualizarCajaTotalDisplay();
+                        alert("¡Saldo de caja ajustado correctamente a $" + nuevoMontoTotal.toFixed(2) + "!");
+                    }).catch(err => {
+                        actualizarCajaTotalDisplay();
+                        alert("Caja ajustada localmente a $" + nuevoMontoTotal.toFixed(2));
                     });
                 } else {
                     alert("Por favor, introduce un número válido.");
