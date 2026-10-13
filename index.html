@@ -719,7 +719,7 @@
             renderizarFacturas();
         }
 
-        // FUNCIONES DE COPIADO PARA DISCORD
+        // FUNCIONES DE COPIADO PARA DISCORD (CORREGIDAS SIN ERRORES DE SINTAXIS)
         function copiarTextoPortapapeles(texto) {
             navigator.clipboard.writeText(texto).then(() => {
                 alert("📋 ¡Factura copiada al portapapeles! Ya puedes pegarla en Discord.");
@@ -729,17 +729,17 @@
         }
 
         function generarFormatoDiscord(usuario, codigo, resumenItems, total) {
-            const itemsFormateados = resumenItems.split(', ').map(i => `• ${i}`).join('\n');
-            return ````md
-🧾 **THE CORNER - SAINT DENIS**
-👤 **Atendido por:** ${usuario}
-📅 **Ticket:** #${codigo}
------------------------------------
-📦 **Detalle:**
-${itemsFormateados}
------------------------------------
-💰 **TOTAL:** $${total.toFixed(2)}
-````;
+            const itemsFormateados = resumenItems.split(', ').map(i => "• " + i).join('\n');
+            return "```md\n" +
+                   "🧾 **THE CORNER - SAINT DENIS**\n" +
+                   "👤 **Atendido por:** " + usuario + "\n" +
+                   "📅 **Ticket:** #" + codigo + "\n" +
+                   "-----------------------------------\n" +
+                   "📦 **Detalle:**\n" +
+                   itemsFormateados + "\n" +
+                   "-----------------------------------\n" +
+                   "💰 **TOTAL:** $" + total.toFixed(2) + "\n" +
+                   "```";
         }
 
         function copiarTicketDiscordTexto(usuario, codigo, resumen, total) {
@@ -756,7 +756,7 @@ ${itemsFormateados}
                 if (est && est.cantidad > 0) {
                     let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
                     totalAcc += est.cantidad * p;
-                    resumenArray.push(`${est.cantidad}x ${item.nombre}`);
+                    resumenArray.push(est.cantidad + "x " + item.nombre);
                 }
             });
             Object.values(bebida).forEach(item => {
@@ -764,7 +764,7 @@ ${itemsFormateados}
                 if (est && est.cantidad > 0) {
                     let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
                     totalAcc += est.cantidad * p;
-                    resumenArray.push(`${est.cantidad}x ${item.nombre}`);
+                    resumenArray.push(est.cantidad + "x " + item.nombre);
                 }
             });
             Object.values(menus).forEach(item => {
@@ -772,7 +772,7 @@ ${itemsFormateados}
                 if (est && est.cantidad > 0) {
                     let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
                     totalAcc += est.cantidad * p;
-                    resumenArray.push(`${est.cantidad}x ${item.nombre}`);
+                    resumenArray.push(est.cantidad + "x " + item.nombre);
                 }
             });
             Object.values(productos).forEach(item => {
@@ -780,7 +780,7 @@ ${itemsFormateados}
                 if (est && est.cantidad > 0) {
                     let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
                     totalAcc += est.cantidad * p;
-                    resumenArray.push(`${est.cantidad}x ${item.nombre}`);
+                    resumenArray.push(est.cantidad + "x " + item.nombre);
                 }
             });
 
@@ -795,7 +795,7 @@ ${itemsFormateados}
             const anio = ahora.getFullYear();
             const hora = String(ahora.getHours()).padStart(2, '0');
             const minuto = String(ahora.getMinutes()).padStart(2, '0');
-            const codigoTicket = `${dia}/${mes}/${anio}-${hora}:${minuto}`;
+            const codigoTicket = dia + "/" + mes + "/" + anio + "-" + hora + ":" + minuto;
 
             const texto = generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), totalAcc);
             copiarTextoPortapapeles(texto);
@@ -1074,7 +1074,7 @@ ${itemsFormateados}
                 if (est && est.cantidad > 0) {
                     let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
                     totalAcc += est.cantidad * p;
-                    resumenArray.push(`${est.cantidad}x ${item.nombre}`);
+                    resumenArray.push(est.cantidad + "x " + item.nombre);
                 }
             });
             Object.values(bebida).forEach(item => {
@@ -1082,7 +1082,7 @@ ${itemsFormateados}
                 if (est && est.cantidad > 0) {
                     let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
                     totalAcc += est.cantidad * p;
-                    resumenArray.push(`${est.cantidad}x ${item.nombre}`);
+                    resumenArray.push(est.cantidad + "x " + item.nombre);
                 }
             });
             Object.values(menus).forEach(item => {
@@ -1090,7 +1090,7 @@ ${itemsFormateados}
                 if (est && est.cantidad > 0) {
                     let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
                     totalAcc += est.cantidad * p;
-                    resumenArray.push(`${est.cantidad}x ${item.nombre}`);
+                    resumenArray.push(est.cantidad + "x " + item.nombre);
                 }
             });
             Object.values(productos).forEach(item => {
@@ -1098,7 +1098,7 @@ ${itemsFormateados}
                 if (est && est.cantidad > 0) {
                     let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
                     totalAcc += est.cantidad * p;
-                    resumenArray.push(`${est.cantidad}x ${item.nombre}`);
+                    resumenArray.push(est.cantidad + "x " + item.nombre);
                 }
             });
 
@@ -1113,7 +1113,7 @@ ${itemsFormateados}
             const anio = ahora.getFullYear();
             const hora = String(ahora.getHours()).padStart(2, '0');
             const minuto = String(ahora.getMinutes()).padStart(2, '0');
-            const codigoTicket = `${dia}/${mes}/${anio}-${hora}:${minuto}`;
+            const codigoTicket = dia + "/" + mes + "/" + anio + "-" + hora + ":" + minuto;
 
             const facturaData = {
                 id: Date.now(),
