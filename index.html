@@ -1064,4 +1064,694 @@
 
             if (turnoActivo) {
                 btnFichaje.textContent = "🔴 Salir de Servicio";
-                btnFichaje.className = "w-full bg-red-800 hover:bg-red-700 text-red-100 font-bold py-
+                btnFichaje.className = "w-full bg-red-800 hover:bg-red-700 text-red-100 font-bold py-2 rounded text-xs border border-red-600 transition font-rustic shadow";
+                
+                const ahora = Date.now();
+                const diffMs = ahora - turnoActivo.inicio;
+                const horas = Math.floor(diffMs / (1000 * 60 * 60));
+                const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                const segundos = Math.floor((diffMs % (1000 * 60)) / 1000);
+                
+                estadoFichajeText.innerHTML = `🟢 En servicio (${turnoActivo.usuario}): <span class="font-mono text-emerald-400 font-bold">${String(horas).padStart(2,'0')}:${String(minutos).padStart(2,'0')}:${String(segundos).padStart(2,'0')}</span>`;
+            } else {
+                btnFichaje.textContent = "🟢 Entrar de Servicio";
+                btnFichaje.className = "w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2 rounded text-xs border border-emerald-600 transition font-rustic shadow";
+                estadoFichajeText.innerHTML = `⚪ Fuera de servicio`;
+            }
+        }
+
+        function toggleFichaje() {
+            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
+            if (!turnoActivo) {
+                turnoActivo = {
+                    usuario: usuarioNombre,
+                    inicio: Date.now(),
+                    fechaInicioStr: new Date().toLocaleString()
+                };
+                localStorage.setItem('turno_activo_the_corner', JSON.stringify(turnoActivo));
+                alert(`🟢 ¡Has entrado de servicio, ${usuarioNombre}! Buen turno.`);
+            } else {
+                const fin = Date.now();
+                const diffMs = fin - turnoActivo.inicio;
+                const totalHoras = (diffMs / (1000 * 60 * 60)).toFixed(2);
+                
+                let ventasTurno = 0, cantidadTickets = 0;
+                listaFacturasGlobal.forEach(f => {
+                    if (f.usuario.toLowerCase() === turnoActivo.usuario.toLowerCase() && f.id >= turnoActivo.inicio) {
+                        ventasTurno += f.total;
+                        cantidadTickets++;
+                    }
+                });
+
+                const turnoResumen = {
+                    id: Date.now(),
+                    usuario: turnoActivo.usuario,
+                    inicioStr: turnoActivo.fechaInicioStr,
+                    finStr: new Date().toLocaleString(),
+                    horas: totalHoras,
+                    ventas: ventasTurno,
+                    tickets: cantidadTickets
+                };
+
+                database.ref('fichajes_historial').push(turnoResumen);
+
+                const textoDiscord = "```md\n" +
+                                     "⏱️ **CONTROL DE FICHAJE - THE CORNER**\n" +
+                                     "-----------------------------------\n" +
+                                     "👤 **Empleado:** " + turnoResumen.usuario + "\n" +
+                                     "⏰ **Inicio:** " + turnoResumen.inicioStr + "\n" +
+                                     "🏁 **Fin:** " + turnoResumen.finStr + "\n" +
+                                     "⏳ **Horas Trabajadas:** " + turnoResumen.horas + "h\n" +
+                                     "🧾 **Tickets Emitidos:** " + turnoResumen.tickets + "\n" +
+                                     "💰 **Beneficio Generado:** $" + turnoResumen.ventas.toFixed(2) + "\n" +
+                                     "```";
+
+                copiarTextoPortapapeles(textoDiscord);
+                alert(`🔴 Turno finalizado para ${turnoResumen.usuario}.\nHoras: ${turnoResumen.horas}h | Ventas: $${turnoResumen.ventas.toFixed(2)}\n(Resumen copiado para Discord).`);
+
+                localStorage.removeItem('turno_activo_the_corner');
+                turnoActivo = null;
+            }
+            actualizarEstadoFichajeUI();
+        }
+
+        setInterval(() => {
+            if (turnoActivo) actualizarEstadoFichajeUI();
+        }, 1000);
+
+        function renderizarFacturas() {
+            const contenedor = document.getElementById('lista-historial-facturas');
+            if (!contenedor) return;
+            const filtro = (document.getElementById('buscador-tickets')?.value || '').toLowerCase().trim();
+
+            contenedor.innerHTML = '';
+            const facturasFiltradas = listaFacturasGlobal.filter(f => {
+                const usr = (f.usuario || '').toLowerCase();
+                const codigo = (f.codigoTicket || '').toLowerCase();
+                const res = (f.resumen || '').toLowerCase();
+                const fec = (f.fecha || '').toLowerCase();
+                return usr.includes(filtro) || codigo.includes(filtro) || res.includes(filtro) || fec.includes(filtro);
+            });
+
+            if (facturasFiltradas.length === 0) {
+                contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-2 text-center py-4">No se encontraron facturas.</p>';
+                return;
+            }
+
+            facturasFiltradas.forEach(f => {
+                const usr = f.usuario ? f.usuario : 'Sin registro';
+                const idMostrado = f.codigoTicket || f.id;
+
+                const card = document.createElement('div');
+                card.className = 'bg-stone-900/85 border border-amber-900/50 p-3 rounded-lg shadow space-y-1 relative';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center font-bold text-amber-300">
+                        <span>Factura #${idMostrado}</span>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="font-mono text-amber-400 text-sm">$${f.total.toFixed(2)}</span>
+                            <button class="btn-copiar-factura bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-xs px-1.5 py-0.5 rounded border border-indigo-700" title="Copiar para Discord">📋</button>
+                            ${usuarioActualData && usuarioActualData.rol === 'admin' ? `<button onclick="eliminarFacturaAdmin('${f.keyFirebase}')" title="Borrar Ticket" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>` : ''}
+                        </div>
+                    </div>
+                    <div class="text-[10px] text-amber-400/90 font-bold font-rustic bg-stone-950/60 px-2 py-0.5 rounded w-fit border border-amber-900/40">
+                        👤 Atendido por: <span class="text-amber-200">${usr}</span>
+                    </div>
+                    <div class="text-[11px] text-amber-200/70 leading-tight pt-1">${f.resumen}</div>
+                    <div class="text-[9px] text-amber-500/50 pt-1 border-t border-amber-900/20">${f.fecha}</div>`;
+
+                card.querySelector('.btn-copiar-factura').addEventListener('click', () => {
+                    copiarTicketDiscordTexto(usr, idMostrado, f.resumen, f.total);
+                });
+                contenedor.appendChild(card);
+            });
+        }
+
+        function renderizarFichajesAdmin() {
+            const galeria = document.getElementById('galeria-fichajes-admin');
+            if (!galeria) return;
+            galeria.innerHTML = '';
+
+            if (listaFichajesGlobal.length === 0) {
+                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-3">No hay turnos finalizados aún.</p>';
+                return;
+            }
+
+            listaFichajesGlobal.forEach(t => {
+                galeria.innerHTML += `
+                    <div class="bg-stone-950/80 border border-amber-900/50 p-3 rounded-lg shadow space-y-1">
+                        <div class="flex justify-between items-center border-b border-amber-900/30 pb-1">
+                            <span class="font-bold text-amber-300 font-rustic">👤 ${t.usuario}</span>
+                            <span class="font-mono text-emerald-400 font-bold">${t.horas}h</span>
+                        </div>
+                        <div class="text-[10px] text-amber-200/70 space-y-0.5 pt-1">
+                            <div>⏰ Inicio: ${t.inicioStr}</div>
+                            <div>🏁 Fin: ${t.finStr}</div>
+                            <div>🧾 Tickets: <span class="text-amber-300 font-bold">${t.tickets || 0}</span></div>
+                            <div>💰 Recaudación: <span class="text-amber-400 font-bold">$${(t.ventas || 0).toFixed(2)}</span></div>
+                        </div>
+                        <div class="flex justify-end gap-1 pt-1">
+                            <button onclick="copiarFichajeIndividual('${t.usuario}', '${t.inicioStr}', '${t.finStr}', '${t.horas}', '${t.tickets||0}', '${t.ventas||0}')" class="bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-[10px] px-2 py-0.5 rounded border border-indigo-700">📋 Copiar Discord</button>
+                            <button onclick="eliminarFichajeAdmin('${t.keyFirebase}')" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function copiarFichajeIndividual(usr, inicio, fin, hrs, tickets, ventas) {
+            const textoDiscord = "```md\n" +
+                                 "⏱️ **CONTROL DE FICHAJE - THE CORNER**\n" +
+                                 "-----------------------------------\n" +
+                                 "👤 **Empleado:** " + usr + "\n" +
+                                 "⏰ **Inicio:** " + inicio + "\n" +
+                                 "🏁 **Fin:** " + fin + "\n" +
+                                 "⏳ **Horas Trabajadas:** " + hrs + "h\n" +
+                                 "🧾 **Tickets Emitidos:** " + tickets + "\n" +
+                                 "💰 **Beneficio Generado:** $" + parseFloat(ventas).toFixed(2) + "\n" +
+                                 "```";
+            copiarTextoPortapapeles(textoDiscord);
+        }
+
+        function eliminarFichajeAdmin(keyFirebase) {
+            if (confirm("¿Deseas eliminar este registro de fichaje?")) {
+                database.ref('fichajes_historial/' + keyFirebase).remove();
+            }
+        }
+
+        function filtrarTickets() { renderizarFacturas(); }
+
+        function copiarTextoPortapapeles(texto) {
+            navigator.clipboard.writeText(texto).then(() => {
+                alert("📋 ¡Copiado al portapapeles con éxito! Ya puedes pegarlo en Discord.");
+            }).catch(() => {
+                prompt("Copia este texto manualmente:", texto);
+            });
+        }
+
+        function generarFormatoDiscord(usuario, codigo, resumenItems, total) {
+            const lineas = resumenItems.split(', ').map(i => "• " + i).join('\n');
+            return "```md\n" +
+                   "🧾 **THE CORNER - SAINT DENIS**\n" +
+                   "👤 **Atendido por:** " + usuario + "\n" +
+                   "📅 **Ticket:** #" + codigo + "\n" +
+                   "-----------------------------------\n" +
+                   "📦 **Detalle:**\n" +
+                   lineas + "\n" +
+                   "-----------------------------------\n" +
+                   "💰 **TOTAL:** $" + total.toFixed(2) + "\n" +
+                   "```";
+        }
+
+        function copiarTicketDiscordTexto(usuario, codigo, resumen, total) {
+            const texto = generarFormatoDiscord(usuario, codigo, resumen, total);
+            copiarTextoPortapapeles(texto);
+        }
+
+        function verHistorialFichajesAdmin() {
+            document.getElementById('panel-fichajes-admin').classList.remove('hidden');
+        }
+
+        function cerrarPanelFichajes() {
+            document.getElementById('panel-fichajes-admin').classList.add('hidden');
+        }
+
+        function registrarPedidoContabilidad() {
+            let totalCoste = 0, resumenArray = [];
+            Object.values(productosEEUU).forEach(item => {
+                const est = pedidoEEUU[item.id];
+                if (est && est.cantidad > 0) {
+                    let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                    totalCoste += est.cantidad * p;
+                    resumenArray.push(est.cantidad + "x " + item.nombre + " (EEUU)");
+                }
+            });
+            Object.values(productosMexico).forEach(item => {
+                const est = pedidoMex[item.id];
+                if (est && est.cantidad > 0) {
+                    let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                    totalCoste += est.cantidad * p;
+                    resumenArray.push(est.cantidad + "x " + item.nombre + " (Mex)");
+                }
+            });
+
+            if (totalCoste === 0) {
+                alert("No hay ningún producto en el pedido actual.");
+                return;
+            }
+
+            const ahora = new Date();
+            const pedidoData = {
+                id: Date.now(),
+                total: totalCoste,
+                resumen: resumenArray.join(', '),
+                fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
+            };
+
+            database.ref('pedidos_historial').push(pedidoData);
+            alert("¡Pedido registrado en la contabilidad correctamente!");
+            limpiarPedidos();
+        }
+
+        function generarBalanceSemanalAdmin() {
+            let totalVentas = 0;
+            listaFacturasGlobal.forEach(f => { totalVentas += f.total; });
+            let totalPedidos = 0;
+            listaPedidosGlobal.forEach(p => { totalPedidos += p.total; });
+            let totalHorasTrabajadas = 0;
+            listaFichajesGlobal.forEach(t => { totalHorasTrabajadas += parseFloat(t.horas || 0); });
+
+            const beneficioNeto = totalVentas - totalPedidos;
+
+            const textoDiscord = "```md\n" +
+                                 "📊 **BALANCE SEMANAL - THE CORNER**\n" +
+                                 "-----------------------------------\n" +
+                                 "💰 **Total Ventas:** $" + totalVentas.toFixed(2) + "\n" +
+                                 "📦 **Total Pedidos:** $" + totalPedidos.toFixed(2) + "\n" +
+                                 "⏳ **Horas Totales:** " + totalHorasTrabajadas.toFixed(2) + "h\n" +
+                                 "-----------------------------------\n" +
+                                 "📈 **BENEFICIO NETO:** $" + beneficioNeto.toFixed(2) + "\n" +
+                                 "```";
+            copiarTextoPortapapeles(textoDiscord);
+        }
+
+        function eliminarFacturaAdmin(keyFirebase) {
+            if (confirm("¿Estás seguro de eliminar este ticket?")) {
+                database.ref('facturas/' + keyFirebase).remove();
+            }
+        }
+
+        function eliminarLicenciaAdmin(keyFirebase) {
+            if (confirm("¿Estás seguro de eliminar esta licencia?")) {
+                database.ref('licencias/' + keyFirebase).remove();
+            }
+        }
+
+        function purgaHistorialAdmin() {
+            if (confirm("⚠️ ¿Estás 100% seguro de que deseas purgar y eliminar TODAS las facturas registradas?")) {
+                database.ref('facturas').remove();
+                alert("¡Purga completada! Historial limpio.");
+            }
+        }
+
+        // ORDENADOR ALFABÉTICO AUXILIAR
+        function ordenarArrayPorNombre(obj) {
+            return Object.values(obj).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+        }
+
+        function renderizarTodo() {
+            renderTablaVenta('tabla-venta-comida', comida, ventaComida, 'comida');
+            renderTablaVenta('tabla-venta-bebida-normal', bebidaNormal, ventaBebidaNormal, 'bebida_normal');
+            renderTablaVenta('tabla-venta-bebida-alcohol', bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
+            renderTablaVenta('tabla-venta-menus', menus, ventaMenus, 'menu');
+            renderTablaVenta('tabla-venta-productos', productos, ventaProductos, 'productos');
+
+            renderTablaGestion('tabla-gestion-comida', comida, 'comida');
+            renderTablaGestionBebida('tabla-gestion-bebida-normal', bebidaNormal, 'bebida_normal');
+            renderTablaGestionBebida('tabla-gestion-bebida-alcohol', bebidaAlcohol, 'bebida_alcohol');
+            renderTablaGestionMenu('tabla-gestion-menus', menus);
+            renderTablaGestion('tabla-gestion-productos', productos, 'productos_varios');
+
+            renderTablaPedidos('tabla-pedidos-eeuu', productosEEUU, pedidoEEUU, 'eeuu');
+            renderTablaPedidos('tabla-pedidos-mexico', productosMexico, pedidoMex, 'mex');
+
+            renderizarResumenVenta();
+            renderizarResumenPedidos();
+        }
+
+        function renderTablaVenta(elementId, items, estadoObj, tipo) {
+            const tbody = document.getElementById(elementId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const listaOrdenada = ordenarArrayPorNombre(items);
+
+            if (listaOrdenada.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-amber-200/40 italic">No hay productos registrados</td></tr>';
+                return;
+            }
+
+            listaOrdenada.forEach(item => {
+                const est = estadoObj[item.id] || { cantidad: 0, tarifa: 'norm' };
+                let p = 0;
+                if (tipo === 'menu') {
+                    p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                } else {
+                    p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
+                }
+                let sub = est.cantidad * p;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
+                        <td class="p-2 text-center">
+                            <select onchange="cambiarTarifaVenta('${tipo}', '${item.id}', this.value)" class="rounded text-[11px] p-1">
+                                <option value="min" ${est.tarifa === 'min' ? 'selected' : ''}>Mín ($${item.pMin.toFixed(2)})</option>
+                                ${tipo !== 'menu' ? `<option value="med" ${est.tarifa === 'med' ? 'selected' : ''}>Med ($${item.pMed.toFixed(2)})</option>` : ''}
+                                <option value="norm" ${est.tarifa === 'norm' ? 'selected' : ''}>Máx ($${item.pNorm.toFixed(2)})</option>
+                            </select>
+                        </td>
+                        <td class="p-2 text-center">
+                            <input type="number" min="0" value="${est.cantidad}" onchange="cambiarCantVenta('${tipo}', '${item.id}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
+                        </td>
+                        <td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td>
+                    </tr>`;
+            });
+        }
+
+        function renderTablaGestion(elementId, items, dbPath) {
+            const tbody = document.getElementById(elementId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            const listaOrdenada = ordenarArrayPorNombre(items);
+
+            if (listaOrdenada.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay elementos guardados</td></tr>';
+                return;
+            }
+
+            listaOrdenada.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
+                        <td class="p-2 text-center text-[10px] text-amber-200/70">$${item.pMin.toFixed(2)} / $${item.pMed.toFixed(2)} / $${item.pNorm.toFixed(2)}</td>
+                        <td class="p-2 text-center"><button onclick="eliminarItem('${dbPath}', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
+                    </tr>`;
+            });
+        }
+
+        function renderTablaGestionBebida(elementId, items, dbPath) {
+            const tbody = document.getElementById(elementId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            const listaOrdenada = ordenarArrayPorNombre(items);
+
+            if (listaOrdenada.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay bebidas guardadas</td></tr>';
+                return;
+            }
+
+            listaOrdenada.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
+                        <td class="p-2 text-center text-[10px] text-amber-200/70">$${item.pMin.toFixed(2)} / $${item.pMed.toFixed(2)} / $${item.pNorm.toFixed(2)}</td>
+                        <td class="p-2 text-center"><button onclick="eliminarItem('${dbPath}', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
+                    </tr>`;
+            });
+        }
+
+        function renderTablaGestionMenu(elementId, items) {
+            const tbody = document.getElementById(elementId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            const listaOrdenada = ordenarArrayPorNombre(items);
+
+            if (listaOrdenada.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay menús guardados</td></tr>';
+                return;
+            }
+
+            listaOrdenada.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
+                        <td class="p-2 text-center text-[10px] text-amber-200/70">$${item.pMin.toFixed(2)} / $${item.pNorm.toFixed(2)}</td>
+                        <td class="p-2 text-center"><button onclick="eliminarItem('menus', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
+                    </tr>`;
+            });
+        }
+
+        function renderTablaPedidos(elementId, items, estadoObj, region) {
+            const tbody = document.getElementById(elementId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            const dbPath = region === 'eeuu' ? 'pedidos_eeuu' : 'pedidos_mexico';
+            const listaOrdenada = ordenarArrayPorNombre(items);
+
+            listaOrdenada.forEach(item => {
+                const est = estadoObj[item.id] || { cantidad: 0, tarifa: 'min' };
+                let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                let sub = est.cantidad * p;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
+                        <td class="p-2 text-center">
+                            <select onchange="cambiarTarifaPedido('${region}', '${item.id}', this.value)" class="rounded text-[11px] p-1">
+                                <option value="min" ${est.tarifa === 'min' ? 'selected' : ''}>Mín ($${item.pMin.toFixed(2)})</option>
+                                <option value="norm" ${est.tarifa === 'norm' ? 'selected' : ''}>Máx ($${item.pNorm.toFixed(2)})</option>
+                            </select>
+                        </td>
+                        <td class="p-2 text-center">
+                            <input type="number" min="0" value="${est.cantidad}" onchange="cambiarCantPedido('${region}', '${item.id}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
+                        </td>
+                        <td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td>
+                        <td class="p-2 text-center">
+                            <button onclick="eliminarItem('${dbPath}', '${item.id}')" title="Eliminar Producto" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function cambiarCantVenta(tipo, id, val) {
+            let obj;
+            if (tipo === 'comida') obj = ventaComida;
+            else if (tipo === 'bebida_normal') obj = ventaBebidaNormal;
+            else if (tipo === 'bebida_alcohol') obj = ventaBebidaAlcohol;
+            else if (tipo === 'menu') obj = ventaMenus;
+            else obj = ventaProductos;
+
+            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' };
+            obj[id].cantidad = Math.max(0, parseInt(val) || 0);
+            renderizarTodo();
+        }
+
+        function cambiarTarifaVenta(tipo, id, tarifa) {
+            let obj;
+            if (tipo === 'comida') obj = ventaComida;
+            else if (tipo === 'bebida_normal') obj = ventaBebidaNormal;
+            else if (tipo === 'bebida_alcohol') obj = ventaBebidaAlcohol;
+            else if (tipo === 'menu') obj = ventaMenus;
+            else obj = ventaProductos;
+
+            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' };
+            obj[id].tarifa = tarifa;
+            renderizarTodo();
+        }
+
+        function cambiarCantPedido(region, id, val) {
+            let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex;
+            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' };
+            obj[id].cantidad = Math.max(0, parseInt(val) || 0);
+            renderizarTodo();
+        }
+        function cambiarTarifaPedido(region, id, tarifa) {
+            let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex;
+            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' };
+            obj[id].tarifa = tarifa;
+            renderizarTodo();
+        }
+
+        function renderizarResumenVenta() {
+            const contenedor = document.getElementById('lista-resumen-venta');
+            if (!contenedor) return;
+            contenedor.innerHTML = '';
+            let totalAcc = 0, itemsAcc = 0, hay = false;
+
+            const sumarAlResumen = (items, estadoObj, tipo) => {
+                Object.values(items).forEach(item => {
+                    const est = estadoObj[item.id];
+                    if (est && est.cantidad > 0) {
+                        hay = true;
+                        let p = tipo === 'menu' ? (est.tarifa === 'min' ? item.pMin : item.pNorm) : (est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm));
+                        let sub = est.cantidad * p;
+                        totalAcc += sub; itemsAcc += est.cantidad;
+                        contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>${item.nombre} (${est.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
+                    }
+                });
+            };
+
+            sumarAlResumen(comida, ventaComida, 'comida');
+            sumarAlResumen(bebidaNormal, ventaBebidaNormal, 'bebida_normal');
+            sumarAlResumen(bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
+            sumarAlResumen(menus, ventaMenus, 'menu');
+            sumarAlResumen(productos, ventaProductos, 'productos');
+
+            if (!hay) contenedor.innerHTML = '<p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>';
+            document.getElementById('total-items-venta').textContent = itemsAcc;
+            document.getElementById('total-precio-venta').textContent = `$${totalAcc.toFixed(2)}`;
+        }
+
+        function renderizarResumenPedidos() {
+            let totalCoste = 0;
+            Object.values(productosEEUU).forEach(item => {
+                const est = pedidoEEUU[item.id];
+                if (est && est.cantidad > 0) {
+                    let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                    totalCoste += est.cantidad * p;
+                }
+            });
+            Object.values(productosMexico).forEach(item => {
+                const est = pedidoMex[item.id];
+                if (est && est.cantidad > 0) {
+                    let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                    totalCoste += est.cantidad * p;
+                }
+            });
+            const el = document.getElementById('total-coste-pedidos');
+            if (el) el.textContent = `$${totalCoste.toFixed(2)}`;
+        }
+
+        function limpiarPedidos() {
+            pedidoEEUU = {}; pedidoMex = {};
+            renderizarTodo();
+        }
+
+        document.getElementById('btn-registrar-venta').addEventListener('click', () => {
+            let totalAcc = 0, resumenArray = [];
+            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
+
+            const recolectarVenta = (items, estadoObj, tipo) => {
+                Object.values(items).forEach(item => {
+                    const est = estadoObj[item.id];
+                    if (est && est.cantidad > 0) {
+                        let p = tipo === 'menu' ? (est.tarifa === 'min' ? item.pMin : item.pNorm) : (est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm));
+                        totalAcc += est.cantidad * p;
+                        resumenArray.push(est.cantidad + "x " + item.nombre);
+                    }
+                });
+            };
+
+            recolectarVenta(comida, ventaComida, 'comida');
+            recolectarVenta(bebidaNormal, ventaBebidaNormal, 'bebida_normal');
+            recolectarVenta(bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
+            recolectarVenta(menus, ventaMenus, 'menu');
+            recolectarVenta(productos, ventaProductos, 'productos');
+
+            if (totalAcc === 0) {
+                alert("No hay ningún producto en la venta actual.");
+                return;
+            }
+
+            const ahora = new Date();
+            const codigoTicket = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0');
+
+            const facturaData = {
+                id: Date.now(),
+                codigoTicket: codigoTicket,
+                usuario: usuarioNombre,
+                total: totalAcc,
+                resumen: resumenArray.join(', '),
+                fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
+            };
+
+            database.ref('facturas').push(facturaData);
+            copiarTextoPortapapeles(generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), totalAcc));
+
+            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaProductos = {};
+            renderizarTodo();
+        });
+
+        document.getElementById('btn-limpiar-venta').addEventListener('click', () => {
+            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaProductos = {};
+            renderizarTodo();
+        });
+
+        // FORMULARIOS DE NUEVOS ÍTEMS
+        document.getElementById('form-nuevo-pedido-eeuu').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = 'e_' + Date.now().toString();
+            database.ref('pedidos_eeuu/' + id).set({
+                id, nombre: document.getElementById('p-eeuu-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('p-eeuu-min').value),
+                pNorm: parseFloat(document.getElementById('p-eeuu-norm').value)
+            });
+            this.reset();
+            alert("¡Producto añadido a EEUU!");
+        });
+
+        document.getElementById('form-nuevo-pedido-mex').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = 'm_' + Date.now().toString();
+            database.ref('pedidos_mexico/' + id).set({
+                id, nombre: document.getElementById('p-mex-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('p-mex-min').value),
+                pNorm: parseFloat(document.getElementById('p-mex-norm').value)
+            });
+            this.reset();
+            alert("¡Producto añadido a México!");
+        });
+
+        document.getElementById('form-nueva-licencia').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('licencias/' + id).set({
+                id,
+                titular: document.getElementById('licencia-titular').value.trim(),
+                tipo: document.getElementById('licencia-tipo').value,
+                url: document.getElementById('licencia-url').value.trim()
+            });
+            this.reset();
+            alert("¡Licencia archivada correctamente!");
+        });
+
+        document.getElementById('form-nueva-comida').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('comida/' + id).set({
+                id, nombre: document.getElementById('comida-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('comida-min').value),
+                pMed: parseFloat(document.getElementById('comida-med').value),
+                pNorm: parseFloat(document.getElementById('comida-norm').value)
+            });
+            this.reset();
+            alert("¡Plato añadido!");
+        });
+
+        document.getElementById('form-nueva-bebida').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const tipoBebida = document.getElementById('bebida-tipo').value;
+            const dbRef = tipoBebida === 'normal' ? 'bebida_normal' : 'bebida_alcohol';
+            const id = Date.now().toString();
+            database.ref(dbRef + '/' + id).set({
+                id, nombre: document.getElementById('bebida-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('bebida-min').value),
+                pMed: parseFloat(document.getElementById('bebida-med').value),
+                pNorm: parseFloat(document.getElementById('bebida-norm').value)
+            });
+            this.reset();
+            alert("¡Bebida añadida!");
+        });
+
+        document.getElementById('form-nuevo-menu').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('menus/' + id).set({
+                id, nombre: document.getElementById('menu-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('menu-min').value),
+                pNorm: parseFloat(document.getElementById('menu-norm').value)
+            });
+            this.reset();
+            alert("¡Menú añadido!");
+        });
+
+        document.getElementById('form-nuevo-producto').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('productos_varios/' + id).set({
+                id, nombre: document.getElementById('producto-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('producto-min').value),
+                pMed: parseFloat(document.getElementById('producto-med').value),
+                pNorm: parseFloat(document.getElementById('producto-norm').value)
+            });
+            this.reset();
+            alert("¡Producto añadido!");
+        });
+
+        function eliminarItem(dbPath, id) {
+            if (confirm("¿Estás seguro de eliminar este elemento?")) {
+                database.ref(dbPath + '/' + id).remove();
+            }
+        }
+    </script>
+</body>
+</html>
