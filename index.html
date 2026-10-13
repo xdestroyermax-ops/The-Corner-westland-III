@@ -171,18 +171,29 @@
                     </div>
                 </div>
 
-                <!-- RESUMEN, USUARIO Y REGISTRO DE FACTURA -->
+                <!-- RESUMEN, USUARIO, FICHAJE Y REGISTRO DE FACTURA -->
                 <div class="western-panel rounded-xl p-4 flex flex-col justify-between h-fit border-amber-700 space-y-4">
-                    <div>
-                        <h2 class="text-lg font-extrabold text-amber-400 mb-2 border-b border-amber-900/60 pb-2 font-rustic">🧾 Factura / Ticket</h2>
+                    <div class="space-y-3">
+                        <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🧾 Factura / Ticket</h2>
                         
                         <!-- SELECCIÓN / IDENTIFICACIÓN DE USUARIO -->
-                        <div class="bg-stone-900/80 p-2.5 rounded-lg border border-amber-800/60 mb-3 space-y-1">
+                        <div class="bg-stone-900/80 p-2.5 rounded-lg border border-amber-800/60 space-y-1">
                             <label class="text-[10px] text-amber-300 font-bold uppercase tracking-wider font-rustic block">👤 Usuario / Atendido por:</label>
                             <input type="text" id="usuario-activo" placeholder="Ej: Nano33" class="w-full p-2 rounded text-xs font-bold text-amber-200 border-amber-700" onchange="guardarUsuarioMemoria(this.value)">
                         </div>
 
-                        <div id="lista-resumen-venta" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs">
+                        <!-- SISTEMA DE FICHAJE DE SERVICIO -->
+                        <div class="bg-stone-950/80 p-3 rounded-lg border border-amber-900/60 space-y-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-amber-300 font-rustic">⏱️ Control de Fichaje:</span>
+                                <span id="estado-fichaje-text" class="text-[10px] text-amber-200/70">⚪ Fuera de servicio</span>
+                            </div>
+                            <button id="btn-fichaje" onclick="toggleFichaje()" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2 rounded text-xs border border-emerald-600 transition font-rustic shadow">
+                                🟢 Entrar de Servicio
+                            </button>
+                        </div>
+
+                        <div id="lista-resumen-venta" class="space-y-2 max-h-40 overflow-y-auto pr-1 text-xs">
                             <p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>
                         </div>
                     </div>
@@ -200,9 +211,6 @@
                         <button id="btn-registrar-venta" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2.5 rounded border border-emerald-600 transition text-xs font-rustic shadow-lg">
                             💾 Registrar Venta y Copiar
                         </button>
-                        <button onclick="copiarTicketActualDiscord()" class="w-full bg-indigo-900 hover:bg-indigo-800 text-indigo-100 font-bold py-2 rounded border border-indigo-700 transition text-xs font-rustic">
-                            📋 Copiar Formato Discord
-                        </button>
                         <button id="btn-limpiar-venta" class="w-full bg-stone-900 hover:bg-stone-800 text-amber-200/80 font-bold py-1.5 rounded border border-amber-900/50 transition text-xs font-rustic">
                             🗑️ Limpiar Venta
                         </button>
@@ -213,9 +221,12 @@
             <!-- HISTORIAL Y BÚSQUEDA DE FACTURAS -->
             <div class="western-panel rounded-xl p-4 space-y-3">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-amber-900/60 pb-2">
-                    <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Facturas</h2>
+                    <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Facturas y Fichajes</h2>
                     
                     <div class="flex flex-wrap gap-2">
+                        <button onclick="verHistorialFichajesAdmin()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 border border-amber-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition">
+                            ⏱️ Ver Fichajes (Admin)
+                        </button>
                         <button onclick="generarBalanceSemanalAdmin()" class="bg-indigo-900 hover:bg-indigo-800 text-indigo-100 border border-indigo-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition">
                             📊 Balance Semanal (Admin)
                         </button>
@@ -501,7 +512,7 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // NUEVA CLAVE DE ADMINISTRADOR
+        // CLAVE DE ADMINISTRADOR
         const CLAVE_ADMIN = "SuperAdmin";
 
         // DATOS INICIALES Y CATÁLOGO
@@ -586,16 +597,103 @@
 
         let listaFacturasGlobal = [];
         let listaPedidosGlobal = [];
+        let listaFichajesGlobal = [];
 
-        // GESTIÓN DE USUARIOS
+        // GESTIÓN DE USUARIOS Y FICHAJE
+        let turnoActivo = JSON.parse(localStorage.getItem('turno_activo_the_corner')) || null;
+
         function CargarUsuarioMemoria() {
             const usr = localStorage.getItem('usuario_the_corner') || 'Nano33';
             document.getElementById('usuario-activo').value = usr;
+            actualizarEstadoFichajeUI();
         }
 
         function guardarUsuarioMemoria(val) {
             localStorage.setItem('usuario_the_corner', val.trim() || 'Empleado');
         }
+
+        function actualizarEstadoFichajeUI() {
+            const btnFichaje = document.getElementById('btn-fichaje');
+            const estadoFichajeText = document.getElementById('estado-fichaje-text');
+            if (!btnFichaje || !estadoFichajeText) return;
+
+            if (turnoActivo) {
+                btnFichaje.textContent = "🔴 Salir de Servicio";
+                btnFichaje.className = "w-full bg-red-800 hover:bg-red-700 text-red-100 font-bold py-2 rounded text-xs border border-red-600 transition font-rustic shadow";
+                
+                const ahora = Date.now();
+                const diffMs = ahora - turnoActivo.inicio;
+                const horas = Math.floor(diffMs / (1000 * 60 * 60));
+                const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                const segundos = Math.floor((diffMs % (1000 * 60)) / 1000);
+                
+                estadoFichajeText.innerHTML = `🟢 En servicio (${turnoActivo.usuario}): <span class="font-mono text-emerald-400 font-bold">${String(horas).padStart(2,'0')}:${String(minutos).padStart(2,'0')}:${String(segundos).padStart(2,'0')}</span>`;
+            } else {
+                btnFichaje.textContent = "🟢 Entrar de Servicio";
+                btnFichaje.className = "w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2 rounded text-xs border border-emerald-600 transition font-rustic shadow";
+                estadoFichajeText.innerHTML = `⚪ Fuera de servicio`;
+            }
+        }
+
+        function toggleFichaje() {
+            const usuarioNombre = document.getElementById('usuario-activo').value.trim() || 'Empleado';
+            if (!turnoActivo) {
+                turnoActivo = {
+                    usuario: usuarioNombre,
+                    inicio: Date.now(),
+                    fechaInicioStr: new Date().toLocaleString()
+                };
+                localStorage.setItem('turno_activo_the_corner', JSON.stringify(turnoActivo));
+                alert(`🟢 ¡Has entrado de servicio, ${usuarioNombre}! Buen turno.`);
+            } else {
+                const fin = Date.now();
+                const diffMs = fin - turnoActivo.inicio;
+                const totalHoras = (diffMs / (1000 * 60 * 60)).toFixed(2);
+                
+                let ventasTurno = 0;
+                let cantidadTickets = 0;
+                listaFacturasGlobal.forEach(f => {
+                    if (f.usuario.toLowerCase() === turnoActivo.usuario.toLowerCase() && f.id >= turnoActivo.inicio) {
+                        ventasTurno += f.total;
+                        cantidadTickets++;
+                    }
+                });
+
+                const turnoResumen = {
+                    id: Date.now(),
+                    usuario: turnoActivo.usuario,
+                    inicioStr: turnoActivo.fechaInicioStr,
+                    finStr: new Date().toLocaleString(),
+                    horas: totalHoras,
+                    ventas: ventasTurno,
+                    tickets: cantidadTickets
+                };
+
+                database.ref('fichajes_historial').push(turnoResumen);
+
+                const textoDiscord = "```md\n" +
+                                     "⏱️ **CONTROL DE FICHAJE - THE CORNER**\n" +
+                                     "-----------------------------------\n" +
+                                     "👤 **Empleado:** " + turnoResumen.usuario + "\n" +
+                                     "⏰ **Inicio:** " + turnoResumen.inicioStr + "\n" +
+                                     "🏁 **Fin:** " + turnoResumen.finStr + "\n" +
+                                     "⏳ **Horas Trabajadas:** " + turnoResumen.horas + "h\n" +
+                                     "🧾 **Tickets Emitidos:** " + turnoResumen.tickets + "\n" +
+                                     "💰 **Beneficio Generado:** $" + turnoResumen.ventas.toFixed(2) + "\n" +
+                                     "```";
+
+                copiarTextoPortapapeles(textoDiscord);
+                alert(`🔴 Turno finalizado para ${turnoResumen.usuario}.\nHoras: ${turnoResumen.horas}h | Ventas: $${turnoResumen.ventas.toFixed(2)}\n(Resumen copiado para Discord).`);
+
+                localStorage.removeItem('turno_activo_the_corner');
+                turnoActivo = null;
+            }
+            actualizarEstadoFichajeUI();
+        }
+
+        setInterval(() => {
+            if (turnoActivo) actualizarEstadoFichajeUI();
+        }, 1000);
 
         function cambiarPantalla(pantalla) {
             ['ventas', 'pedidos', 'licencias', 'comida', 'bebida', 'menus', 'productos'].forEach(p => {
@@ -654,6 +752,16 @@
             if (data) {
                 Object.keys(data).forEach(key => {
                     listaPedidosGlobal.push({ ...data[key], keyFirebase: key });
+                });
+            }
+        });
+
+        database.ref('fichajes_historial').on('value', (s) => {
+            const data = s.val();
+            listaFichajesGlobal = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    listaFichajesGlobal.push({ ...data[key], keyFirebase: key });
                 });
             }
         });
@@ -774,58 +882,22 @@
             copiarTextoPortapapeles(texto);
         }
 
-        function copiarTicketActualDiscord() {
-            let totalAcc = 0, resumenArray = [];
-            const usuarioNombre = document.getElementById('usuario-activo').value.trim() || 'Empleado';
-
-            Object.values(comida).forEach(item => {
-                const est = ventaComida[item.id];
-                if (est && est.cantidad > 0) {
-                    let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
-                    totalAcc += est.cantidad * p;
-                    resumenArray.push(est.cantidad + "x " + item.nombre);
+        // VER HISTORIAL DE FICHAJES (ADMIN)
+        function verHistorialFichajesAdmin() {
+            const pass = prompt("🔐 Introduce la contraseña de Administrador (SuperAdmin) para ver los fichajes:");
+            if (pass === CLAVE_ADMIN) {
+                if (listaFichajesGlobal.length === 0) {
+                    alert("No hay registros de fichajes todavía.");
+                    return;
                 }
-            });
-            Object.values(bebida).forEach(item => {
-                const est = ventaBebida[item.id];
-                if (est && est.cantidad > 0) {
-                    let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
-                    totalAcc += est.cantidad * p;
-                    resumenArray.push(est.cantidad + "x " + item.nombre);
-                }
-            });
-            Object.values(menus).forEach(item => {
-                const est = ventaMenus[item.id];
-                if (est && est.cantidad > 0) {
-                    let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
-                    totalAcc += est.cantidad * p;
-                    resumenArray.push(est.cantidad + "x " + item.nombre);
-                }
-            });
-            Object.values(productos).forEach(item => {
-                const est = ventaProductos[item.id];
-                if (est && est.cantidad > 0) {
-                    let p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
-                    totalAcc += est.cantidad * p;
-                    resumenArray.push(est.cantidad + "x " + item.nombre);
-                }
-            });
-
-            if (totalAcc === 0) {
-                alert("No hay ningún producto seleccionado para copiar.");
-                return;
+                let reporte = "⏱️ REGISTRO DE FICHAJES Y TURNOS:\n\n";
+                listaFichajesGlobal.forEach(t => {
+                    reporte += `• Empleado: ${t.usuario} | Horas: ${t.horas}h | Ventas: $${t.ventas.toFixed(2)} | Inicio: ${t.inicioStr}\n`;
+                });
+                prompt("Copia el registro de fichajes:", reporte);
+            } else if (pass !== null) {
+                alert("❌ Contraseña incorrecta.");
             }
-
-            const ahora = new Date();
-            const dia = String(ahora.getDate()).padStart(2, '0');
-            const mes = String(ahora.getMonth() + 1).padStart(2, '0');
-            const anio = ahora.getFullYear();
-            const hora = String(ahora.getHours()).padStart(2, '0');
-            const minuto = String(ahora.getMinutes()).padStart(2, '0');
-            const codigoTicket = dia + "/" + mes + "/" + anio + "-" + hora + ":" + minuto;
-
-            const texto = generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), totalAcc);
-            copiarTextoPortapapeles(texto);
         }
 
         // REGISTRAR PEDIDO EN CONTABILIDAD
@@ -880,6 +952,11 @@
                     totalPedidos += p.total;
                 });
 
+                let totalHorasTrabajadas = 0;
+                listaFichajesGlobal.forEach(t => {
+                    totalHorasTrabajadas += parseFloat(t.horas || 0);
+                });
+
                 const beneficioNeto = totalVentas - totalPedidos;
 
                 const textoDiscord = "```md\n" +
@@ -887,6 +964,7 @@
                                      "-----------------------------------\n" +
                                      "💰 **Total Ventas:** $" + totalVentas.toFixed(2) + "\n" +
                                      "📦 **Total Pedidos:** $" + totalPedidos.toFixed(2) + "\n" +
+                                     "⏳ **Horas Totales:** " + totalHorasTrabajadas.toFixed(2) + "h\n" +
                                      "-----------------------------------\n" +
                                      "📈 **BENEFICIO NETO:** $" + beneficioNeto.toFixed(2) + "\n" +
                                      "```";
