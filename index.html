@@ -72,7 +72,7 @@
     <div id="seccion-auth" class="max-w-md mx-auto my-12 western-panel p-6 rounded-2xl space-y-6 shadow-2xl">
         <div class="text-center space-y-2">
             <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-amber-600 shadow-lg bg-stone-900 flex items-center justify-center">
-                <img src="logo.jpg" alt="Logo The Corner" class="w-full h-full object-cover">
+                <img src="logo.jpg" alt="Logo The Corner" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/150?text=The+Corner'">
             </div>
             <h1 class="text-2xl font-black text-amber-500 font-rustic tracking-widest">THE CORNER</h1>
             <p class="text-xs text-amber-200/70">Acceso Privado a la Gestión del Saloon</p>
@@ -125,7 +125,7 @@
         <header class="py-3 px-4 rounded-xl western-header flex flex-col md:flex-row items-center justify-between gap-3">
             <div class="flex items-center space-x-3">
                 <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-600 shadow-xl bg-stone-900">
-                    <img src="logo.jpg" alt="Logo The Corner" class="w-full h-full object-cover">
+                    <img src="logo.jpg" alt="Logo The Corner" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/150?text=The+Corner'">
                 </div>
                 <div>
                     <div class="text-[9px] tracking-widest text-amber-600 font-bold uppercase">✦ Saint Denis • Est. 1880 ✦</div>
@@ -355,7 +355,7 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-amber-900/60 pb-2">
                     <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Facturas</h2>
                     <div class="flex flex-wrap gap-2">
-                        <button id="btn-admin-caja-base" onclick="modalAjustarCajaBase()" class="bg-emerald-900 hover:bg-emerald-800 text-emerald-100 border border-emerald-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🪙 Ajustar Base Caja (Admin)</button>
+                        <button id="btn-admin-caja-base" onclick="modalAjustarCajaBase()" class="bg-emerald-900 hover:bg-emerald-800 text-emerald-100 border border-emerald-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🪙 Ajustar Base Caja (SuperAdmim)</button>
                         <button id="btn-admin-fichajes" onclick="verHistorialFichajesAdmin()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 border border-amber-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">⏱️ Ver Turnos (Admin)</button>
                         <button id="btn-admin-balance" onclick="generarBalanceSemanalAdmin()" class="bg-indigo-900 hover:bg-indigo-800 text-indigo-100 border border-indigo-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">📊 Balance Semanal (Admin)</button>
                         <button id="btn-admin-purga" onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🧹 Purga (Admin)</button>
@@ -464,7 +464,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 3: CONVENIOS ================= -->
+        <!-- ================= PANTALLA 3: CONVENIOS (REHECHO DESDE CERO) ================= -->
         <div id="pantalla-convenios" class="space-y-4 hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div class="lg:col-span-2 space-y-4">
@@ -482,21 +482,21 @@
                             </div>
                         </div>
 
-                        <!-- FORMULARIO CREAR NUEVO PRODUCTO EN CONVENIO & BORRAR CATEGORÍA -->
-                        <form id="form-nuevo-convenio-item" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
-                            <div class="flex flex-wrap justify-between items-center gap-2">
-                                <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Servicio/Producto a <span id="label-convenio-actual" class="text-amber-400">Médicos</span></h3>
+                        <!-- FORMULARIO CREAR NUEVO PRODUCTO EN CONVENIO & GESTIÓN DE COLECTIVOS -->
+                        <div class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                            <div class="flex flex-wrap justify-between items-center gap-2 border-b border-amber-900/40 pb-2">
+                                <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Servicio a <span id="label-convenio-actual" class="text-amber-400">Médicos</span></h3>
                                 <div class="flex gap-2">
-                                    <button type="button" onclick="crearNuevaCategoriaConvenio()" class="text-[10px] bg-stone-950 hover:bg-stone-800 text-amber-300 px-2 py-1 rounded border border-amber-800 font-rustic">➕ Crear Colectivo</button>
-                                    <button type="button" onclick="eliminarCategoriaConvenioActual()" class="text-[10px] bg-red-950 hover:bg-red-900 text-red-200 px-2 py-1 rounded border border-red-800 font-rustic">🗑️ Eliminar Colectivo</button>
+                                    <button type="button" onclick="crearNuevaCategoriaConvenio()" class="text-[10px] bg-stone-950 hover:bg-stone-800 text-amber-300 px-2 py-1 rounded border border-amber-800 font-rustic font-bold">➕ Crear Colectivo</button>
+                                    <button type="button" onclick="eliminarCategoriaConvenioActual()" class="text-[10px] bg-red-950 hover:bg-red-900 text-red-200 px-2 py-1 rounded border border-red-800 font-rustic font-bold">🗑️ Eliminar Colectivo</button>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-3 gap-2">
-                                <input type="text" id="convenio-item-nombre" placeholder="Nombre del servicio" required class="col-span-2 p-2 rounded text-xs">
-                                <input type="number" step="0.01" id="convenio-item-precio" placeholder="Precio Base ($)" required class="col-span-1 p-2 rounded text-xs">
-                            </div>
-                            <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Guardar en Convenio</button>
-                        </form>
+                            <form id="form-nuevo-convenio-item" class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <input type="text" id="convenio-item-nombre" placeholder="Nombre del servicio o plato" required class="md:col-span-2 p-2 rounded text-xs">
+                                <input type="number" step="0.01" id="convenio-item-precio" placeholder="Precio Base ($)" required class="md:col-span-1 p-2 rounded text-xs">
+                                <button type="submit" class="md:col-span-3 bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Guardar Servicio en Convenio</button>
+                            </form>
+                        </div>
 
                         <!-- TABLA DE PRODUCTOS DEL CONVENIO SELECCIONADO -->
                         <div class="overflow-x-auto">
@@ -521,18 +521,18 @@
                     <div class="space-y-3">
                         <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🧾 Ticket de Convenio</h2>
 
-                        <!-- SELECTOR DE DESCUENTO PORCENTUAL -->
+                        <!-- SELECTOR Y INPUT DE DESCUENTO PORCENTUAL -->
                         <div class="bg-stone-900/80 p-3 rounded-lg border border-amber-800/60 space-y-2">
-                            <label class="text-[10px] text-amber-300 font-bold uppercase tracking-wider font-rustic block">🏷️ % Ajuste / Descuento de Convenio:</label>
+                            <label class="text-[10px] text-amber-300 font-bold uppercase tracking-wider font-rustic block">🏷️ Porcentaje de Descuento:</label>
                             <div class="grid grid-cols-4 gap-1">
-                                <button type="button" onclick="setPorcentajeConvenio(0)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800">0%</button>
-                                <button type="button" onclick="setPorcentajeConvenio(10)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800">10%</button>
-                                <button type="button" onclick="setPorcentajeConvenio(15)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800">15%</button>
-                                <button type="button" onclick="setPorcentajeConvenio(20)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800">20%</button>
+                                <button type="button" onclick="setPorcentajeConvenio(0)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">0%</button>
+                                <button type="button" onclick="setPorcentajeConvenio(10)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">10%</button>
+                                <button type="button" onclick="setPorcentajeConvenio(15)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">15%</button>
+                                <button type="button" onclick="setPorcentajeConvenio(20)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">20%</button>
                             </div>
                             <div class="flex items-center space-x-2 pt-1">
-                                <span class="text-[10px] text-amber-200/70">Personalizado:</span>
-                                <input type="number" id="input-porcentaje-convenio" value="0" min="0" max="100" oninput="renderizarResumenConvenio()" class="w-16 p-1 rounded text-center text-xs font-bold text-amber-300 bg-stone-950 border-amber-800">
+                                <span class="text-[10px] text-amber-200/70">Personalizado (%):</span>
+                                <input type="number" id="input-porcentaje-convenio" value="0" min="0" max="100" step="0.5" oninput="renderizarResumenConvenio()" class="w-20 p-1.5 rounded text-center text-xs font-bold text-amber-300 bg-stone-950 border-amber-800">
                                 <span class="text-xs font-bold text-amber-400">%</span>
                             </div>
                         </div>
@@ -1097,27 +1097,35 @@
             if (btnTarget) btnTarget.classList.add('active');
         }
 
+        // ================= FUNCIÓN DE AJUSTAR BASE DE CAJA CON CONTRASEÑA "SuperAdmim" =================
         function modalAjustarCajaBase() {
-            const entrada = prompt("🪙 Ajustar saldo total deseado para la caja fuerte ($):", CAJA_INICIAL_BASE);
+            const passInput = prompt("🔒 Introduce la contraseña de Administrador para ajustar la caja:");
+            if (passInput === null) return;
+            if (passInput !== "SuperAdmim") {
+                alert("❌ Contraseña incorrecta. Acceso denegado.");
+                return;
+            }
+
+            let totalVentas = 0;
+            listaFacturasGlobal.forEach(f => { totalVentas += f.total; });
+            let totalPedidos = 0;
+            listaPedidosGlobal.forEach(p => { totalPedidos += p.total; });
+            const dineroActualCalculado = CAJA_INICIAL_BASE + totalVentas - totalPedidos;
+
+            const entrada = prompt("🪙 Contraseña correcta. Introduce el dinero REAL total que hay en la caja (IC):", dineroActualCalculado.toFixed(2));
             if (entrada !== null && entrada.trim() !== "") {
                 const entradaLimpia = entrada.replace(',', '.').trim();
                 const nuevoMontoTotal = parseFloat(entradaLimpia);
                 if (!isNaN(nuevoMontoTotal)) {
-                    // Calculamos las ventas y pedidos para reajustar la base exacta
-                    let totalVentas = 0;
-                    listaFacturasGlobal.forEach(f => { totalVentas += f.total; });
-                    let totalPedidos = 0;
-                    listaPedidosGlobal.forEach(p => { totalPedidos += p.total; });
-
                     const baseCalculada = nuevoMontoTotal - totalVentas + totalPedidos;
                     CAJA_INICIAL_BASE = baseCalculada;
 
                     database.ref('configuracion/caja_base').set(baseCalculada).then(() => {
                         actualizarCajaTotalDisplay();
-                        alert("¡Saldo de caja ajustado correctamente a $" + nuevoMontoTotal.toFixed(2) + "!");
+                        alert("¡Caja cuadrada con éxito! Nuevo saldo total en caja: $" + nuevoMontoTotal.toFixed(2));
                     }).catch(err => {
                         actualizarCajaTotalDisplay();
-                        alert("Caja ajustada localmente a $" + nuevoMontoTotal.toFixed(2));
+                        alert("Caja ajustada correctamente a $" + nuevoMontoTotal.toFixed(2));
                     });
                 } else {
                     alert("Por favor, introduce un número válido.");
@@ -1323,7 +1331,7 @@
                 
                 let ventasTurno = 0, cantidadTickets = 0;
                 listaFacturasGlobal.forEach(f => {
-                    if (f.usuario.toLowerCase() === turnoActivo.usuario.toLowerCase() && f.id >= turnoActivo.inicio) {
+                    if (f.usuario.toLowerCase().includes(turnoActivo.usuario.toLowerCase()) && f.id >= turnoActivo.inicio) {
                         ventasTurno += f.total;
                         cantidadTickets++;
                     }
@@ -1462,6 +1470,7 @@
             }
         }
 
+        // ================= SISTEMA DE CONVENIOS REHECHO DESDE CERO =================
         function actualizarSelectCategoriasConvenio() {
             const select = document.getElementById('select-categoria-convenio');
             if (!select) return;
@@ -1483,17 +1492,20 @@
                 select.value = categoriaConvenioActual;
             }
 
-            document.getElementById('label-convenio-actual').textContent = categoriaConvenioActual;
+            const labelActual = document.getElementById('label-convenio-actual');
+            if (labelActual) labelActual.textContent = categoriaConvenioActual;
         }
 
         function cambiarCategoriaConvenio(nuevaCat) {
             categoriaConvenioActual = nuevaCat;
-            document.getElementById('label-convenio-actual').textContent = nuevaCat;
+            const labelActual = document.getElementById('label-convenio-actual');
+            if (labelActual) labelActual.textContent = nuevaCat;
+            ventaConvenio = {};
             renderizarTablaConvenio();
         }
 
         function crearNuevaCategoriaConvenio() {
-            const nuevaCat = prompt("Introduce el nombre de la nueva categoría/convenio (ej. Sheriffs, Ferrocarril, Abogados):");
+            const nuevaCat = prompt("Introduce el nombre de la nueva categoría / colectivo de convenios (ej. Sheriffs, Ferrocarril, Abogados):");
             if (nuevaCat && nuevaCat.trim() !== "") {
                 const catFormateada = nuevaCat.trim();
                 if (!conveniosData[catFormateada]) {
@@ -1504,13 +1516,17 @@
                         alert(`¡Colectivo "${catFormateada}" creado con éxito!`);
                     });
                 } else {
-                    alert("Esa categoría ya existe.");
+                    alert("Ese colectivo ya existe.");
                 }
             }
         }
 
         function eliminarCategoriaConvenioActual() {
-            if (confirm(`⚠️ ¿Estás seguro de eliminar el colectivo completo "${categoriaConvenioActual}" y todos sus productos?`)) {
+            if (Object.keys(conveniosData).length <= 1) {
+                alert("Debe existir al menos un colectivo de convenios.");
+                return;
+            }
+            if (confirm(`⚠️ ¿Estás seguro de eliminar el colectivo completo "${categoriaConvenioActual}" y todos sus servicios?`)) {
                 database.ref('convenios/' + categoriaConvenioActual).remove().then(() => {
                     alert(`🗑️ Colectivo "${categoriaConvenioActual}" eliminado.`);
                     categoriaConvenioActual = Object.keys(conveniosData).find(c => c !== categoriaConvenioActual) || "Médicos";
@@ -1529,7 +1545,8 @@
             const lista = Object.values(itemsCat);
 
             if (lista.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-amber-200/40 italic">No hay productos o servicios agregados a este convenio.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-amber-200/40 italic">No hay servicios o platos agregados a este convenio.</td></tr>';
+                renderizarResumenConvenio();
                 return;
             }
 
@@ -1588,7 +1605,8 @@
                 contenedor.innerHTML = '<p class="text-amber-200/40 italic text-center py-3">No hay ítems seleccionados.</p>';
             }
 
-            const pct = parseFloat(document.getElementById('input-porcentaje-convenio').value) || 0;
+            const pctInput = parseFloat(document.getElementById('input-porcentaje-convenio').value);
+            const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
             const descuentoMonto = subtotalBase * (pct / 100);
             const totalConvenio = Math.max(0, subtotalBase - descuentoMonto);
 
@@ -1614,11 +1632,17 @@
             const nombre = document.getElementById('convenio-item-nombre').value.trim();
             const precio = parseFloat(document.getElementById('convenio-item-precio').value);
 
+            if (!nombre || isNaN(precio)) {
+                alert("Introduce un nombre y un precio válido.");
+                return;
+            }
+
             database.ref('convenios/' + categoriaConvenioActual + '/' + id).set({
                 id, nombre, precio
             }).then(() => {
-                this.reset();
-                alert(`¡Servicio añadido a ${categoriaConvenioActual}!`);
+                document.getElementById('convenio-item-nombre').value = '';
+                document.getElementById('convenio-item-precio').value = '';
+                alert(`¡Servicio añadido al convenio ${categoriaConvenioActual}!`);
             });
         });
 
@@ -1641,7 +1665,8 @@
                 return;
             }
 
-            const pct = parseFloat(document.getElementById('input-porcentaje-convenio').value) || 0;
+            const pctInput = parseFloat(document.getElementById('input-porcentaje-convenio').value);
+            const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
             const descuentoMonto = subtotalBase * (pct / 100);
             const totalConvenio = Math.max(0, subtotalBase - descuentoMonto);
 
@@ -1653,7 +1678,7 @@
                 codigoTicket: codigoTicket,
                 usuario: usuarioNombre + " (" + categoriaConvenioActual + ")",
                 total: totalConvenio,
-                resumen: resumenArray.join(', ') + ` [Convenio ${categoriaConvenioActual} - Descuento ${pct}%]`,
+                resumen: resumenArray.join(', ') + ` [Convenio ${categoriaConvenioActual} - Desc. ${pct}%]`,
                 fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
             };
 
@@ -1674,10 +1699,11 @@
                                  "```";
 
             copiarTextoPortapapeles(textoDiscord);
-            alert("¡Ticket de convenio registrado en contabilidad y copiado para Discord!");
+            alert("¡Ticket de convenio registrado en contabilidad, sumado a la caja y copiado para Discord!");
             limpiarVentaConvenio();
         });
 
+        // ================= HISTORIAL Y FACTURAS =================
         function renderizarFacturas() {
             const contenedor = document.getElementById('lista-historial-facturas');
             if (!contenedor) return;
@@ -1914,7 +1940,7 @@
 
             database.ref('pedidos_historial').push(pedidoData);
             copiarTextoPortapapeles(generarFormatoDiscordPedido(codigoPedido, resumenArray.join(', '), totalCoste));
-            alert("¡Pedido registrado en la contabilidad y copiado para Discord!");
+            alert("¡Pedido registrado en contabilidad, descontado de la caja y copiado para Discord!");
             limpiarPedidos();
         }
 
@@ -1933,7 +1959,7 @@
             const textoDiscord = "```md\n" +
                                  "📊 **BALANCE SEMANAL - THE CORNER**\n" +
                                  "-----------------------------------\n" +
-                                 "🪙 **Caja Inicial:** $" + CAJA_INICIAL_BASE.toFixed(2) + "\n" +
+                                 "🪙 **Caja Base:** $" + CAJA_INICIAL_BASE.toFixed(2) + "\n" +
                                  "💰 **Total Ventas:** $" + totalVentas.toFixed(2) + "\n" +
                                  "📦 **Total Pedidos:** $" + totalPedidos.toFixed(2) + "\n" +
                                  "⏳ **Horas Totales:** " + totalHorasTrabajadas.toFixed(2) + "h\n" +
