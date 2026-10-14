@@ -1589,16 +1589,18 @@
 
         function registrarPedidoContabilidad() {
             let totalCoste = 0, resumenArray = [];
-            Object.values(productosEEUU).forEach(item => {
-                const est = pedidoEEUU[item.id];
+            Object.entries(productosEEUU || {}).forEach(([key, item]) => {
+                const itemId = item.id || key;
+                const est = pedidoEEUU[itemId];
                 if (est && est.cantidad > 0) {
                     let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
                     totalCoste += est.cantidad * p;
                     resumenArray.push(est.cantidad + "x " + item.nombre + " (EEUU)");
                 }
             });
-            Object.values(productosMexico).forEach(item => {
-                const est = pedidoMex[item.id];
+            Object.entries(productosMexico || {}).forEach(([key, item]) => {
+                const itemId = item.id || key;
+                const est = pedidoMex[itemId];
                 if (est && est.cantidad > 0) {
                     let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
                     totalCoste += est.cantidad * p;
@@ -1675,7 +1677,7 @@
         }
 
         function ordenarArrayPorNombre(obj) {
-            return Object.values(obj).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+            return Object.values(obj || {}).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
         }
 
         function renderizarTodo() {
@@ -1805,10 +1807,15 @@
             if (!tbody) return;
             tbody.innerHTML = '';
             const dbPath = region === 'eeuu' ? 'pedidos_eeuu' : 'pedidos_mexico';
-            const listaOrdenada = ordenarArrayPorNombre(items);
+            
+            const listaOrdenada = Object.entries(items || {}).map(([key, item]) => ({
+                ...item,
+                id: item.id || key
+            })).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
 
             listaOrdenada.forEach(item => {
-                const est = estadoObj[item.id] || { cantidad: 0, tarifa: 'min' };
+                const itemId = item.id;
+                const est = estadoObj[itemId] || { cantidad: 0, tarifa: 'min' };
                 let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
                 let sub = est.cantidad * p;
 
@@ -1816,17 +1823,17 @@
                     <tr class="hover:bg-amber-900/20">
                         <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
                         <td class="p-2 text-center">
-                            <select onchange="cambiarTarifaPedido('${region}', '${item.id}', this.value)" class="rounded text-[11px] p-1">
+                            <select onchange="cambiarTarifaPedido('${region}', '${itemId}', this.value)" class="rounded text-[11px] p-1">
                                 <option value="min" ${est.tarifa === 'min' ? 'selected' : ''}>Mín ($${item.pMin.toFixed(2)})</option>
                                 <option value="norm" ${est.tarifa === 'norm' ? 'selected' : ''}>Máx ($${item.pNorm.toFixed(2)})</option>
                             </select>
                         </td>
                         <td class="p-2 text-center">
-                            <input type="number" min="0" value="${est.cantidad}" onchange="cambiarCantPedido('${region}', '${item.id}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
+                            <input type="number" min="0" value="${est.cantidad}" oninput="cambiarCantPedido('${region}', '${itemId}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
                         </td>
                         <td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td>
                         <td class="p-2 text-center">
-                            <button onclick="eliminarItem('${dbPath}', '${item.id}')" title="Eliminar Producto" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                            <button onclick="eliminarItem('${dbPath}', '${itemId}')" title="Eliminar Producto" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
                         </td>
                     </tr>`;
             });
@@ -1879,7 +1886,7 @@
             let subtotalBase = 0, itemsAcc = 0, hay = false;
 
             const sumarAlResumen = (items, estadoObj, tipo) => {
-                Object.values(items).forEach(item => {
+                Object.values(items || {}).forEach(item => {
                     const est = estadoObj[item.id];
                     if (est && est.cantidad > 0) {
                         hay = true;
@@ -1912,15 +1919,17 @@
 
         function renderizarResumenPedidos() {
             let totalCoste = 0;
-            Object.values(productosEEUU).forEach(item => {
-                const est = pedidoEEUU[item.id];
+            Object.entries(productosEEUU || {}).forEach(([key, item]) => {
+                const itemId = item.id || key;
+                const est = pedidoEEUU[itemId];
                 if (est && est.cantidad > 0) {
                     let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
                     totalCoste += est.cantidad * p;
                 }
             });
-            Object.values(productosMexico).forEach(item => {
-                const est = pedidoMex[item.id];
+            Object.entries(productosMexico || {}).forEach(([key, item]) => {
+                const itemId = item.id || key;
+                const est = pedidoMex[itemId];
                 if (est && est.cantidad > 0) {
                     let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
                     totalCoste += est.cantidad * p;
@@ -1940,7 +1949,7 @@
             const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
 
             const recolectarVenta = (items, estadoObj, tipo) => {
-                Object.values(items).forEach(item => {
+                Object.values(items || {}).forEach(item => {
                     const est = estadoObj[item.id];
                     if (est && est.cantidad > 0) {
                         let p = tipo === 'menu' ? (est.tarifa === 'min' ? item.pMin : item.pNorm) : (est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm));
