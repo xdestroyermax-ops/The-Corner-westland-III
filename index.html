@@ -153,7 +153,7 @@
             </div>
         </header>
 
-        <!-- NAVEGACIÓN PRINCIPAL (SIN CONVENIOS) -->
+        <!-- NAVEGACIÓN PRINCIPAL -->
         <div class="grid grid-cols-3 md:grid-cols-9 gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
             <button onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>💰</span> <span>Ventas</span>
@@ -348,8 +348,8 @@
                             <span>Descuento Aplicado:</span>
                             <span id="descuento-monto-venta" class="font-bold text-emerald-400">-$0.00</span>
                         </div>
-                        <div class="flex justify-between items-center text-lg md:text-xl font-black text-amber-400 font-rustic pt-1 border-t border-amber-900/40">
-                            <span>Total a Facturar:</span>
+                        <div class="flex justify-between items-center text-xl md:text-2xl font-black text-amber-400 font-rustic pt-1 border-t border-amber-900/40">
+                            <span>TOTAL A FACTURAR:</span>
                             <span id="total-precio-venta">$0.00</span>
                         </div>
 
@@ -755,7 +755,7 @@
         const database = firebase.database();
 
         let usuarioActualData = null;
-        let CAJA_INICIAL_BASE = 157.75;
+        let CAJA_INICIAL_BASE = 0.00; // Base fijada por defecto en cero
 
         const productosEEUUInicial = {
             "e1": { id: "e1", nombre: "Ajo", pMin: 0.10, pNorm: 0.15 },
@@ -1064,6 +1064,7 @@
                     CAJA_INICIAL_BASE = parseFloat(val);
                 } else {
                     database.ref('configuracion/caja_base').set(0.00);
+                    CAJA_INICIAL_BASE = 0.00;
                 }
                 actualizarCajaTotalDisplay();
             });
@@ -1871,7 +1872,6 @@
             const cant = Math.max(0, parseInt(val) || 0);
             obj[id].cantidad = cant;
 
-            // Actualizar subtotal de esta fila de forma independiente para no perder el foco del input
             const items = region === 'eeuu' ? productosEEUU : productosMexico;
             const item = items[id];
             if (item) {
@@ -1905,7 +1905,7 @@
             const contenedor = document.getElementById('lista-resumen-venta');
             if (!contenedor) return;
             contenedor.innerHTML = '';
-            let subtotalBase = 0, itemsAcc = 0, hay = false;
+            let subtotalBase = 0, hay = false;
 
             const sumarAlResumen = (items, estadoObj, tipo) => {
                 Object.values(items || {}).forEach(item => {
@@ -1914,7 +1914,7 @@
                         hay = true;
                         let p = tipo === 'menu' ? (est.tarifa === 'min' ? item.pMin : item.pNorm) : (est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm));
                         let sub = est.cantidad * p;
-                        subtotalBase += sub; itemsAcc += est.cantidad;
+                        subtotalBase += sub;
                         contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>${item.nombre} (${est.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
                     }
                 });
@@ -1935,8 +1935,9 @@
 
             document.getElementById('subtotal-base-venta').textContent = `$${subtotalBase.toFixed(2)}`;
             document.getElementById('descuento-monto-venta').textContent = `-$${descuentoMonto.toFixed(2)} (${pct}%)`;
-            document.getElementById('total-items-venta').textContent = itemsAcc;
-            document.getElementById('total-precio-venta').textContent = `$${totalVenta.toFixed(2)}`;
+            
+            const elTotal = document.getElementById('total-precio-venta');
+            if (elTotal) elTotal.textContent = `$${totalVenta.toFixed(2)}`;
         }
 
         function renderizarResumenPedidos() {
