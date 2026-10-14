@@ -464,7 +464,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 3: CONVENIOS (REHECHO DESDE CERO) ================= -->
+        <!-- ================= PANTALLA 3: CONVENIOS (CORREGIDO PARA CREAR COLECTIVOS NATIVAMENTE) ================= -->
         <div id="pantalla-convenios" class="space-y-4 hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div class="lg:col-span-2 space-y-4">
@@ -487,8 +487,8 @@
                             <div class="flex flex-wrap justify-between items-center gap-2 border-b border-amber-900/40 pb-2">
                                 <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Servicio a <span id="label-convenio-actual" class="text-amber-400">Médicos</span></h3>
                                 <div class="flex gap-2">
-                                    <button type="button" onclick="crearNuevaCategoriaConvenio()" class="text-[10px] bg-stone-950 hover:bg-stone-800 text-amber-300 px-2 py-1 rounded border border-amber-800 font-rustic font-bold">➕ Crear Colectivo</button>
-                                    <button type="button" onclick="eliminarCategoriaConvenioActual()" class="text-[10px] bg-red-950 hover:bg-red-900 text-red-200 px-2 py-1 rounded border border-red-800 font-rustic font-bold">🗑️ Eliminar Colectivo</button>
+                                    <button type="button" onclick="crearNuevaCategoriaConvenio()" class="text-[10px] bg-stone-950 hover:bg-stone-800 text-amber-300 px-2.5 py-1 rounded border border-amber-800 font-rustic font-bold shadow">➕ Crear Colectivo</button>
+                                    <button type="button" onclick="eliminarCategoriaConvenioActual()" class="text-[10px] bg-red-950 hover:bg-red-900 text-red-200 px-2.5 py-1 rounded border border-red-800 font-rustic font-bold shadow">🗑️ Eliminar Colectivo</button>
                                 </div>
                             </div>
                             <form id="form-nuevo-convenio-item" class="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -1097,7 +1097,6 @@
             if (btnTarget) btnTarget.classList.add('active');
         }
 
-        // ================= FUNCIÓN DE AJUSTAR BASE DE CAJA CON CONTRASEÑA "SuperAdmim" =================
         function modalAjustarCajaBase() {
             const passInput = prompt("🔒 Introduce la contraseña de Administrador para ajustar la caja:");
             if (passInput === null) return;
@@ -1470,7 +1469,7 @@
             }
         }
 
-        // ================= SISTEMA DE CONVENIOS REHECHO DESDE CERO =================
+        // ================= SISTEMA DE CONVENIOS (CORREGIDO PARA CREAR CATEGORÍAS EN FIREBASE) =================
         function actualizarSelectCategoriasConvenio() {
             const select = document.getElementById('select-categoria-convenio');
             if (!select) return;
@@ -1488,7 +1487,7 @@
             if (conveniosData[categoriaConvenioActual]) {
                 select.value = categoriaConvenioActual;
             } else {
-                categoriaConvenioActual = Object.keys(conveniosData)[0];
+                categoriaConvenioActual = Object.keys(conveniosData)[0] || "Médicos";
                 select.value = categoriaConvenioActual;
             }
 
@@ -1504,16 +1503,22 @@
             renderizarTablaConvenio();
         }
 
+        // CORRECCIÓN: Firebase elimina objetos vacíos {}, por eso guardamos un primer item base para que la categoría persista
         function crearNuevaCategoriaConvenio() {
-            const nuevaCat = prompt("Introduce el nombre de la nueva categoría / colectivo de convenios (ej. Sheriffs, Ferrocarril, Abogados):");
+            const nuevaCat = prompt("Introduce el nombre de la nueva categoría / colectivo (ej. Sheriffs, Ferrocarril, Abogados):");
             if (nuevaCat && nuevaCat.trim() !== "") {
                 const catFormateada = nuevaCat.trim();
                 if (!conveniosData[catFormateada]) {
-                    database.ref('convenios/' + catFormateada).set({}).then(() => {
+                    const idInicial = 'cv_' + Date.now().toString();
+                    database.ref('convenios/' + catFormateada + '/' + idInicial).set({
+                        id: idInicial,
+                        nombre: "Servicio Inicial " + catFormateada,
+                        precio: 5.00
+                    }).then(() => {
                         categoriaConvenioActual = catFormateada;
                         actualizarSelectCategoriasConvenio();
                         renderizarTablaConvenio();
-                        alert(`¡Colectivo "${catFormateada}" creado con éxito!`);
+                        alert(`¡Colectivo "${catFormateada}" creado con éxito con un ítem inicial!`);
                     });
                 } else {
                     alert("Ese colectivo ya existe.");
@@ -1545,7 +1550,7 @@
             const lista = Object.values(itemsCat);
 
             if (lista.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-amber-200/40 italic">No hay servicios o platos agregados a este convenio.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-amber-200/40 italic">No hay servicios o platos agregados a este colectivo.</td></tr>';
                 renderizarResumenConvenio();
                 return;
             }
