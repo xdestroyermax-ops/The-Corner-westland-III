@@ -755,7 +755,7 @@
         const database = firebase.database();
 
         let usuarioActualData = null;
-        let CAJA_INICIAL_BASE = 0.00; // Base fijada por defecto en cero
+        let CAJA_INICIAL_BASE = 0.00;
 
         const productosEEUUInicial = {
             "e1": { id: "e1", nombre: "Ajo", pMin: 0.10, pNorm: 0.15 },
@@ -881,20 +881,32 @@
             });
         });
 
+        // REGISTRO MEJORADO CON GARANTÍA DE ESCRITURA EN DB
         document.getElementById('form-registro').addEventListener('submit', (e) => {
             e.preventDefault();
             const nombre = document.getElementById('reg-nombre').value.trim();
             const email = document.getElementById('reg-email').value.trim();
             const pass = document.getElementById('reg-password').value;
 
+            mostrarMensajeAuth("Registrando cuenta...", false);
+
             auth.createUserWithEmailAndPassword(email, pass).then(cred => {
                 const uid = cred.user.uid;
-                database.ref('usuarios/' + uid).set({
-                    uid, nombre, email, aprobado: false, rol: 'empleado'
-                }).then(() => {
+                const nuevoUsuario = {
+                    uid: uid,
+                    nombre: nombre,
+                    email: email,
+                    aprobado: false,
+                    rol: 'empleado'
+                };
+
+                // Forzar guardado en base de datos asegurando persistencia
+                database.ref('usuarios/' + uid).set(nuevoUsuario).then(() => {
                     auth.signOut();
-                    mostrarMensajeAuth("✅ Registro enviado. Espera a que un Administrador apruebe tu cuenta.", false);
+                    mostrarMensajeAuth("✅ Solicitud enviada con éxito. Espera a que un Administrador apruebe tu cuenta.", false);
                     switchAuthTab('login');
+                }).catch(dbErr => {
+                    mostrarMensajeAuth("❌ Error al guardar perfil en DB: " + dbErr.message, true);
                 });
             }).catch(err => {
                 mostrarMensajeAuth("❌ Error al registrar: " + err.message, true);
@@ -904,12 +916,22 @@
         auth.onAuthStateChanged(user => {
             if (user) {
                 database.ref('usuarios/' + user.uid).once('value', snapshot => {
-                    usuarioActualData = snapshot.val();
-                    if (!usuarioActualData) {
-                        auth.signOut();
-                        mostrarMensajeAuth("❌ Cuenta no encontrada en la base de datos.", true);
-                        return;
+                    let usuarioData = snapshot.val();
+                    
+                    // Auto-reparación si el usuario existe en Auth pero faltaba en la DB
+                    if (!usuarioData) {
+                        usuarioData = {
+                            uid: user.uid,
+                            nombre: user.email.split('@')[0],
+                            email: user.email,
+                            aprobado: false,
+                            rol: 'empleado'
+                        };
+                        database.ref('usuarios/' + user.uid).set(usuarioData);
                     }
+
+                    usuarioActualData = usuarioData;
+
                     if (!usuarioActualData.aprobado && usuarioActualData.rol !== 'admin') {
                         auth.signOut();
                         mostrarMensajeAuth("⏳ Tu cuenta aún no ha sido aprobada por un Administrador.", true);
@@ -2040,7 +2062,7 @@
                 pNorm: parseFloat(document.getElementById('p-eeuu-norm').value)
             });
             this.reset();
-            alert("¡Producto añadido a EEUU!");
+            alert("¡Producto añadido à EEUU!");
         });
 
         document.getElementById('form-nuevo-pedido-mex').addEventListener('submit', function(e) {
