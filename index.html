@@ -1831,7 +1831,7 @@
                         <td class="p-2 text-center">
                             <input type="number" min="0" value="${est.cantidad}" oninput="cambiarCantPedido('${region}', '${itemId}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
                         </td>
-                        <td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td>
+                        <td class="p-2 text-right font-mono font-bold text-amber-400" id="subtotal-${region}-${itemId}">$${sub.toFixed(2)}</td>
                         <td class="p-2 text-center">
                             <button onclick="eliminarItem('${dbPath}', '${itemId}')" title="Eliminar Producto" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
                         </td>
@@ -1868,15 +1868,37 @@
         function cambiarCantPedido(region, id, val) {
             let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex;
             if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' };
-            obj[id].cantidad = Math.max(0, parseInt(val) || 0);
-            renderizarTodo();
+            const cant = Math.max(0, parseInt(val) || 0);
+            obj[id].cantidad = cant;
+
+            // Actualizar subtotal de esta fila de forma independiente para no perder el foco del input
+            const items = region === 'eeuu' ? productosEEUU : productosMexico;
+            const item = items[id];
+            if (item) {
+                let p = obj[id].tarifa === 'min' ? item.pMin : item.pNorm;
+                let sub = cant * p;
+                const subEl = document.getElementById(`subtotal-${region}-${id}`);
+                if (subEl) subEl.textContent = `$${sub.toFixed(2)}`;
+            }
+
+            renderizarResumenPedidos();
         }
 
         function cambiarTarifaPedido(region, id, tarifa) {
             let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex;
             if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' };
             obj[id].tarifa = tarifa;
-            renderizarTodo();
+
+            const items = region === 'eeuu' ? productosEEUU : productosMexico;
+            const item = items[id];
+            if (item) {
+                let p = tarifa === 'min' ? item.pMin : item.pNorm;
+                let sub = obj[id].cantidad * p;
+                const subEl = document.getElementById(`subtotal-${region}-${id}`);
+                if (subEl) subEl.textContent = `$${sub.toFixed(2)}`;
+            }
+
+            renderizarResumenPedidos();
         }
 
         function renderizarResumenVenta() {
