@@ -153,15 +153,13 @@
             </div>
         </header>
 
-        <div class="grid grid-cols-3 md:grid-cols-10 gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
+        <!-- NAVEGACIÓN PRINCIPAL (SIN CONVENIOS) -->
+        <div class="grid grid-cols-3 md:grid-cols-9 gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
             <button onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>💰</span> <span>Ventas</span>
             </button>
             <button onclick="cambiarPantalla('pedidos')" id="btn-tab-pedidos" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🌾</span> <span>Pedidos</span>
-            </button>
-            <button onclick="cambiarPantalla('convenios')" id="btn-tab-convenios" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
-                <span>🤝</span> <span>Convenios</span>
             </button>
             <button onclick="cambiarPantalla('comida')" id="btn-tab-comida" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🥩</span> <span>Comida</span>
@@ -291,6 +289,7 @@
                     </div>
                 </div>
 
+                <!-- TICKET DE VENTA CON DESCUENTO Y CONCEPTO DE CONVENIO INTEGRADO -->
                 <div class="western-panel rounded-xl p-4 flex flex-col justify-between h-fit border-amber-700 space-y-4">
                     <div class="space-y-3">
                         <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-ticket')">
@@ -314,6 +313,26 @@
                                 </button>
                             </div>
 
+                            <!-- BLOQUE DE PORCENTAJE DE DESCUENTO Y CONCEPTO DE CONVENIO -->
+                            <div class="bg-stone-900/80 p-3 rounded-lg border border-amber-800/60 space-y-2">
+                                <label class="text-[10px] text-amber-300 font-bold uppercase tracking-wider font-rustic block">🏷️ Porcentaje de Descuento:</label>
+                                <div class="grid grid-cols-4 gap-1">
+                                    <button type="button" onclick="setPorcentajeVenta(0)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">0%</button>
+                                    <button type="button" onclick="setPorcentajeVenta(10)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">10%</button>
+                                    <button type="button" onclick="setPorcentajeVenta(15)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">15%</button>
+                                    <button type="button" onclick="setPorcentajeVenta(20)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">20%</button>
+                                </div>
+                                <div class="flex items-center space-x-2 pt-1">
+                                    <span class="text-[10px] text-amber-200/70">Personalizado (%):</span>
+                                    <input type="number" id="input-porcentaje-venta" value="0" min="0" max="100" step="0.5" oninput="renderizarResumenVenta()" class="w-20 p-1.5 rounded text-center text-xs font-bold text-amber-300 bg-stone-950 border-amber-800">
+                                    <span class="text-xs font-bold text-amber-400">%</span>
+                                </div>
+                                <div class="pt-1">
+                                    <label class="text-[10px] text-amber-200/70 block mb-1">Concepto / Convenio aplicable (opcional):</label>
+                                    <input type="text" id="input-concepto-convenio" placeholder="Ej: Médicos, Sheriffs, Banda..." class="w-full p-1.5 rounded text-xs bg-stone-950 border-amber-800 text-amber-200">
+                                </div>
+                            </div>
+
                             <div id="lista-resumen-venta" class="space-y-2 max-h-40 overflow-y-auto pr-1 text-xs">
                                 <p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>
                             </div>
@@ -322,10 +341,14 @@
 
                     <div class="pt-3 border-t border-amber-900/60 space-y-2">
                         <div class="flex justify-between items-center text-amber-200/70 text-xs">
-                            <span>Total Ítems:</span>
-                            <span id="total-items-venta" class="font-bold text-amber-100">0</span>
+                            <span>Subtotal Base:</span>
+                            <span id="subtotal-base-venta" class="font-bold text-amber-100">$0.00</span>
                         </div>
-                        <div class="flex justify-between items-center text-lg md:text-xl font-black text-amber-400 font-rustic">
+                        <div class="flex justify-between items-center text-amber-200/70 text-xs">
+                            <span>Descuento Aplicado:</span>
+                            <span id="descuento-monto-venta" class="font-bold text-emerald-400">-$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center text-lg md:text-xl font-black text-amber-400 font-rustic pt-1 border-t border-amber-900/40">
                             <span>Total a Facturar:</span>
                             <span id="total-precio-venta">$0.00</span>
                         </div>
@@ -464,110 +487,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 3: CONVENIOS (CORREGIDO PARA CREAR COLECTIVOS NATIVAMENTE) ================= -->
-        <div id="pantalla-convenios" class="space-y-4 hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div class="lg:col-span-2 space-y-4">
-                    <div class="western-panel rounded-xl p-4 space-y-4">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-amber-900/60 pb-3">
-                            <h2 class="text-lg font-extrabold text-amber-400 font-rustic">🤝 Convenios y Colectivos Especiales</h2>
-                            
-                            <div class="flex items-center space-x-2 w-full sm:w-auto">
-                                <label class="text-xs font-bold text-amber-300 font-rustic whitespace-nowrap">Colectivo:</label>
-                                <select id="select-categoria-convenio" onchange="cambiarCategoriaConvenio(this.value)" class="p-1.5 rounded text-xs w-full sm:w-48">
-                                    <option value="Médicos">🩺 Médicos / Hospital</option>
-                                    <option value="Sheriffs">⭐ Sheriffs / Ley</option>
-                                    <option value="Ferrocarril">🚂 Compañía de Ferrocarril</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- FORMULARIO CREAR NUEVO PRODUCTO EN CONVENIO & GESTIÓN DE COLECTIVOS -->
-                        <div class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
-                            <div class="flex flex-wrap justify-between items-center gap-2 border-b border-amber-900/40 pb-2">
-                                <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Servicio a <span id="label-convenio-actual" class="text-amber-400">Médicos</span></h3>
-                                <div class="flex gap-2">
-                                    <button type="button" onclick="crearNuevaCategoriaConvenio()" class="text-[10px] bg-stone-950 hover:bg-stone-800 text-amber-300 px-2.5 py-1 rounded border border-amber-800 font-rustic font-bold shadow">➕ Crear Colectivo</button>
-                                    <button type="button" onclick="eliminarCategoriaConvenioActual()" class="text-[10px] bg-red-950 hover:bg-red-900 text-red-200 px-2.5 py-1 rounded border border-red-800 font-rustic font-bold shadow">🗑️ Eliminar Colectivo</button>
-                                </div>
-                            </div>
-                            <form id="form-nuevo-convenio-item" class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                <input type="text" id="convenio-item-nombre" placeholder="Nombre del servicio o plato" required class="md:col-span-2 p-2 rounded text-xs">
-                                <input type="number" step="0.01" id="convenio-item-precio" placeholder="Precio Base ($)" required class="md:col-span-1 p-2 rounded text-xs">
-                                <button type="submit" class="md:col-span-3 bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Guardar Servicio en Convenio</button>
-                            </form>
-                        </div>
-
-                        <!-- TABLA DE PRODUCTOS DEL CONVENIO SELECCIONADO -->
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead class="table-header uppercase font-rustic">
-                                    <tr>
-                                        <th class="p-2">Servicio / Ítem</th>
-                                        <th class="p-2 text-center">Precio Base</th>
-                                        <th class="p-2 text-center w-16">Cant.</th>
-                                        <th class="p-2 text-right">Subtotal</th>
-                                        <th class="p-2 text-center">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabla-venta-convenio" class="divide-y divide-amber-900/40"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TICKET DE CONVENIO -->
-                <div class="western-panel rounded-xl p-4 flex flex-col justify-between h-fit border-amber-700 space-y-4">
-                    <div class="space-y-3">
-                        <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🧾 Ticket de Convenio</h2>
-
-                        <!-- SELECTOR Y INPUT DE DESCUENTO PORCENTUAL -->
-                        <div class="bg-stone-900/80 p-3 rounded-lg border border-amber-800/60 space-y-2">
-                            <label class="text-[10px] text-amber-300 font-bold uppercase tracking-wider font-rustic block">🏷️ Porcentaje de Descuento:</label>
-                            <div class="grid grid-cols-4 gap-1">
-                                <button type="button" onclick="setPorcentajeConvenio(0)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">0%</button>
-                                <button type="button" onclick="setPorcentajeConvenio(10)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">10%</button>
-                                <button type="button" onclick="setPorcentajeConvenio(15)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">15%</button>
-                                <button type="button" onclick="setPorcentajeConvenio(20)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">20%</button>
-                            </div>
-                            <div class="flex items-center space-x-2 pt-1">
-                                <span class="text-[10px] text-amber-200/70">Personalizado (%):</span>
-                                <input type="number" id="input-porcentaje-convenio" value="0" min="0" max="100" step="0.5" oninput="renderizarResumenConvenio()" class="w-20 p-1.5 rounded text-center text-xs font-bold text-amber-300 bg-stone-950 border-amber-800">
-                                <span class="text-xs font-bold text-amber-400">%</span>
-                            </div>
-                        </div>
-
-                        <div id="lista-resumen-convenio" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs">
-                            <p class="text-amber-200/40 italic text-center py-3">No hay ítems seleccionados.</p>
-                        </div>
-                    </div>
-
-                    <div class="pt-3 border-t border-amber-900/60 space-y-2">
-                        <div class="flex justify-between items-center text-amber-200/70 text-xs">
-                            <span>Subtotal Base:</span>
-                            <span id="subtotal-base-convenio" class="font-bold text-amber-100">$0.00</span>
-                        </div>
-                        <div class="flex justify-between items-center text-amber-200/70 text-xs">
-                            <span>Descuento Aplicado:</span>
-                            <span id="descuento-monto-convenio" class="font-bold text-emerald-400">-$0.00</span>
-                        </div>
-                        <div class="flex justify-between items-center text-lg md:text-xl font-black text-amber-400 font-rustic pt-1 border-t border-amber-900/40">
-                            <span>Total Convenio:</span>
-                            <span id="total-precio-convenio">$0.00</span>
-                        </div>
-
-                        <button id="btn-registrar-convenio" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2.5 rounded border border-emerald-600 transition text-xs font-rustic shadow-lg">
-                            💾 Registrar Convenio y Copiar
-                        </button>
-                        <button onclick="limpiarVentaConvenio()" class="w-full bg-stone-900 hover:bg-stone-800 text-amber-200/80 font-bold py-1.5 rounded border border-amber-900/50 transition text-xs font-rustic">
-                            🗑️ Limpiar Selección
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= PANTALLA 4: COMIDA ================= -->
+        <!-- ================= PANTALLA 3: COMIDA ================= -->
         <div id="pantalla-comida" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🥩 Gestión de Comida (3 Tarifas)</h2>
@@ -607,7 +527,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 5: BEBIDA ================= -->
+        <!-- ================= PANTALLA 4: BEBIDA ================= -->
         <div id="pantalla-bebida" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🍺 Gestión de Bebidas</h2>
@@ -673,7 +593,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 6: MENÚS ================= -->
+        <!-- ================= PANTALLA 5: MENÚS ================= -->
         <div id="pantalla-menus" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🍲 Gestión de Menús (2 Tarifas)</h2>
@@ -709,7 +629,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 7: PRODUCTOS ================= -->
+        <!-- ================= PANTALLA 6: PRODUCTOS ================= -->
         <div id="pantalla-productos" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📦 Gestión de Productos Varios (3 Tarifas)</h2>
@@ -749,7 +669,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 8: LICENCIAS ================= -->
+        <!-- ================= PANTALLA 7: LICENCIAS ================= -->
         <div id="pantalla-licencias" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📜 Archivador de Licencias</h2>
@@ -785,7 +705,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 9: PLANTILLA (EXCLUSIVO ADMIN) ================= -->
+        <!-- ================= PANTALLA 8: PLANTILLA (EXCLUSIVO ADMIN) ================= -->
         <div id="pantalla-plantilla" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-amber-900/60 pb-2">
@@ -805,7 +725,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 10: APROBACIONES (EXCLUSIVO ADMIN) ================= -->
+        <!-- ================= PANTALLA 9: APROBACIONES (EXCLUSIVO ADMIN) ================= -->
         <div id="pantalla-aprobaciones" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">👥 Solicitudes de Aprobación de Usuarios</h2>
@@ -906,25 +826,11 @@
             "p2": { id: "p2", nombre: "Tabaco de Mascar", pMin: 0.50, pMed: 0.75, pNorm: 1.00 }
         };
 
-        const conveniosIniciales = {
-            "Médicos": {
-                "cv1": { id: "cv1", nombre: "Suministro Médico Semanal", precio: 15.00 },
-                "cv2": { id: "cv2", nombre: "Tónico de Vigor", precio: 2.50 }
-            },
-            "Sheriffs": {
-                "cv3": { id: "cv3", nombre: "Ración Diaria de Comisaría", precio: 10.00 },
-                "cv4": { id: "cv4", nombre: "Whisky Especial Ley", precio: 1.20 }
-            }
-        };
-
         let comida = {}, bebidaNormal = {}, bebidaAlcohol = {}, menus = {}, productos = {}, productosEEUU = {}, productosMexico = {};
-        let conveniosData = {};
         let ventaComida = {}, ventaBebidaNormal = {}, ventaBebidaAlcohol = {}, ventaMenus = {}, ventaProductos = {};
-        let ventaConvenio = {};
         let pedidoEEUU = {}, pedidoMex = {};
         let listaFacturasGlobal = [], listaPedidosGlobal = [], listaFichajesGlobal = [];
         let turnoActivo = null;
-        let categoriaConvenioActual = "Médicos";
 
         function toggleSeccion(idSeccion) {
             const sec = document.getElementById(idSeccion);
@@ -1085,7 +991,7 @@
         }
 
         function cambiarPantalla(pantalla) {
-            ['ventas', 'pedidos', 'convenios', 'licencias', 'comida', 'bebida', 'menus', 'productos', 'plantilla', 'aprobaciones'].forEach(p => {
+            ['ventas', 'pedidos', 'licencias', 'comida', 'bebida', 'menus', 'productos', 'plantilla', 'aprobaciones'].forEach(p => {
                 const el = document.getElementById('pantalla-' + p);
                 const btn = document.getElementById('btn-tab-' + p);
                 if (el) el.classList.add('hidden');
@@ -1190,13 +1096,6 @@
                 productos = s.val() || productosIniciales;
                 if (!s.val()) database.ref('productos_varios').set(productosIniciales);
                 renderizarTodo();
-            });
-
-            database.ref('convenios').on('value', (s) => {
-                conveniosData = s.val() || conveniosIniciales;
-                if (!s.val()) database.ref('convenios').set(conveniosIniciales);
-                actualizarSelectCategoriasConvenio();
-                renderizarTablaConvenio();
             });
 
             database.ref('pedidos_eeuu').on('value', (s) => {
@@ -1469,244 +1368,10 @@
             }
         }
 
-        // ================= SISTEMA DE CONVENIOS (CORREGIDO PARA CREAR CATEGORÍAS EN FIREBASE) =================
-        function actualizarSelectCategoriasConvenio() {
-            const select = document.getElementById('select-categoria-convenio');
-            if (!select) return;
-            select.innerHTML = '';
-            
-            const cats = Object.keys(conveniosData);
-            if (cats.length === 0) {
-                conveniosData["Médicos"] = {};
-            }
-
-            Object.keys(conveniosData).forEach(cat => {
-                select.innerHTML += `<option value="${cat}">${cat}</option>`;
-            });
-
-            if (conveniosData[categoriaConvenioActual]) {
-                select.value = categoriaConvenioActual;
-            } else {
-                categoriaConvenioActual = Object.keys(conveniosData)[0] || "Médicos";
-                select.value = categoriaConvenioActual;
-            }
-
-            const labelActual = document.getElementById('label-convenio-actual');
-            if (labelActual) labelActual.textContent = categoriaConvenioActual;
+        function setPorcentajeVenta(pct) {
+            document.getElementById('input-porcentaje-venta').value = pct;
+            renderizarResumenVenta();
         }
-
-        function cambiarCategoriaConvenio(nuevaCat) {
-            categoriaConvenioActual = nuevaCat;
-            const labelActual = document.getElementById('label-convenio-actual');
-            if (labelActual) labelActual.textContent = nuevaCat;
-            ventaConvenio = {};
-            renderizarTablaConvenio();
-        }
-
-        // CORRECCIÓN: Firebase elimina objetos vacíos {}, por eso guardamos un primer item base para que la categoría persista
-        function crearNuevaCategoriaConvenio() {
-            const nuevaCat = prompt("Introduce el nombre de la nueva categoría / colectivo (ej. Sheriffs, Ferrocarril, Abogados):");
-            if (nuevaCat && nuevaCat.trim() !== "") {
-                const catFormateada = nuevaCat.trim();
-                if (!conveniosData[catFormateada]) {
-                    const idInicial = 'cv_' + Date.now().toString();
-                    database.ref('convenios/' + catFormateada + '/' + idInicial).set({
-                        id: idInicial,
-                        nombre: "Servicio Inicial " + catFormateada,
-                        precio: 5.00
-                    }).then(() => {
-                        categoriaConvenioActual = catFormateada;
-                        actualizarSelectCategoriasConvenio();
-                        renderizarTablaConvenio();
-                        alert(`¡Colectivo "${catFormateada}" creado con éxito con un ítem inicial!`);
-                    });
-                } else {
-                    alert("Ese colectivo ya existe.");
-                }
-            }
-        }
-
-        function eliminarCategoriaConvenioActual() {
-            if (Object.keys(conveniosData).length <= 1) {
-                alert("Debe existir al menos un colectivo de convenios.");
-                return;
-            }
-            if (confirm(`⚠️ ¿Estás seguro de eliminar el colectivo completo "${categoriaConvenioActual}" y todos sus servicios?`)) {
-                database.ref('convenios/' + categoriaConvenioActual).remove().then(() => {
-                    alert(`🗑️ Colectivo "${categoriaConvenioActual}" eliminado.`);
-                    categoriaConvenioActual = Object.keys(conveniosData).find(c => c !== categoriaConvenioActual) || "Médicos";
-                    actualizarSelectCategoriasConvenio();
-                    renderizarTablaConvenio();
-                });
-            }
-        }
-
-        function renderizarTablaConvenio() {
-            const tbody = document.getElementById('tabla-venta-convenio');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            const itemsCat = conveniosData[categoriaConvenioActual] || {};
-            const lista = Object.values(itemsCat);
-
-            if (lista.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-amber-200/40 italic">No hay servicios o platos agregados a este colectivo.</td></tr>';
-                renderizarResumenConvenio();
-                return;
-            }
-
-            lista.forEach(item => {
-                const est = ventaConvenio[item.id] || { cantidad: 0 };
-                let sub = est.cantidad * item.precio;
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-amber-900/20">
-                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
-                        <td class="p-2 text-center font-mono text-amber-300">$${item.precio.toFixed(2)}</td>
-                        <td class="p-2 text-center">
-                            <input type="number" min="0" value="${est.cantidad}" onchange="cambiarCantConvenio('${item.id}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
-                        </td>
-                        <td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td>
-                        <td class="p-2 text-center">
-                            <button onclick="eliminarItemConvenio('${item.id}')" title="Eliminar Ítem" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
-                        </td>
-                    </tr>`;
-            });
-
-            renderizarResumenConvenio();
-        }
-
-        function cambiarCantConvenio(id, val) {
-            if (!ventaConvenio[id]) ventaConvenio[id] = { cantidad: 0 };
-            ventaConvenio[id].cantidad = Math.max(0, parseInt(val) || 0);
-            renderizarTablaConvenio();
-        }
-
-        function setPorcentajeConvenio(pct) {
-            document.getElementById('input-porcentaje-convenio').value = pct;
-            renderizarResumenConvenio();
-        }
-
-        function renderizarResumenConvenio() {
-            const contenedor = document.getElementById('lista-resumen-convenio');
-            if (!contenedor) return;
-            contenedor.innerHTML = '';
-
-            let subtotalBase = 0;
-            let hay = false;
-
-            const itemsCat = conveniosData[categoriaConvenioActual] || {};
-            Object.values(itemsCat).forEach(item => {
-                const est = ventaConvenio[item.id];
-                if (est && est.cantidad > 0) {
-                    hay = true;
-                    let sub = est.cantidad * item.precio;
-                    subtotalBase += sub;
-                    contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>${item.nombre} (${est.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
-                }
-            });
-
-            if (!hay) {
-                contenedor.innerHTML = '<p class="text-amber-200/40 italic text-center py-3">No hay ítems seleccionados.</p>';
-            }
-
-            const pctInput = parseFloat(document.getElementById('input-porcentaje-convenio').value);
-            const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
-            const descuentoMonto = subtotalBase * (pct / 100);
-            const totalConvenio = Math.max(0, subtotalBase - descuentoMonto);
-
-            document.getElementById('subtotal-base-convenio').textContent = `$${subtotalBase.toFixed(2)}`;
-            document.getElementById('descuento-monto-convenio').textContent = `-$${descuentoMonto.toFixed(2)} (${pct}%)`;
-            document.getElementById('total-precio-convenio').textContent = `$${totalConvenio.toFixed(2)}`;
-        }
-
-        function limpiarVentaConvenio() {
-            ventaConvenio = {};
-            renderizarTablaConvenio();
-        }
-
-        function eliminarItemConvenio(idItem) {
-            if (confirm("¿Estás seguro de borrar este servicio del convenio?")) {
-                database.ref('convenios/' + categoriaConvenioActual + '/' + idItem).remove();
-            }
-        }
-
-        document.getElementById('form-nuevo-convenio-item').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = 'cv_' + Date.now().toString();
-            const nombre = document.getElementById('convenio-item-nombre').value.trim();
-            const precio = parseFloat(document.getElementById('convenio-item-precio').value);
-
-            if (!nombre || isNaN(precio)) {
-                alert("Introduce un nombre y un precio válido.");
-                return;
-            }
-
-            database.ref('convenios/' + categoriaConvenioActual + '/' + id).set({
-                id, nombre, precio
-            }).then(() => {
-                document.getElementById('convenio-item-nombre').value = '';
-                document.getElementById('convenio-item-precio').value = '';
-                alert(`¡Servicio añadido al convenio ${categoriaConvenioActual}!`);
-            });
-        });
-
-        document.getElementById('btn-registrar-convenio').addEventListener('click', () => {
-            let subtotalBase = 0, resumenArray = [];
-            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
-            const itemsCat = conveniosData[categoriaConvenioActual] || {};
-
-            Object.values(itemsCat).forEach(item => {
-                const est = ventaConvenio[item.id];
-                if (est && est.cantidad > 0) {
-                    let sub = est.cantidad * item.precio;
-                    subtotalBase += sub;
-                    resumenArray.push(est.cantidad + "x " + item.nombre);
-                }
-            });
-
-            if (subtotalBase === 0) {
-                alert("No hay ningún ítem de convenio seleccionado.");
-                return;
-            }
-
-            const pctInput = parseFloat(document.getElementById('input-porcentaje-convenio').value);
-            const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
-            const descuentoMonto = subtotalBase * (pct / 100);
-            const totalConvenio = Math.max(0, subtotalBase - descuentoMonto);
-
-            const ahora = new Date();
-            const codigoTicket = "CV-" + String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0');
-
-            const facturaData = {
-                id: Date.now(),
-                codigoTicket: codigoTicket,
-                usuario: usuarioNombre + " (" + categoriaConvenioActual + ")",
-                total: totalConvenio,
-                resumen: resumenArray.join(', ') + ` [Convenio ${categoriaConvenioActual} - Desc. ${pct}%]`,
-                fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
-            };
-
-            database.ref('facturas').push(facturaData);
-
-            const textoDiscord = "```md\n" +
-                                 "🤝 **THE CORNER - FACTURA DE CONVENIO**\n" +
-                                 "🏛️ **Convenio / Colectivo:** " + categoriaConvenioActual + "\n" +
-                                 "👤 **Atendido por:** " + usuarioNombre + "\n" +
-                                 "📅 **Ticket:** #" + codigoTicket + "\n" +
-                                 "-----------------------------------\n" +
-                                 "📦 **Detalle:**\n" +
-                                 resumenArray.map(i => "• " + i).join('\n') + "\n" +
-                                 "-----------------------------------\n" +
-                                 "💵 **Subtotal Base:** $" + subtotalBase.toFixed(2) + "\n" +
-                                 "🏷️ **Descuento Aplicado:** " + pct + "% (-$" + descuentoMonto.toFixed(2) + ")\n" +
-                                 "💰 **TOTAL CONVENIO:** $" + totalConvenio.toFixed(2) + "\n" +
-                                 "```";
-
-            copiarTextoPortapapeles(textoDiscord);
-            alert("¡Ticket de convenio registrado en contabilidad, sumado a la caja y copiado para Discord!");
-            limpiarVentaConvenio();
-        });
 
         // ================= HISTORIAL Y FACTURAS =================
         function renderizarFacturas() {
@@ -1867,16 +1532,22 @@
             });
         }
 
-        function generarFormatoDiscord(usuario, codigo, resumenItems, total) {
+        function generarFormatoDiscord(usuario, codigo, resumenItems, subtotal, descuentoMonto, pct, concepto, total) {
             const lineas = resumenItems.split(', ').map(i => "• " + i).join('\n');
+            let infoConvenio = concepto ? `🏛️ **Concepto / Convenio:** ${concepto}\n` : '';
+            let infoDescuento = pct > 0 ? `🏷️ **Descuento Aplicado:** ${pct}% (-$${descuentoMonto.toFixed(2)})\n` : '';
+
             return "```md\n" +
                    "🧾 **THE CORNER - SAINT DENIS**\n" +
                    "👤 **Atendido por:** " + usuario + "\n" +
                    "📅 **Ticket:** #" + codigo + "\n" +
+                   infoConvenio +
                    "-----------------------------------\n" +
                    "📦 **Detalle:**\n" +
                    lineas + "\n" +
                    "-----------------------------------\n" +
+                   (pct > 0 ? `💵 **Subtotal:** $${subtotal.toFixed(2)}\n` : '') +
+                   infoDescuento +
                    "💰 **TOTAL:** $" + total.toFixed(2) + "\n" +
                    "```";
         }
@@ -1895,7 +1566,16 @@
         }
 
         function copiarTicketDiscordTexto(usuario, codigo, resumen, total) {
-            const texto = generarFormatoDiscord(usuario, codigo, resumen, total);
+            const texto = "```md\n" +
+                          "🧾 **THE CORNER - SAINT DENIS**\n" +
+                          "👤 **Atendido por:** " + usuario + "\n" +
+                          "📅 **Ticket:** #" + codigo + "\n" +
+                          "-----------------------------------\n" +
+                          "📦 **Detalle:**\n" +
+                          resumen.split(', ').map(i => "• " + i).join('\n') + "\n" +
+                          "-----------------------------------\n" +
+                          "💰 **TOTAL:** $" + total.toFixed(2) + "\n" +
+                          "```";
             copiarTextoPortapapeles(texto);
         }
 
@@ -2196,7 +1876,7 @@
             const contenedor = document.getElementById('lista-resumen-venta');
             if (!contenedor) return;
             contenedor.innerHTML = '';
-            let totalAcc = 0, itemsAcc = 0, hay = false;
+            let subtotalBase = 0, itemsAcc = 0, hay = false;
 
             const sumarAlResumen = (items, estadoObj, tipo) => {
                 Object.values(items).forEach(item => {
@@ -2205,7 +1885,7 @@
                         hay = true;
                         let p = tipo === 'menu' ? (est.tarifa === 'min' ? item.pMin : item.pNorm) : (est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm));
                         let sub = est.cantidad * p;
-                        totalAcc += sub; itemsAcc += est.cantidad;
+                        subtotalBase += sub; itemsAcc += est.cantidad;
                         contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>${item.nombre} (${est.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
                     }
                 });
@@ -2218,8 +1898,16 @@
             sumarAlResumen(productos, ventaProductos, 'productos');
 
             if (!hay) contenedor.innerHTML = '<p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>';
+
+            const pctInput = parseFloat(document.getElementById('input-porcentaje-venta').value);
+            const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
+            const descuentoMonto = subtotalBase * (pct / 100);
+            const totalVenta = Math.max(0, subtotalBase - descuentoMonto);
+
+            document.getElementById('subtotal-base-venta').textContent = `$${subtotalBase.toFixed(2)}`;
+            document.getElementById('descuento-monto-venta').textContent = `-$${descuentoMonto.toFixed(2)} (${pct}%)`;
             document.getElementById('total-items-venta').textContent = itemsAcc;
-            document.getElementById('total-precio-venta').textContent = `$${totalAcc.toFixed(2)}`;
+            document.getElementById('total-precio-venta').textContent = `$${totalVenta.toFixed(2)}`;
         }
 
         function renderizarResumenPedidos() {
@@ -2248,7 +1936,7 @@
         }
 
         document.getElementById('btn-registrar-venta').addEventListener('click', () => {
-            let totalAcc = 0, resumenArray = [];
+            let subtotalBase = 0, resumenArray = [];
             const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
 
             const recolectarVenta = (items, estadoObj, tipo) => {
@@ -2256,7 +1944,7 @@
                     const est = estadoObj[item.id];
                     if (est && est.cantidad > 0) {
                         let p = tipo === 'menu' ? (est.tarifa === 'min' ? item.pMin : item.pNorm) : (est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm));
-                        totalAcc += est.cantidad * p;
+                        subtotalBase += est.cantidad * p;
                         resumenArray.push(est.cantidad + "x " + item.nombre);
                     }
                 });
@@ -2268,32 +1956,46 @@
             recolectarVenta(menus, ventaMenus, 'menu');
             recolectarVenta(productos, ventaProductos, 'productos');
 
-            if (totalAcc === 0) {
+            if (subtotalBase === 0) {
                 alert("No hay ningún producto en la venta actual.");
                 return;
             }
 
+            const pctInput = parseFloat(document.getElementById('input-porcentaje-venta').value);
+            const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
+            const descuentoMonto = subtotalBase * (pct / 100);
+            const totalVenta = Math.max(0, subtotalBase - descuentoMonto);
+            const concepto = document.getElementById('input-concepto-convenio').value.trim();
+
             const ahora = new Date();
             const codigoTicket = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0');
+
+            let resumenFinalStr = resumenArray.join(', ');
+            if (concepto) resumenFinalStr += ` [Convenio/Concepto: ${concepto}]`;
+            if (pct > 0) resumenFinalStr += ` [Desc: ${pct}%]`;
 
             const facturaData = {
                 id: Date.now(),
                 codigoTicket: codigoTicket,
                 usuario: usuarioNombre,
-                total: totalAcc,
-                resumen: resumenArray.join(', '),
+                total: totalVenta,
+                resumen: resumenFinalStr,
                 fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
             };
 
             database.ref('facturas').push(facturaData);
-            copiarTextoPortapapeles(generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), totalAcc));
+            copiarTextoPortapapeles(generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), subtotalBase, descuentoMonto, pct, concepto, totalVenta));
 
             ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaProductos = {};
+            document.getElementById('input-porcentaje-venta').value = '0';
+            document.getElementById('input-concepto-convenio').value = '';
             renderizarTodo();
         });
 
         document.getElementById('btn-limpiar-venta').addEventListener('click', () => {
             ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaProductos = {};
+            document.getElementById('input-porcentaje-venta').value = '0';
+            document.getElementById('input-concepto-convenio').value = '';
             renderizarTodo();
         });
 
