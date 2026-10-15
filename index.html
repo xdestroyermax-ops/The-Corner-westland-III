@@ -277,7 +277,6 @@
                         </div>
                     </div>
 
-                    <!-- NUEVA SECCIÓN DE PLATOS NPC EN VENTAS -->
                     <div class="western-panel rounded-xl p-3 md:p-4">
                         <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-platos-npc')">
                             <h2 class="text-base font-extrabold text-amber-400 font-rustic">🎩 Platos NPC</h2>
@@ -319,7 +318,7 @@
                     </div>
                 </div>
 
-                <!-- TICKET DE VENTA CON DESCUENTO Y CONCEPTO DE CONVENIO INTEGRADO -->
+                <!-- TICKET DE VENTA CON DESCUENTO, CONVENIO Y EFECTIVO/PROPINA -->
                 <div class="western-panel rounded-xl p-4 flex flex-col justify-between h-fit border-amber-700 space-y-4">
                     <div class="space-y-3">
                         <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-ticket')">
@@ -360,6 +359,18 @@
                                 <div class="pt-1">
                                     <label class="text-[10px] text-amber-200/70 block mb-1">Concepto / Convenio aplicable (opcional):</label>
                                     <input type="text" id="input-concepto-convenio" placeholder="Ej: Médicos, Sheriffs, Banda..." class="w-full p-1.5 rounded text-xs bg-stone-950 border-amber-800 text-amber-200">
+                                </div>
+                            </div>
+
+                            <!-- NUEVO BLOQUE: EFECTIVO ENTREGADO Y CÁLCULO DE PROPINA -->
+                            <div class="bg-stone-900/80 p-3 rounded-lg border border-amber-800/60 space-y-2">
+                                <label class="text-[10px] text-amber-300 font-bold uppercase tracking-wider font-rustic block">🪙 Efectivo Entregado por Cliente:</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="number" id="input-efectivo-entregado" step="0.01" min="0" placeholder="Dejar en blanco si paga exacto" oninput="renderizarResumenVenta()" class="w-full p-1.5 rounded text-center text-xs font-bold text-amber-300 bg-stone-950 border-amber-800">
+                                    <span class="text-xs font-bold text-amber-400">$</span>
+                                </div>
+                                <div id="info-propina-calculada" class="text-[10px] text-emerald-400 font-bold pt-1 hidden">
+                                    🪙 Propina / Bote añadido: <span id="valor-propina-calc" class="font-mono">$0.00</span>
                                 </div>
                             </div>
 
@@ -1484,7 +1495,7 @@
         function filtrarCartaVentas() {
             const filtro = (document.getElementById('buscador-ventas')?.value || '').toLowerCase().trim();
             
-            const filtrarTabla = (tableId, itemsObj) => {
+            const filtrarTabla = (tableId) => {
                 const tbody = document.getElementById(tableId);
                 if (!tbody) return;
                 const filas = tbody.querySelectorAll('tr');
@@ -1498,12 +1509,12 @@
                 });
             };
 
-            filtrarTabla('tabla-venta-comida', comida);
-            filtrarTabla('tabla-venta-bebida-normal', bebidaNormal);
-            filtrarTabla('tabla-venta-bebida-alcohol', bebidaAlcohol);
-            filtrarTabla('tabla-venta-menus', menus);
-            filtrarTabla('tabla-venta-platos-npc', platosNPC);
-            filtrarTabla('tabla-venta-productos', productos);
+            filtrarTabla('tabla-venta-comida');
+            filtrarTabla('tabla-venta-bebida-normal');
+            filtrarTabla('tabla-venta-bebida-alcohol');
+            filtrarTabla('tabla-venta-menus');
+            filtrarTabla('tabla-venta-platos-npc');
+            filtrarTabla('tabla-venta-productos');
         }
 
         function filtrarCatalogoPedidos() {
@@ -1550,6 +1561,7 @@
             facturasFiltradas.forEach(f => {
                 const usr = f.usuario ? f.usuario : 'Sin registro';
                 const idMostrado = f.codigoTicket || f.id;
+                const propinaStr = f.propina && f.propina > 0 ? ` <span class="text-emerald-400 font-bold">(Propina: +$${f.propina.toFixed(2)})</span>` : '';
 
                 const card = document.createElement('div');
                 card.className = 'bg-stone-900/85 border border-amber-900/50 p-3 rounded-lg shadow space-y-1 relative';
@@ -1557,7 +1569,7 @@
                     <div class="flex justify-between items-center font-bold text-amber-300">
                         <span>Factura #${idMostrado}</span>
                         <div class="flex items-center space-x-1.5">
-                            <span class="font-mono text-amber-400 text-sm">$${f.total.toFixed(2)}</span>
+                            <span class="font-mono text-amber-400 text-sm">$${f.total.toFixed(2)}${propinaStr}</span>
                             <button class="btn-copiar-factura bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-xs px-1.5 py-0.5 rounded border border-indigo-700" title="Copiar para Discord">📋</button>
                             ${usuarioActualData && usuarioActualData.rol === 'admin' ? `<button onclick="eliminarFacturaAdmin('${f.keyFirebase}')" title="Borrar Ticket" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>` : ''}
                         </div>
@@ -1569,7 +1581,7 @@
                     <div class="text-[9px] text-amber-500/50 pt-1 border-t border-amber-900/20">${f.fecha}</div>`;
 
                 card.querySelector('.btn-copiar-factura').addEventListener('click', () => {
-                    copiarTicketDiscordTexto(usr, idMostrado, f.resumen, f.total);
+                    copiarTicketDiscordTexto(usr, idMostrado, f.resumen, f.total, f.propina || 0);
                 });
                 contenedor.appendChild(card);
             });
@@ -1589,7 +1601,7 @@
             });
 
             if (pedidosFiltrados.length === 0) {
-                contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-2 text-center py-4">No se encontraron pedidos.</p>';
+                contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay pedidos registrados todavía.</p>';
                 return;
             }
 
@@ -1686,10 +1698,12 @@
             });
         }
 
-        function generarFormatoDiscord(usuario, codigo, resumenItems, subtotal, descuentoMonto, pct, concepto, total) {
+        function generarFormatoDiscord(usuario, codigo, resumenItems, subtotal, descuentoMonto, pct, concepto, totalConsumo, propina) {
             const lineas = resumenItems.split(', ').map(i => "• " + i).join('\n');
             let infoConvenio = concepto ? `🏛️ **Concepto / Convenio:** ${concepto}\n` : '';
             let infoDescuento = pct > 0 ? `🏷️ **Descuento Aplicado:** ${pct}% (-$${descuentoMonto.toFixed(2)})\n` : '';
+            let infoPropina = propina > 0 ? `🪙 **Propina / Bote:** +$${propina.toFixed(2)}\n` : '';
+            let totalRealCaja = totalConsumo + propina;
 
             return "```md\n" +
                    "🧾 **THE CORNER - SAINT DENIS**\n" +
@@ -1702,7 +1716,8 @@
                    "-----------------------------------\n" +
                    (pct > 0 ? `💵 **Subtotal:** $${subtotal.toFixed(2)}\n` : '') +
                    infoDescuento +
-                   "💰 **TOTAL:** $" + total.toFixed(2) + "\n" +
+                   (propina > 0 ? `🍽️ **Consumo:** $${totalConsumo.toFixed(2)}\n` + infoPropina : '') +
+                   "💰 **TOTAL EN CAJA:** $" + totalRealCaja.toFixed(2) + "\n" +
                    "```";
         }
 
@@ -1719,17 +1734,22 @@
                    "```";
         }
 
-        function copiarTicketDiscordTexto(usuario, codigo, resumen, total) {
-            const texto = "```md\n" +
-                          "🧾 **THE CORNER - SAINT DENIS**\n" +
-                          "👤 **Atendido por:** " + usuario + "\n" +
-                          "📅 **Ticket:** #" + codigo + "\n" +
-                          "-----------------------------------\n" +
-                          "📦 **Detalle:**\n" +
-                          resumen.split(', ').map(i => "• " + i).join('\n') + "\n" +
-                          "-----------------------------------\n" +
-                          "💰 **TOTAL:** $" + total.toFixed(2) + "\n" +
-                          "```";
+        function copiarTicketDiscordTexto(usuario, codigo, resumen, total, propina) {
+            const consumoReal = total - propina;
+            let infoPropina = propina > 0 ? `🪙 **Propina / Bote:** +$${propina.toFixed(2)}\n` : '';
+            let texto = "```md\n" +
+                        "🧾 **THE CORNER - SAINT DENIS**\n" +
+                        "👤 **Atendido por:** " + usuario + "\n" +
+                        "📅 **Ticket:** #" + codigo + "\n" +
+                        "-----------------------------------\n" +
+                        "📦 **Detalle:**\n" +
+                        resumen.split(', ').map(i => "• " + i).join('\n') + "\n" +
+                        "-----------------------------------\n";
+            if (propina > 0) {
+                texto += `🍽️ **Consumo:** $${consumoReal.toFixed(2)}\n` + infoPropina;
+            }
+            texto += "💰 **TOTAL EN CAJA:** $" + total.toFixed(2) + "\n" +
+                     "```";
             copiarTextoPortapapeles(texto);
         }
 
@@ -1801,7 +1821,7 @@
                                  "📊 **BALANCE SEMANAL - THE CORNER**\n" +
                                  "-----------------------------------\n" +
                                  "🪙 **Caja Base:** $" + CAJA_INICIAL_BASE.toFixed(2) + "\n" +
-                                 "💰 **Total Ventas:** $" + totalVentas.toFixed(2) + "\n" +
+                                 "💰 **Total Entradas Caja (Ventas+Propinas):** $" + totalVentas.toFixed(2) + "\n" +
                                  "📦 **Total Pedidos:** $" + totalPedidos.toFixed(2) + "\n" +
                                  "⏳ **Horas Totales:** " + totalHorasTrabajadas.toFixed(2) + "h\n" +
                                  "-----------------------------------\n" +
@@ -1855,7 +1875,6 @@
             renderizarResumenVenta();
             renderizarResumenPedidos();
 
-            // Re-aplicar búsquedas si había texto escrito
             filtrarCartaVentas();
             filtrarCatalogoPedidos();
         }
@@ -2095,11 +2114,38 @@
             const descuentoMonto = subtotalBase * (pct / 100);
             const totalVenta = Math.max(0, subtotalBase - descuentoMonto);
 
+            // Cálculo de propina en tiempo real
+            const efectivoInput = parseFloat(document.getElementById('input-efectivo-entregado').value);
+            const efectivoEntregado = isNaN(efectivoInput) ? 0 : efectivoInput;
+            const divPropina = document.getElementById('info-propina-calculada');
+            const spanPropina = document.getElementById('valor-propina-calc');
+
+            let propina = 0;
+            if (efectivoEntregado > totalVenta) {
+                propina = efectivoEntregado - totalVenta;
+                if (divPropina && spanPropina) {
+                    spanPropina.textContent = `+$${propina.toFixed(2)}`;
+                    divPropina.classList.remove('hidden');
+                }
+            } else {
+                if (divPropina) divPropina.classList.add('hidden');
+            }
+
+            const totalIngresadoCaja = totalVenta + propina;
+
             document.getElementById('subtotal-base-venta').textContent = `$${subtotalBase.toFixed(2)}`;
             document.getElementById('descuento-monto-venta').textContent = `-$${descuentoMonto.toFixed(2)} (${pct}%)`;
             
             const elTotal = document.getElementById('total-precio-venta');
-            if (elTotal) elTotal.textContent = `$${totalVenta.toFixed(2)}`;
+            if (elTotal) {
+                if (propina > 0) {
+                    elTotal.textContent = `$${totalIngresadoCaja.toFixed(2)} (incl. $${propina.toFixed(2)} propina)`;
+                    elTotal.className = "text-base md:text-xl font-black text-emerald-400 font-rustic pt-1";
+                } else {
+                    elTotal.textContent = `$${totalIngresadoCaja.toFixed(2)}`;
+                    elTotal.className = "text-xl md:text-2xl font-black text-amber-400 font-rustic pt-1";
+                }
+            }
         }
 
         function renderizarResumenPedidos() {
@@ -2162,28 +2208,37 @@
             const totalVenta = Math.max(0, subtotalBase - descuentoMonto);
             const concepto = document.getElementById('input-concepto-convenio').value.trim();
 
+            const efectivoInput = parseFloat(document.getElementById('input-efectivo-entregado').value);
+            const efectivoEntregado = isNaN(efectivoInput) ? 0 : efectivoInput;
+            const propina = efectivoEntregado > totalVenta ? efectivoEntregado - totalVenta : 0;
+            const totalIngresadoCaja = totalVenta + propina;
+
             const ahora = new Date();
             const codigoTicket = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0');
 
             let resumenFinalStr = resumenArray.join(', ');
             if (concepto) resumenFinalStr += ` [Convenio/Concepto: ${concepto}]`;
             if (pct > 0) resumenFinalStr += ` [Desc: ${pct}%]`;
+            if (propina > 0) resumenFinalStr += ` [Propina: +$${propina.toFixed(2)}]`;
 
             const facturaData = {
                 id: Date.now(),
                 codigoTicket: codigoTicket,
                 usuario: usuarioNombre,
-                total: totalVenta,
+                total: totalIngresadoCaja,
+                consumo: totalVenta,
+                propina: propina,
                 resumen: resumenFinalStr,
                 fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
             };
 
             database.ref('facturas').push(facturaData);
-            copiarTextoPortapapeles(generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), subtotalBase, descuentoMonto, pct, concepto, totalVenta));
+            copiarTextoPortapapeles(generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), subtotalBase, descuentoMonto, pct, concepto, totalVenta, propina));
 
             ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {};
             document.getElementById('input-porcentaje-venta').value = '0';
             document.getElementById('input-concepto-convenio').value = '';
+            document.getElementById('input-efectivo-entregado').value = '';
             renderizarTodo();
         });
 
@@ -2191,6 +2246,7 @@
             ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {};
             document.getElementById('input-porcentaje-venta').value = '0';
             document.getElementById('input-concepto-convenio').value = '';
+            document.getElementById('input-efectivo-entregado').value = '';
             renderizarTodo();
         });
 
