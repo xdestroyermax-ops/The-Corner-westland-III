@@ -154,7 +154,7 @@
         </header>
 
         <!-- NAVEGACIÓN PRINCIPAL -->
-        <div class="grid grid-cols-3 md:grid-cols-9 gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
+        <div class="grid grid-cols-3 md:grid-cols-10 gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
             <button onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>💰</span> <span>Ventas</span>
             </button>
@@ -169,6 +169,9 @@
             </button>
             <button onclick="cambiarPantalla('menus')" id="btn-tab-menus" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🍲</span> <span>Menús</span>
+            </button>
+            <button onclick="cambiarPantalla('platos-npc')" id="btn-tab-platos-npc" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+                <span>🎩</span> <span>Platos NPC</span>
             </button>
             <button onclick="cambiarPantalla('productos')" id="btn-tab-productos" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>📦</span> <span>Productos</span>
@@ -186,6 +189,12 @@
 
         <!-- ================= PANTALLA 1: VENTAS ================= -->
         <div id="pantalla-ventas" class="space-y-4">
+            <!-- BUSCADOR RÁPIDO EN VENTAS -->
+            <div class="western-panel rounded-xl p-3 flex items-center space-x-2">
+                <span class="text-base">🔍</span>
+                <input type="text" id="buscador-ventas" placeholder="Buscar en la carta (platos, bebidas, menús, platos NPC...)" class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarCartaVentas()">
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div class="lg:col-span-2 space-y-4">
                     <div class="western-panel rounded-xl p-3 md:p-4">
@@ -264,6 +273,27 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tabla-venta-menus" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- NUEVA SECCIÓN DE PLATOS NPC EN VENTAS -->
+                    <div class="western-panel rounded-xl p-3 md:p-4">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-platos-npc')">
+                            <h2 class="text-base font-extrabold text-amber-400 font-rustic">🎩 Platos NPC</h2>
+                            <button id="btn-sec-platos-npc" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
+                        </div>
+                        <div id="sec-platos-npc" class="overflow-x-auto pt-3">
+                            <table class="w-full text-left text-xs md:text-sm">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Plato NPC</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-venta-platos-npc" class="divide-y divide-amber-900/40"></tbody>
                             </table>
                         </div>
                     </div>
@@ -398,6 +428,12 @@
 
         <!-- ================= PANTALLA 2: PEDIDOS ================= -->
         <div id="pantalla-pedidos" class="space-y-4 hidden">
+            <!-- BUSCADOR RÁPIDO EN PEDIDOS -->
+            <div class="western-panel rounded-xl p-3 flex items-center space-x-2">
+                <span class="text-base">🔍</span>
+                <input type="text" id="buscador-catalogo-pedidos" placeholder="Buscar producto en el catálogo de pedidos (EEUU o México)..." class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarCatalogoPedidos()">
+            </div>
+
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🌾 Pedidos de Materia Prima (EEUU y México)</h2>
                 
@@ -629,7 +665,47 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 6: PRODUCTOS ================= -->
+        <!-- ================= PANTALLA 6: PLATOS NPC ================= -->
+        <div id="pantalla-platos-npc" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🎩 Gestión de Platos NPC (3 Tarifas)</h2>
+                
+                <form id="form-nuevo-plato-npc" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Plato NPC</h3>
+                    <input type="text" id="plato-npc-nombre" placeholder="Nombre del plato NPC" required class="w-full p-2 rounded text-xs">
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Mín ($)</label>
+                            <input type="number" step="0.01" id="plato-npc-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Med ($)</label>
+                            <input type="number" step="0.01" id="plato-npc-med" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Máx ($)</label>
+                            <input type="number" step="0.01" id="plato-npc-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Plato NPC</button>
+                </form>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="table-header uppercase font-rustic">
+                            <tr>
+                                <th class="p-2">Plato NPC</th>
+                                <th class="p-2 text-center">Mín / Med / Máx</th>
+                                <th class="p-2 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-gestion-platos-npc" class="divide-y divide-amber-900/40"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 7: PRODUCTOS ================= -->
         <div id="pantalla-productos" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📦 Gestión de Productos Varios (3 Tarifas)</h2>
@@ -669,7 +745,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 7: LICENCIAS ================= -->
+        <!-- ================= PANTALLA 8: LICENCIAS ================= -->
         <div id="pantalla-licencias" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📜 Archivador de Licencias</h2>
@@ -705,7 +781,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 8: PLANTILLA (EXCLUSIVO ADMIN) ================= -->
+        <!-- ================= PANTALLA 9: PLANTILLA (EXCLUSIVO ADMIN) ================= -->
         <div id="pantalla-plantilla" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-amber-900/60 pb-2">
@@ -725,7 +801,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 9: APROBACIONES (EXCLUSIVO ADMIN) ================= -->
+        <!-- ================= PANTALLA 10: APROBACIONES (EXCLUSIVO ADMIN) ================= -->
         <div id="pantalla-aprobaciones" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">👥 Solicitudes de Aprobación de Usuarios</h2>
@@ -821,13 +897,18 @@
             "m2": { id: "m2", nombre: "Último Capricho", pMin: 1.50, pNorm: 1.94 }
         };
 
+        const platosNPCIniciales = {
+            "npc1": { id: "npc1", nombre: "Guisado Especial NPC", pMin: 1.00, pMed: 1.50, pNorm: 2.00 },
+            "npc2": { id: "npc2", nombre: "Estofado de Venado NPC", pMin: 1.20, pMed: 1.80, pNorm: 2.50 }
+        };
+
         const productosIniciales = {
             "p1": { id: "p1", nombre: "Puros Premium", pMin: 1.00, pMed: 1.50, pNorm: 2.00 },
             "p2": { id: "p2", nombre: "Tabaco de Mascar", pMin: 0.50, pMed: 0.75, pNorm: 1.00 }
         };
 
-        let comida = {}, bebidaNormal = {}, bebidaAlcohol = {}, menus = {}, productos = {}, productosEEUU = {}, productosMexico = {};
-        let ventaComida = {}, ventaBebidaNormal = {}, ventaBebidaAlcohol = {}, ventaMenus = {}, ventaProductos = {};
+        let comida = {}, bebidaNormal = {}, bebidaAlcohol = {}, menus = {}, platosNPC = {}, productos = {}, productosEEUU = {}, productosMexico = {};
+        let ventaComida = {}, ventaBebidaNormal = {}, ventaBebidaAlcohol = {}, ventaMenus = {}, ventaPlatosNPC = {}, ventaProductos = {};
         let pedidoEEUU = {}, pedidoMex = {};
         let listaFacturasGlobal = [], listaPedidosGlobal = [], listaFichajesGlobal = [];
         let turnoActivo = null;
@@ -881,7 +962,6 @@
             });
         });
 
-        // REGISTRO MEJORADO CON GARANTÍA DE ESCRITURA EN DB
         document.getElementById('form-registro').addEventListener('submit', (e) => {
             e.preventDefault();
             const nombre = document.getElementById('reg-nombre').value.trim();
@@ -900,7 +980,6 @@
                     rol: 'empleado'
                 };
 
-                // Forzar guardado en base de datos asegurando persistencia
                 database.ref('usuarios/' + uid).set(nuevoUsuario).then(() => {
                     auth.signOut();
                     mostrarMensajeAuth("✅ Solicitud enviada con éxito. Espera a que un Administrador apruebe tu cuenta.", false);
@@ -918,7 +997,6 @@
                 database.ref('usuarios/' + user.uid).once('value', snapshot => {
                     let usuarioData = snapshot.val();
                     
-                    // Auto-reparación si el usuario existe en Auth pero faltaba en la DB
                     if (!usuarioData) {
                         usuarioData = {
                             uid: user.uid,
@@ -1013,7 +1091,7 @@
         }
 
         function cambiarPantalla(pantalla) {
-            ['ventas', 'pedidos', 'licencias', 'comida', 'bebida', 'menus', 'productos', 'plantilla', 'aprobaciones'].forEach(p => {
+            ['ventas', 'pedidos', 'licencias', 'comida', 'bebida', 'menus', 'platos-npc', 'productos', 'plantilla', 'aprobaciones'].forEach(p => {
                 const el = document.getElementById('pantalla-' + p);
                 const btn = document.getElementById('btn-tab-' + p);
                 if (el) el.classList.add('hidden');
@@ -1112,6 +1190,12 @@
             database.ref('menus').on('value', (s) => {
                 menus = s.val() || menusIniciales;
                 if (!s.val()) database.ref('menus').set(menusIniciales);
+                renderizarTodo();
+            });
+
+            database.ref('platos_npc').on('value', (s) => {
+                platosNPC = s.val() || platosNPCIniciales;
+                if (!s.val()) database.ref('platos_npc').set(platosNPCIniciales);
                 renderizarTodo();
             });
 
@@ -1394,6 +1478,53 @@
         function setPorcentajeVenta(pct) {
             document.getElementById('input-porcentaje-venta').value = pct;
             renderizarResumenVenta();
+        }
+
+        // ================= BUSCADORES EN TIEMPO REAL =================
+        function filtrarCartaVentas() {
+            const filtro = (document.getElementById('buscador-ventas')?.value || '').toLowerCase().trim();
+            
+            const filtrarTabla = (tableId, itemsObj) => {
+                const tbody = document.getElementById(tableId);
+                if (!tbody) return;
+                const filas = tbody.querySelectorAll('tr');
+                filas.forEach(fila => {
+                    const texto = fila.textContent.toLowerCase();
+                    if (texto.includes(filtro)) {
+                        fila.style.display = '';
+                    } else {
+                        fila.style.display = 'none';
+                    }
+                });
+            };
+
+            filtrarTabla('tabla-venta-comida', comida);
+            filtrarTabla('tabla-venta-bebida-normal', bebidaNormal);
+            filtrarTabla('tabla-venta-bebida-alcohol', bebidaAlcohol);
+            filtrarTabla('tabla-venta-menus', menus);
+            filtrarTabla('tabla-venta-platos-npc', platosNPC);
+            filtrarTabla('tabla-venta-productos', productos);
+        }
+
+        function filtrarCatalogoPedidos() {
+            const filtro = (document.getElementById('buscador-catalogo-pedidos')?.value || '').toLowerCase().trim();
+            
+            const filtrarTabla = (tableId) => {
+                const tbody = document.getElementById(tableId);
+                if (!tbody) return;
+                const filas = tbody.querySelectorAll('tr');
+                filas.forEach(fila => {
+                    const texto = fila.textContent.toLowerCase();
+                    if (texto.includes(filtro)) {
+                        fila.style.display = '';
+                    } else {
+                        fila.style.display = 'none';
+                    }
+                });
+            };
+
+            filtrarTabla('tabla-pedidos-eeuu');
+            filtrarTabla('tabla-pedidos-mexico');
         }
 
         // ================= HISTORIAL Y FACTURAS =================
@@ -1708,12 +1839,14 @@
             renderTablaVenta('tabla-venta-bebida-normal', bebidaNormal, ventaBebidaNormal, 'bebida_normal');
             renderTablaVenta('tabla-venta-bebida-alcohol', bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
             renderTablaVenta('tabla-venta-menus', menus, ventaMenus, 'menu');
+            renderTablaVenta('tabla-venta-platos-npc', platosNPC, ventaPlatosNPC, 'platos_npc');
             renderTablaVenta('tabla-venta-productos', productos, ventaProductos, 'productos');
 
             renderTablaGestion('tabla-gestion-comida', comida, 'comida');
             renderTablaGestionBebida('tabla-gestion-bebida-normal', bebidaNormal, 'bebida_normal');
             renderTablaGestionBebida('tabla-gestion-bebida-alcohol', bebidaAlcohol, 'bebida_alcohol');
             renderTablaGestionMenu('tabla-gestion-menus', menus);
+            renderTablaGestion('tabla-gestion-platos-npc', platosNPC, 'platos_npc');
             renderTablaGestion('tabla-gestion-productos', productos, 'productos_varios');
 
             renderTablaPedidos('tabla-pedidos-eeuu', productosEEUU, pedidoEEUU, 'eeuu');
@@ -1721,6 +1854,10 @@
 
             renderizarResumenVenta();
             renderizarResumenPedidos();
+
+            // Re-aplicar búsquedas si había texto escrito
+            filtrarCartaVentas();
+            filtrarCatalogoPedidos();
         }
 
         function renderTablaVenta(elementId, items, estadoObj, tipo) {
@@ -1868,6 +2005,7 @@
             else if (tipo === 'bebida_normal') obj = ventaBebidaNormal;
             else if (tipo === 'bebida_alcohol') obj = ventaBebidaAlcohol;
             else if (tipo === 'menu') obj = ventaMenus;
+            else if (tipo === 'platos_npc') obj = ventaPlatosNPC;
             else obj = ventaProductos;
 
             if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' };
@@ -1881,6 +2019,7 @@
             else if (tipo === 'bebida_normal') obj = ventaBebidaNormal;
             else if (tipo === 'bebida_alcohol') obj = ventaBebidaAlcohol;
             else if (tipo === 'menu') obj = ventaMenus;
+            else if (tipo === 'platos_npc') obj = ventaPlatosNPC;
             else obj = ventaProductos;
 
             if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' };
@@ -1946,6 +2085,7 @@
             sumarAlResumen(bebidaNormal, ventaBebidaNormal, 'bebida_normal');
             sumarAlResumen(bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
             sumarAlResumen(menus, ventaMenus, 'menu');
+            sumarAlResumen(platosNPC, ventaPlatosNPC, 'platos_npc');
             sumarAlResumen(productos, ventaProductos, 'productos');
 
             if (!hay) contenedor.innerHTML = '<p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>';
@@ -2008,6 +2148,7 @@
             recolectarVenta(bebidaNormal, ventaBebidaNormal, 'bebida_normal');
             recolectarVenta(bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
             recolectarVenta(menus, ventaMenus, 'menu');
+            recolectarVenta(platosNPC, ventaPlatosNPC, 'platos_npc');
             recolectarVenta(productos, ventaProductos, 'productos');
 
             if (subtotalBase === 0) {
@@ -2040,14 +2181,14 @@
             database.ref('facturas').push(facturaData);
             copiarTextoPortapapeles(generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), subtotalBase, descuentoMonto, pct, concepto, totalVenta));
 
-            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaProductos = {};
+            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {};
             document.getElementById('input-porcentaje-venta').value = '0';
             document.getElementById('input-concepto-convenio').value = '';
             renderizarTodo();
         });
 
         document.getElementById('btn-limpiar-venta').addEventListener('click', () => {
-            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaProductos = {};
+            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {};
             document.getElementById('input-porcentaje-venta').value = '0';
             document.getElementById('input-concepto-convenio').value = '';
             renderizarTodo();
@@ -2062,7 +2203,7 @@
                 pNorm: parseFloat(document.getElementById('p-eeuu-norm').value)
             });
             this.reset();
-            alert("¡Producto añadido à EEUU!");
+            alert("¡Producto añadido a EEUU!");
         });
 
         document.getElementById('form-nuevo-pedido-mex').addEventListener('submit', function(e) {
@@ -2128,6 +2269,19 @@
             });
             this.reset();
             alert("¡Menú añadido!");
+        });
+
+        document.getElementById('form-nuevo-plato-npc').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('platos_npc/' + id).set({
+                id, nombre: document.getElementById('plato-npc-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('plato-npc-min').value),
+                pMed: parseFloat(document.getElementById('plato-npc-med').value),
+                pNorm: parseFloat(document.getElementById('plato-npc-norm').value)
+            });
+            this.reset();
+            alert("¡Plato NPC añadido!");
         });
 
         document.getElementById('form-nuevo-producto').addEventListener('submit', function(e) {
