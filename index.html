@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Corner - Saint Denis | Sistema Integrado</title>
+    <!-- Tailwind CSS desde CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase App, Auth & Database SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Playfair+Display:ital,wght@0,600;1,400&display=swap');
+        
+        .font-rustic { font-family: 'Cinzel', serif; }
+        .font-serif-custom { font-family: 'Playfair Display', serif; }
+
+        body { 
+            background-color: #0e0906;
+            background-image: linear-gradient(rgba(14, 9, 6, 0.70), rgba(8, 5, 3, 0.85)), 
+                              url('fondo.jpg'), 
+                              url('Fondo.jpg'), 
+                              url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1920&auto=format&fit=crop');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            background-size: cover;
+            color: #f3e5d8; 
+        }
+
+        .western-panel {
+            background: rgba(26, 18, 13, 0.92);
+            border: 2px solid #8c5a2b;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.85), inset 0 0 15px rgba(140, 90, 43, 0.25);
+            backdrop-filter: blur(4px);
+        }
+
+        .western-header {
+            background: rgba(38, 24, 16, 0.95);
+            border-bottom: 2px solid #b8860b;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.7);
+        }
+
+        .table-header {
+            background: rgba(54, 34, 22, 0.95);
+            color: #e6c687;
+        }
+
+        input, select {
+            background-color: #140d09 !important;
+            border-color: #5c3a1e !important;
+            color: #f3e5d8 !important;
+        }
+
+        input:focus, select:focus {
+            border-color: #d4af37 !important;
+            outline: none;
+        }
+
+        .tab-btn.active {
+            background-color: #78350f;
+            border-color: #d4af37;
+            color: #fef3c7;
+        }
+    </style>
+</head>
+<body class="p-2 md:p-8 min-h-screen font-serif-custom">
+
+    <!-- ================= PANTALLA DE AUTENTICACIÓN ================= -->
+    <div id="seccion-auth" class="max-w-md mx-auto my-12 western-panel p-6 rounded-2xl space-y-6 shadow-2xl">
+        <div class="text-center space-y-2">
+            <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-amber-600 shadow-lg bg-stone-900 flex items-center justify-center">
+                <img src="logo.jpg" alt="Logo The Corner" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/150?text=The+Corner'">
+            </div>
+            <h1 class="text-2xl font-black text-amber-500 font-rustic tracking-widest">THE CORNER</h1>
+            <p class="text-xs text-amber-200/70">Acceso Privado a la Gestión del Saloon</p>
+        </div>
+
+        <div class="flex border-b border-amber-900/60 text-xs font-rustic text-center">
+            <button onclick="switchAuthTab('login')" id="tab-auth-login" class="w-1/2 py-2 font-bold text-amber-400 border-b-2 border-amber-500">Iniciar Sesión</button>
+            <button onclick="switchAuthTab('registro')" id="tab-auth-registro" class="w-1/2 py-2 font-bold text-amber-200/50 border-b-2 border-transparent">Registrarse</button>
+        </div>
+
+        <form id="form-login" class="space-y-4">
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-amber-300 font-rustic mb-1">Correo Electrónico</label>
+                <input type="email" id="login-email" required placeholder="tuemail@ejemplo.com" class="w-full p-2.5 rounded text-xs">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-amber-300 font-rustic mb-1">Contraseña</label>
+                <input type="password" id="login-password" required placeholder="••••••••" class="w-full p-2.5 rounded text-xs">
+            </div>
+            <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2.5 rounded text-xs font-rustic border border-amber-600 shadow-md">
+                🔑 Iniciar Sesión
+            </button>
+        </form>
+
+        <form id="form-registro" class="space-y-3 hidden">
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-amber-300 font-rustic mb-1">Nombre de Personaje / Usuario</label>
+                <input type="text" id="reg-nombre" required placeholder="Ej: John Doe" class="w-full p-2.5 rounded text-xs">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-amber-300 font-rustic mb-1">Correo Electrónico</label>
+                <input type="email" id="reg-email" required placeholder="tuemail@ejemplo.com" class="w-full p-2.5 rounded text-xs">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-amber-300 font-rustic mb-1">Contraseña</label>
+                <input type="password" id="reg-password" required placeholder="Mínimo 6 caracteres" class="w-full p-2.5 rounded text-xs">
+            </div>
+            <p class="text-[10px] text-amber-400/80 italic text-center">⏳ Tras registrarte, tu cuenta deberá ser aprobada por un Administrador.</p>
+            <button type="submit" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2.5 rounded text-xs font-rustic border border-emerald-600 shadow-md">
+                📝 Enviar Solicitud de Registro
+            </button>
+        </form>
+
+        <div id="auth-mensaje" class="text-center text-xs font-bold py-1 hidden"></div>
+    </div>
+
+    <!-- ================= APLICACIÓN PRINCIPAL ================= -->
+    <div id="seccion-app" class="max-w-6xl mx-auto space-y-4 hidden">
+        
+        <header class="py-3 px-4 rounded-xl western-header flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-600 shadow-xl bg-stone-900">
+                    <img src="logo.jpg" alt="Logo The Corner" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/150?text=The+Corner'">
+                </div>
+                <div>
+                    <div class="text-[9px] tracking-widest text-amber-600 font-bold uppercase">✦ Saint Denis • Est. 1880 ✦</div>
+                    <h1 class="text-xl md:text-2xl font-black text-amber-500 font-rustic tracking-widest">THE CORNER</h1>
+                </div>
+            </div>
+
+            <!-- BLOQUE DE CAJA TOTAL EN TIEMPO REAL & USUARIO -->
+            <div class="flex flex-wrap items-center justify-center md:justify-end gap-3">
+                <div class="bg-stone-950/90 border border-amber-600 px-3 py-1.5 rounded-lg text-center shadow-inner">
+                    <span class="text-[9px] text-amber-400/80 uppercase font-bold font-rustic block">🪙 Dinero en Caja Total:</span>
+                    <span id="caja-total-display" class="text-base md:text-lg font-black text-emerald-400 font-mono tracking-wider">$0.00</span>
+                </div>
+
+                <div class="flex items-center space-x-3 bg-stone-900/90 px-3 py-1.5 rounded-lg border border-amber-900/60 text-xs">
+                    <div>
+                        <span class="text-[10px] text-amber-400/70 block">Sesión activa:</span>
+                        <span id="user-display-name" class="font-bold text-amber-200 font-rustic">Cargando...</span>
+                        <span id="user-display-role" class="text-[9px] bg-amber-900/60 px-1 rounded text-amber-300 ml-1">Empleado</span>
+                    </div>
+                    <button onclick="cerrarSesion()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-800 text-[10px] px-2 py-1 rounded font-rustic">
+                        🚪 Salir
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- NAVEGACIÓN PRINCIPAL -->
+        <div class="grid grid-cols-3 md:grid-cols-10 gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
+            <button onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+                <span>💰</span> <span>Ventas</span>
+            </button>
+            <button onclick="cambiarPantalla('pedidos')" id="btn-tab-pedidos" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+                <span>🌾</span> <span>Pedidos</span>
+            </button>
+            <button onclick="cambiarPantalla('comida')" id="btn-tab-comida" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+                <span>🥩</span> <span>Comida</span>
+            </button>
+            <button onclick="cambiarPantalla('bebida')" id="btn-tab-bebida" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+                <span>🍺</span> <span>Bebidas</span>
+            </button>
+            <button onclick="cambiarPantalla('menus')" id="btn-tab-menus" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+                <span>🍲</span> <span>Menús</span>
+            </button>
+            <button onclick="cambiarPantalla('platos-npc')" id="btn-tab-platos-npc" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+                <span>🎩</span> <span>Platos NPC</span>
+            </button>
+            <button onclick="cambiarPantalla('productos')" id="btn-tab-productos" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+                <span>📦</span> <span>Productos</span>
+            </button>
+            <button onclick="cambiarPantalla('licencias')" id="btn-tab-licencias" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+                <span>📜</span> <span>Licencias</span>
+            </button>
+            <button id="btn-tab-plantilla" onclick="cambiarPantalla('plantilla')" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
+                <span>📋</span> <span>Plantilla</span>
+            </button>
+            <button id="btn-tab-aprobaciones" onclick="cambiarPantalla('aprobaciones')" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
+                <span>👥</span> <span>Aprobar</span>
+            </button>
+        </div>
+
+        <!-- ================= PANTALLA 1: VENTAS ================= -->
+        <div id="pantalla-ventas" class="space-y-4">
+            <!-- BUSCADOR RÁPIDO EN VENTAS -->
+            <div class="western-panel rounded-xl p-3 flex items-center space-x-2">
+                <span class="text-base">🔍</span>
+                <input type="text" id="buscador-ventas" placeholder="Buscar en la carta (platos, bebidas, menús, platos NPC...)" class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarCartaVentas()">
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="western-panel rounded-xl p-3 md:p-4">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-comida')">
+                            <h2 class="text-base font-extrabold text-amber-400 font-rustic">🥩 Comida y Platos</h2>
+                            <button id="btn-sec-comida" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
+                        </div>
+                        <div id="sec-comida" class="overflow-x-auto pt-3">
+                            <table class="w-full text-left text-xs md:text-sm">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Plato</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-venta-comida" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="western-panel rounded-xl p-3 md:p-4">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-bebida-normal')">
+                            <h2 class="text-base font-extrabold text-amber-400 font-rustic">🥤 Bebidas Normales / Sin Alcohol</h2>
+                            <button id="btn-sec-bebida-normal" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
+                        </div>
+                        <div id="sec-bebida-normal" class="overflow-x-auto pt-3">
+                            <table class="w-full text-left text-xs md:text-sm">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Bebida</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-venta-bebida-normal" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="western-panel rounded-xl p-3 md:p-4">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-bebida-alcohol')">
+                            <h2 class="text-base font-extrabold text-amber-400 font-rustic">🍺 Bebidas Alcohólicas</h2>
+                            <button id="btn-sec-bebida-alcohol" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
+                        </div>
+                        <div id="sec-bebida-alcohol" class="overflow-x-auto pt-3">
+                            <table class="w-full text-left text-xs md:text-sm">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Bebida</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-venta-bebida-alcohol" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="western-panel rounded-xl p-3 md:p-4">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-menus')">
+                            <h2 class="text-base font-extrabold text-amber-400 font-rustic">🍲 Menús</h2>
+                            <button id="btn-sec-menus" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
+                        </div>
+                        <div id="sec-menus" class="overflow-x-auto pt-3">
+                            <table class="w-full text-left text-xs md:text-sm">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Menú</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-venta-menus" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="western-panel rounded-xl p-3 md:p-4">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-platos-npc')">
+                            <h2 class="text-base font-extrabold text-amber-400 font-rustic">🎩 Platos NPC</h2>
+                            <button id="btn-sec-platos-npc" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
+                        </div>
+                        <div id="sec-platos-npc" class="overflow-x-auto pt-3">
+                            <table class="w-full text-left text-xs md:text-sm">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Plato NPC</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-venta-platos-npc" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="western-panel rounded-xl p-3 md:p-4">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-productos')">
+                            <h2 class="text-base font-extrabold text-amber-400 font-rustic">📦 Varios Productos</h2>
+                            <button id="btn-sec-productos" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
+                        </div>
+                        <div id="sec-productos" class="overflow-x-auto pt-3">
+                            <table class="w-full text-left text-xs md:text-sm">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Producto</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-venta-productos" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TICKET DE VENTA CON DESCUENTO, CONVENIO Y EFECTIVO/PROPINA -->
+                <div class="western-panel rounded-xl p-4 flex flex-col justify-between h-fit border-amber-700 space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center border-b border-amber-900/60 pb-2 cursor-pointer select-none" onclick="toggleSeccion('sec-ticket')">
+                            <h2 class="text-lg font-extrabold text-amber-400 font-rustic">🧾 Factura / Ticket</h2>
+                            <button id="btn-sec-ticket" class="text-xs bg-stone-900 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-bold">➖ Plegar</button>
+                        </div>
+
+                        <div id="sec-ticket" class="space-y-3">
+                            <div class="bg-stone-900/80 p-2.5 rounded-lg border border-amber-800/60 space-y-1">
+                                <label class="text-[10px] text-amber-300 font-bold uppercase tracking-wider font-rustic block">👤 Usuario / Atendido por:</label>
+                                <input type="text" id="usuario-activo" readonly class="w-full p-2 rounded text-xs font-bold text-amber-200 border-amber-700 bg-stone-950/60">
+                            </div>
+
+                            <div class="bg-stone-950/80 p-3 rounded-lg border border-amber-900/60 space-y-2">
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="font-bold text-amber-300 font-rustic">⏱️ Control de Fichaje:</span>
+                                    <span id="estado-fichaje-text" class="text-[10px] text-amber-200/70">⚪ Fuera de servicio</span>
+                                </div>
+                                <button id="btn-fichaje" onclick="toggleFichaje()" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2 rounded text-xs border border-emerald-600 transition font-rustic shadow">
+                                    🟢 Entrar de Servicio
+                                </button>
+                            </div>
+
+                            <!-- BLOQUE DE PORCENTAJE DE DESCUENTO Y CONCEPTO DE CONVENIO -->
+                            <div class="bg-stone-900/80 p-3 rounded-lg border border-amber-800/60 space-y-2">
+                                <label class="text-[10px] text-amber-300 font-bold uppercase tracking-wider font-rustic block">🏷️ Porcentaje de Descuento:</label>
+                                <div class="grid grid-cols-4 gap-1">
+                                    <button type="button" onclick="setPorcentajeVenta(0)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">0%</button>
+                                    <button type="button" onclick="setPorcentajeVenta(10)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">10%</button>
+                                    <button type="button" onclick="setPorcentajeVenta(15)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">15%</button>
+                                    <button type="button" onclick="setPorcentajeVenta(20)" class="bg-stone-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-bold">20%</button>
+                                </div>
+                                <div class="flex items-center space-x-2 pt-1">
+                                    <span class="text-[10px] text-amber-200/70">Personalizado (%):</span>
+                                    <input type="number" id="input-porcentaje-venta" value="0" min="0" max="100" step="0.5" oninput="renderizarResumenVenta()" class="w-20 p-1.5 rounded text-center text-xs font-bold text-amber-300 bg-stone-950 border-amber-800">
+                                    <span class="text-xs font-bold text-amber-400">%</span>
+                                </div>
+                                <div class="pt-1">
+                                    <label class="text-[10px] text-amber-200/70 block mb-1">Concepto / Convenio aplicable (opcional):</label>
+                                    <input type="text" id="input-concepto-convenio" placeholder="Ej: Médicos, Sheriffs, Banda..." class="w-full p-1.5 rounded text-xs bg-stone-950 border-amber-800 text-amber-200">
+                                </div>
+                            </div>
+
+                            <!-- NUEVO BLOQUE: EFECTIVO ENTREGADO Y CÁLCULO DE PROPINA -->
+                            <div class="bg-stone-900/80 p-3 rounded-lg border border-amber-800/60 space-y-2">
+                                <label class="text-[10px] text-amber-300 font-bold uppercase tracking-wider font-rustic block">🪙 Efectivo Entregado por Cliente:</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="number" id="input-efectivo-entregado" step="0.01" min="0" placeholder="Dejar en blanco si paga exacto" oninput="renderizarResumenVenta()" class="w-full p-1.5 rounded text-center text-xs font-bold text-amber-300 bg-stone-950 border-amber-800">
+                                    <span class="text-xs font-bold text-amber-400">$</span>
+                                </div>
+                                <div id="info-propina-calculada" class="text-[10px] text-emerald-400 font-bold pt-1 hidden">
+                                    🪙 Propina / Bote añadido: <span id="valor-propina-calc" class="font-mono">$0.00</span>
+                                </div>
+                            </div>
+
+                            <div id="lista-resumen-venta" class="space-y-2 max-h-40 overflow-y-auto pr-1 text-xs">
+                                <p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-amber-900/60 space-y-2">
+                        <div class="flex justify-between items-center text-amber-200/70 text-xs">
+                            <span>Subtotal Base:</span>
+                            <span id="subtotal-base-venta" class="font-bold text-amber-100">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center text-amber-200/70 text-xs">
+                            <span>Descuento Aplicado:</span>
+                            <span id="descuento-monto-venta" class="font-bold text-emerald-400">-$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xl md:text-2xl font-black text-amber-400 font-rustic pt-1 border-t border-amber-900/40">
+                            <span>TOTAL A FACTURAR:</span>
+                            <span id="total-precio-venta">$0.00</span>
+                        </div>
+
+                        <button id="btn-registrar-venta" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2.5 rounded border border-emerald-600 transition text-xs font-rustic shadow-lg">
+                            💾 Registrar Venta y Copiar
+                        </button>
+                        <button id="btn-limpiar-venta" class="w-full bg-stone-900 hover:bg-stone-800 text-amber-200/80 font-bold py-1.5 rounded border border-amber-900/50 transition text-xs font-rustic">
+                            🗑️ Limpiar Venta
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL: HISTORIAL DE FICHAJES -->
+            <div id="panel-fichajes-admin" class="western-panel rounded-xl p-4 space-y-3 hidden">
+                <div class="flex justify-between items-center border-b border-amber-900/60 pb-2">
+                    <h2 class="text-base font-extrabold text-amber-400 font-rustic">⏱️ Historial de Fichajes y Horas de Empleados</h2>
+                    <button onclick="cerrarPanelFichajes()" class="text-xs bg-stone-900 hover:bg-stone-800 text-amber-200 px-2 py-1 rounded border border-amber-800">✖ Cerrar</button>
+                </div>
+                <div id="galeria-fichajes-admin" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                    <p class="italic text-amber-200/40 col-span-full text-center py-3">No hay turnos finalizados aún.</p>
+                </div>
+            </div>
+
+            <div class="western-panel rounded-xl p-4 space-y-3">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-amber-900/60 pb-2">
+                    <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Facturas</h2>
+                    <div class="flex flex-wrap gap-2">
+                        <button id="btn-admin-caja-base" onclick="modalAjustarCajaBase()" class="bg-emerald-900 hover:bg-emerald-800 text-emerald-100 border border-emerald-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🪙 Ajustar Base Caja (SuperAdmim)</button>
+                        <button id="btn-admin-fichajes" onclick="verHistorialFichajesAdmin()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 border border-amber-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">⏱️ Ver Turnos (Admin)</button>
+                        <button id="btn-admin-balance" onclick="generarBalanceSemanalAdmin()" class="bg-indigo-900 hover:bg-indigo-800 text-indigo-100 border border-indigo-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">📊 Balance Semanal (Admin)</button>
+                        <button id="btn-admin-purga" onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🧹 Purga (Admin)</button>
+                    </div>
+                </div>
+
+                <div class="bg-stone-900/70 p-2 rounded-lg border border-amber-900/40 flex items-center space-x-2">
+                    <span class="text-sm">🔍</span>
+                    <input type="text" id="buscador-tickets" placeholder="Buscar por usuario, fecha, hora o producto..." class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarTickets()">
+                </div>
+
+                <div id="lista-historial-facturas" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-amber-200/80">
+                    <p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay facturas registradas todavía.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 2: PEDIDOS ================= -->
+        <div id="pantalla-pedidos" class="space-y-4 hidden">
+            <!-- BUSCADOR RÁPIDO EN PEDIDOS -->
+            <div class="western-panel rounded-xl p-3 flex items-center space-x-2">
+                <span class="text-base">🔍</span>
+                <input type="text" id="buscador-catalogo-pedidos" placeholder="Buscar producto en el catálogo de pedidos (EEUU o México)..." class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarCatalogoPedidos()">
+            </div>
+
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🌾 Pedidos de Materia Prima (EEUU y México)</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-stone-900/60 p-3 rounded-xl border border-amber-900/40">
+                    <form id="form-nuevo-pedido-eeuu" class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Producto a EEUU</h3>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="text" id="p-eeuu-nombre" placeholder="Nombre" required class="col-span-1 p-1.5 rounded text-xs">
+                            <input type="number" step="0.01" id="p-eeuu-min" placeholder="P. Mín ($)" required class="p-1.5 rounded text-xs">
+                            <input type="number" step="0.01" id="p-eeuu-norm" placeholder="P. Máx ($)" required class="p-1.5 rounded text-xs">
+                        </div>
+                        <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-1 rounded text-xs border border-amber-600 font-rustic">Añadir a EEUU</button>
+                    </form>
+
+                    <form id="form-nuevo-pedido-mex" class="space-y-2">
+                        <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Producto a México</h3>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="text" id="p-mex-nombre" placeholder="Nombre" required class="col-span-1 p-1.5 rounded text-xs">
+                            <input type="number" step="0.01" id="p-mex-min" placeholder="P. Mín ($)" required class="p-1.5 rounded text-xs">
+                            <input type="number" step="0.01" id="p-mex-norm" placeholder="P. Máx ($)" required class="p-1.5 rounded text-xs">
+                        </div>
+                        <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-1 rounded text-xs border border-amber-600 font-rustic">Añadir a México</button>
+                    </form>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🇺🇸 Agricultura EEUU</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Ítem</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                        <th class="p-2 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-pedidos-eeuu" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🇲🇽 Agricultura México</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Ítem</th>
+                                        <th class="p-2 text-center">Tarifa</th>
+                                        <th class="p-2 text-center w-16">Cant.</th>
+                                        <th class="p-2 text-right">Subtotal</th>
+                                        <th class="p-2 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-pedidos-mexico" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-stone-900/80 p-4 rounded-xl border border-amber-900/60 flex flex-col sm:flex-row justify-between items-center gap-3">
+                    <div class="text-sm font-rustic font-bold text-amber-300">
+                        Coste Total de Pedido: <span id="total-coste-pedidos" class="text-amber-400 font-mono text-base">$0.00</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="registrarPedidoContabilidad()" class="bg-emerald-800 hover:bg-emerald-700 text-emerald-100 px-3 py-2 rounded border border-emerald-600 text-xs font-rustic font-bold">💾 Registrar Pedido y Copiar</button>
+                        <button onclick="limpiarPedidos()" class="bg-stone-950 hover:bg-stone-800 text-amber-200 px-3 py-2 rounded border border-amber-900 text-xs font-rustic">🗑️ Limpiar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REGISTRO HISTÓRICO DE PEDIDOS -->
+            <div class="western-panel rounded-xl p-4 space-y-3">
+                <div class="flex justify-between items-center border-b border-amber-900/60 pb-2">
+                    <h2 class="text-base font-extrabold text-amber-400 font-rustic">📋 Registro Histórico de Pedidos</h2>
+                </div>
+                <div class="bg-stone-900/70 p-2 rounded-lg border border-amber-900/40 flex items-center space-x-2">
+                    <span class="text-sm">🔍</span>
+                    <input type="text" id="buscador-pedidos" placeholder="Buscar por fecha, hora o producto del pedido..." class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarPedidosHistorial()">
+                </div>
+                <div id="lista-historial-pedidos" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-amber-200/80">
+                    <p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay pedidos registrados todavía.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 3: COMIDA ================= -->
+        <div id="pantalla-comida" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🥩 Gestión de Comida (3 Tarifas)</h2>
+                
+                <form id="form-nueva-comida" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Plato de Comida</h3>
+                    <input type="text" id="comida-nombre" placeholder="Nombre del plato" required class="w-full p-2 rounded text-xs">
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Mín ($)</label>
+                            <input type="number" step="0.01" id="comida-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Med ($)</label>
+                            <input type="number" step="0.01" id="comida-med" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Máx ($)</label>
+                            <input type="number" step="0.01" id="comida-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Comida</button>
+                </form>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="table-header uppercase font-rustic">
+                            <tr>
+                                <th class="p-2">Plato</th>
+                                <th class="p-2 text-center">Mín / Med / Máx</th>
+                                <th class="p-2 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-gestion-comida" class="divide-y divide-amber-900/40"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 4: BEBIDA ================= -->
+        <div id="pantalla-bebida" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🍺 Gestión de Bebidas</h2>
+                
+                <form id="form-nueva-bebida" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Bebida</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <input type="text" id="bebida-nombre" placeholder="Nombre de la bebida" required class="p-2 rounded text-xs">
+                        <select id="bebida-tipo" required class="p-2 rounded text-xs">
+                            <option value="normal">🥤 Bebida Normal / Sin Alcohol</option>
+                            <option value="alcohol">🍺 Bebida Alcohólica</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Mín ($)</label>
+                            <input type="number" step="0.01" id="bebida-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Med ($)</label>
+                            <input type="number" step="0.01" id="bebida-med" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Máx ($)</label>
+                            <input type="number" step="0.01" id="bebida-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Bebida</button>
+                </form>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🥤 Bebidas Normales</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Bebida</th>
+                                        <th class="p-2 text-center">Mín / Med / Máx</th>
+                                        <th class="p-2 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-gestion-bebida-normal" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🍺 Bebidas Alcohólicas</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="table-header uppercase font-rustic">
+                                    <tr>
+                                        <th class="p-2">Bebida</th>
+                                        <th class="p-2 text-center">Mín / Med / Máx</th>
+                                        <th class="p-2 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-gestion-bebida-alcohol" class="divide-y divide-amber-900/40"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 5: MENÚS ================= -->
+        <div id="pantalla-menus" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🍲 Gestión de Menús (2 Tarifas)</h2>
+                
+                <form id="form-nuevo-menu" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Menú</h3>
+                    <input type="text" id="menu-nombre" placeholder="Nombre del menú" required class="w-full p-2 rounded text-xs">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Mínimo ($)</label>
+                            <input type="number" step="0.01" id="menu-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Máximo ($)</label>
+                            <input type="number" step="0.01" id="menu-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Menú</button>
+                </form>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="table-header uppercase font-rustic">
+                            <tr>
+                                <th class="p-2">Menú</th>
+                                <th class="p-2 text-center">Mín / Máx</th>
+                                <th class="p-2 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-gestion-menus" class="divide-y divide-amber-900/40"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 6: PLATOS NPC ================= -->
+        <div id="pantalla-platos-npc" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🎩 Gestión de Platos NPC (3 Tarifas)</h2>
+                
+                <form id="form-nuevo-plato-npc" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Plato NPC</h3>
+                    <input type="text" id="plato-npc-nombre" placeholder="Nombre del plato NPC" required class="w-full p-2 rounded text-xs">
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Mín ($)</label>
+                            <input type="number" step="0.01" id="plato-npc-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Med ($)</label>
+                            <input type="number" step="0.01" id="plato-npc-med" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Máx ($)</label>
+                            <input type="number" step="0.01" id="plato-npc-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Plato NPC</button>
+                </form>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="table-header uppercase font-rustic">
+                            <tr>
+                                <th class="p-2">Plato NPC</th>
+                                <th class="p-2 text-center">Mín / Med / Máx</th>
+                                <th class="p-2 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-gestion-platos-npc" class="divide-y divide-amber-900/40"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 7: PRODUCTOS ================= -->
+        <div id="pantalla-productos" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📦 Gestión de Productos Varios (3 Tarifas)</h2>
+                
+                <form id="form-nuevo-producto" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Nuevo Producto</h3>
+                    <input type="text" id="producto-nombre" placeholder="Nombre del producto" required class="w-full p-2 rounded text-xs">
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Mín ($)</label>
+                            <input type="number" step="0.01" id="producto-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Med ($)</label>
+                            <input type="number" step="0.01" id="producto-med" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">P. Máx ($)</label>
+                            <input type="number" step="0.01" id="producto-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Producto</button>
+                </form>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="table-header uppercase font-rustic">
+                            <tr>
+                                <th class="p-2">Producto</th>
+                                <th class="p-2 text-center">Mín / Med / Máx</th>
+                                <th class="p-2 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-gestion-productos" class="divide-y divide-amber-900/40"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 8: LICENCIAS ================= -->
+        <div id="pantalla-licencias" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📜 Archivador de Licencias</h2>
+                
+                <form id="form-nueva-licencia" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Archivar Nueva Licencia</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">Titular / Nombre del Personaje</label>
+                            <input type="text" id="licencia-titular" placeholder="Ej: John Doe" required class="w-full p-2 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/70">Tipo de Licencia</label>
+                            <select id="licencia-tipo" required class="w-full p-2 rounded text-xs">
+                                <option value="Licencia de Alcohol y Saloon">🍺 Alcohol / Saloon</option>
+                                <option value="Licencia de Armas">🔫 Armas</option>
+                                <option value="Licencia de Comercio">💼 Comercio</option>
+                                <option value="Licencia Sanitaria">⚕️ Sanidad / Medicina</option>
+                                <option value="Otro">📜 Otra Licencia</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-amber-200/70">URL de la Imagen de la Licencia</label>
+                        <input type="url" id="licencia-url" placeholder="https://i.imgur.com/ejemplo.png" required class="w-full p-2 rounded text-xs">
+                    </div>
+                    <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Guardar Licencia</button>
+                </form>
+
+                <div id="galeria-licencias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <p class="italic text-amber-200/40 col-span-full text-center py-4">No hay licencias archivadas todavía.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 9: PLANTILLA (EXCLUSIVO ADMIN) ================= -->
+        <div id="pantalla-plantilla" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-amber-900/60 pb-2">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-amber-400 font-rustic">📋 Plantilla de Empleados</h2>
+                        <p class="text-xs text-amber-200/60">Estado de fichaje y servicio de la plantilla en tiempo real.</p>
+                    </div>
+                    <div id="resumen-plantilla-badges" class="flex gap-2 text-xs font-mono font-bold mt-2 md:mt-0">
+                        <span class="bg-emerald-950 text-emerald-400 px-2.5 py-1 rounded border border-emerald-700">🟢 En Servicio: <span id="cant-en-servicio">0</span></span>
+                        <span class="bg-stone-900 text-amber-200/60 px-2.5 py-1 rounded border border-amber-900">⚪ Fuera de Servicio: <span id="cant-fuera-servicio">0</span></span>
+                    </div>
+                </div>
+
+                <div id="galeria-plantilla-admin" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                    <p class="italic text-amber-200/40 col-span-full text-center py-4">Cargando plantilla de empleados...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 10: APROBACIONES (EXCLUSIVO ADMIN) ================= -->
+        <div id="pantalla-aprobaciones" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">👥 Solicitudes de Aprobación de Usuarios</h2>
+                <div id="lista-usuarios-pendientes" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <p class="italic text-amber-200/40 col-span-full text-center py-4">No hay usuarios pendientes de aprobación.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DE FIREBASE Y LÓGICA -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1zSOscA5Ub4IRPVC0H15Lh5oAiMw5XpI",
+            authDomain: "taberna-san-denis.firebaseapp.com",
+            databaseURL: "https://taberna-san-denis-default-rtdb.firebaseio.com",
+            projectId: "taberna-san-denis",
+            storageBucket: "taberna-san-denis.firebasestorage.app",
+            messagingSenderId: "717455184090",
+            appId: "1:717455184090:web:9e36950620203cf61515e3",
+            measurementId: "G-C27RZFHQ7D"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        let usuarioActualData = null;
+        let CAJA_INICIAL_BASE = 0.00;
+
+        const productosEEUUInicial = {
+            "e1": { id: "e1", nombre: "Ajo", pMin: 0.10, pNorm: 0.15 },
+            "e2": { id: "e2", nombre: "Algodón", pMin: 0.10, pNorm: 0.15 },
+            "e3": { id: "e3", nombre: "Azúcar", pMin: 0.10, pNorm: 0.15 },
+            "e4": { id: "e4", nombre: "Caña de Azúcar", pMin: 0.10, pNorm: 0.15 },
+            "e5": { id: "e5", nombre: "Cebolla", pMin: 0.10, pNorm: 0.15 },
+            "e6": { id: "e6", nombre: "Fresa", pMin: 0.10, pNorm: 0.15 },
+            "e7": { id: "e7", nombre: "Guisantes", pMin: 0.10, pNorm: 0.15 },
+            "e8": { id: "e8", nombre: "Heno", pMin: 0.10, pNorm: 0.15 },
+            "e9": { id: "e9", nombre: "Maíz", pMin: 0.10, pNorm: 0.15 },
+            "e10": { id: "e10", nombre: "Manzana", pMin: 0.10, pNorm: 0.15 },
+            "e11": { id: "e11", nombre: "Melocotón", pMin: 0.10, pNorm: 0.15 },
+            "e12": { id: "e12", nombre: "Mermelada de Fresa", pMin: 0.30, pNorm: 0.42 },
+            "e13": { id: "e13", nombre: "Mermelada de Melocotón", pMin: 0.30, pNorm: 0.42 },
+            "e14": { id: "e14", nombre: "Patata", pMin: 0.10, pNorm: 0.15 },
+            "e15": { id: "e15", nombre: "Tejocote", pMin: 0.10, pNorm: 0.15 },
+            "e16": { id: "e16", nombre: "Tela", pMin: 0.50, pNorm: 0.70 },
+            "e17": { id: "e17", nombre: "Trigo", pMin: 0.10, pNorm: 0.15 },
+            "e18": { id: "e18", nombre: "Zanahoria", pMin: 0.10, pNorm: 0.15 },
+            "e19": { id: "e19", nombre: "Zumo de Manzana", pMin: 1.60, pNorm: 2.24 }
+        };
+
+        const productosMexicoInicial = {
+            "m1": { id: "m1", nombre: "Aloe", pMin: 0.10, pNorm: 0.15 },
+            "m2": { id: "m2", nombre: "Arroz", pMin: 0.10, pNorm: 0.15 },
+            "m3": { id: "m3", nombre: "Azúcar", pMin: 0.10, pNorm: 0.15 },
+            "m4": { id: "m4", nombre: "Barril Zumo Mango", pMin: 1.60, pNorm: 2.24 },
+            "m5": { id: "m5", nombre: "Barril Zumo Naranja", pMin: 1.60, pNorm: 2.24 },
+            "m6": { id: "m6", nombre: "Barril Zumo Sandía", pMin: 1.60, pNorm: 2.24 },
+            "m7": { id: "m7", nombre: "Cacao", pMin: 0.10, pNorm: 0.15 },
+            "m8": { id: "m8", nombre: "Café", pMin: 0.10, pNorm: 0.15 },
+            "m9": { id: "m9", nombre: "Calabaza", pMin: 0.10, pNorm: 0.15 },
+            "m10": { id: "m10", nombre: "Caña de Azúcar", pMin: 0.10, pNorm: 0.15 },
+            "m11": { id: "m11", nombre: "Chile", pMin: 0.10, pNorm: 0.15 },
+            "m12": { id: "m12", nombre: "Judías", pMin: 0.10, pNorm: 0.15 },
+            "m13": { id: "m13", nombre: "Limón", pMin: 0.10, pNorm: 0.15 },
+            "m14": { id: "m14", nombre: "Mango", pMin: 0.10, pNorm: 0.15 },
+            "m15": { id: "m15", nombre: "Naranja", pMin: 0.10, pNorm: 0.15 },
+            "m16": { id: "m16", nombre: "Plátano", pMin: 0.10, pNorm: 0.15 },
+            "m17": { id: "m17", nombre: "Sandía", pMin: 0.10, pNorm: 0.15 },
+            "m18": { id: "m18", nombre: "Tela", pMin: 0.50, pNorm: 0.70 },
+            "m19": { id: "m19", nombre: "Tomate", pMin: 0.10, pNorm: 0.15 }
+        };
+
+        const comidaInicial = {
+            "c1": { id: "c1", nombre: "Huevos con Tomate", pMin: 0.90, pMed: 0.95, pNorm: 1.00 },
+            "c2": { id: "c2", nombre: "Johnycake de Maíz", pMin: 1.17, pMed: 1.235, pNorm: 1.30 },
+            "c3": { id: "c3", nombre: "Patatas con Bacon", pMin: 1.35, pMed: 1.425, pNorm: 1.50 }
+        };
+
+        const bebidaNormalInicial = {
+            "bn1": { id: "bn1", nombre: "Zumo de Manzana", pMin: 1.60, pMed: 1.92, pNorm: 2.24 }
+        };
+
+        const bebidaAlcoholInicial = {
+            "ba1": { id: "ba1", nombre: "Cerveza de Barril", pMin: 0.50, pMed: 0.70, pNorm: 0.90 },
+            "ba2": { id: "ba2", nombre: "Whisky Bourbon", pMin: 0.80, pMed: 1.10, pNorm: 1.40 }
+        };
+
+        const menusIniciales = {
+            "m1": { id: "m1", nombre: "Medio Muerto", pMin: 1.30, pNorm: 1.78 },
+            "m2": { id: "m2", nombre: "Último Capricho", pMin: 1.50, pNorm: 1.94 }
+        };
+
+        const platosNPCIniciales = {
+            "npc1": { id: "npc1", nombre: "Guisado Especial NPC", pMin: 1.00, pMed: 1.50, pNorm: 2.00 },
+            "npc2": { id: "npc2", nombre: "Estofado de Venado NPC", pMin: 1.20, pMed: 1.80, pNorm: 2.50 }
+        };
+
+        const productosIniciales = {
+            "p1": { id: "p1", nombre: "Puros Premium", pMin: 1.00, pMed: 1.50, pNorm: 2.00 },
+            "p2": { id: "p2", nombre: "Tabaco de Mascar", pMin: 0.50, pMed: 0.75, pNorm: 1.00 }
+        };
+
+        let comida = {}, bebidaNormal = {}, bebidaAlcohol = {}, menus = {}, platosNPC = {}, productos = {}, productosEEUU = {}, productosMexico = {};
+        let ventaComida = {}, ventaBebidaNormal = {}, ventaBebidaAlcohol = {}, ventaMenus = {}, ventaPlatosNPC = {}, ventaProductos = {};
+        let pedidoEEUU = {}, pedidoMex = {};
+        let listaFacturasGlobal = [], listaPedidosGlobal = [], listaFichajesGlobal = [];
+        let turnoActivo = null;
+
+        function toggleSeccion(idSeccion) {
+            const sec = document.getElementById(idSeccion);
+            const btn = document.getElementById('btn-' + idSeccion);
+            if (!sec || !btn) return;
+            if (sec.classList.contains('hidden')) {
+                sec.classList.remove('hidden');
+                btn.textContent = '➖ Plegar';
+            } else {
+                sec.classList.add('hidden');
+                btn.textContent = '➕ Desplegar';
+            }
+        }
+
+        function switchAuthTab(tab) {
+            const fLogin = document.getElementById('form-login');
+            const fReg = document.getElementById('form-registro');
+            const tLogin = document.getElementById('tab-auth-login');
+            const tReg = document.getElementById('tab-auth-registro');
+
+            if (tab === 'login') {
+                fLogin.classList.remove('hidden');
+                fReg.classList.add('hidden');
+                tLogin.className = 'w-1/2 py-2 font-bold text-amber-400 border-b-2 border-amber-500';
+                tReg.className = 'w-1/2 py-2 font-bold text-amber-200/50 border-b-2 border-transparent';
+            } else {
+                fLogin.classList.add('hidden');
+                fReg.classList.remove('hidden');
+                tReg.className = 'w-1/2 py-2 font-bold text-amber-400 border-b-2 border-amber-500';
+                tLogin.className = 'w-1/2 py-2 font-bold text-amber-200/50 border-b-2 border-transparent';
+            }
+        }
+
+        function mostrarMensajeAuth(msg, esError = false) {
+            const el = document.getElementById('auth-mensaje');
+            el.textContent = msg;
+            el.className = `text-center text-xs font-bold py-1 ${esError ? 'text-red-400' : 'text-emerald-400'}`;
+            el.classList.remove('hidden');
+        }
+
+        document.getElementById('form-login').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-password').value;
+            mostrarMensajeAuth("Verificando acceso...", false);
+            auth.signInWithEmailAndPassword(email, pass).catch(err => {
+                mostrarMensajeAuth("❌ Error de acceso: " + err.message, true);
+            });
+        });
+
+        document.getElementById('form-registro').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById('reg-nombre').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const pass = document.getElementById('reg-password').value;
+
+            mostrarMensajeAuth("Registrando cuenta...", false);
+
+            auth.createUserWithEmailAndPassword(email, pass).then(cred => {
+                const uid = cred.user.uid;
+                const nuevoUsuario = {
+                    uid: uid,
+                    nombre: nombre,
+                    email: email,
+                    aprobado: false,
+                    rol: 'empleado'
+                };
+
+                database.ref('usuarios/' + uid).set(nuevoUsuario).then(() => {
+                    auth.signOut();
+                    mostrarMensajeAuth("✅ Solicitud enviada con éxito. Espera a que un Administrador apruebe tu cuenta.", false);
+                    switchAuthTab('login');
+                }).catch(dbErr => {
+                    mostrarMensajeAuth("❌ Error al guardar perfil en DB: " + dbErr.message, true);
+                });
+            }).catch(err => {
+                mostrarMensajeAuth("❌ Error al registrar: " + err.message, true);
+            });
+        });
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                database.ref('usuarios/' + user.uid).once('value', snapshot => {
+                    let usuarioData = snapshot.val();
+                    
+                    if (!usuarioData) {
+                        usuarioData = {
+                            uid: user.uid,
+                            nombre: user.email.split('@')[0],
+                            email: user.email,
+                            aprobado: false,
+                            rol: 'empleado'
+                        };
+                        database.ref('usuarios/' + user.uid).set(usuarioData);
+                    }
+
+                    usuarioActualData = usuarioData;
+
+                    if (!usuarioActualData.aprobado && usuarioActualData.rol !== 'admin') {
+                        auth.signOut();
+                        mostrarMensajeAuth("⏳ Tu cuenta aún no ha sido aprobada por un Administrador.", true);
+                        return;
+                    }
+
+                    document.getElementById('seccion-auth').classList.add('hidden');
+                    document.getElementById('seccion-app').classList.remove('hidden');
+                    document.getElementById('user-display-name').textContent = usuarioActualData.nombre;
+                    document.getElementById('user-display-role').textContent = usuarioActualData.rol.toUpperCase();
+                    document.getElementById('usuario-activo').value = usuarioActualData.nombre;
+
+                    if (usuarioActualData.rol === 'admin') {
+                        document.getElementById('btn-tab-plantilla').classList.remove('hidden');
+                        document.getElementById('btn-tab-aprobaciones').classList.remove('hidden');
+                        document.getElementById('btn-admin-caja-base').classList.remove('hidden');
+                        document.getElementById('btn-admin-fichajes').classList.remove('hidden');
+                        document.getElementById('btn-admin-balance').classList.remove('hidden');
+                        document.getElementById('btn-admin-purga').classList.remove('hidden');
+                        escucharUsuariosPendientes();
+                        escucharPlantillaAdmin();
+                    }
+
+                    database.ref('usuarios/' + user.uid + '/turnoActivo').on('value', snap => {
+                        turnoActivo = snap.val();
+                        actualizarEstadoFichajeUI();
+                    });
+
+                    iniciarSincronizacionApp();
+                });
+            } else {
+                document.getElementById('seccion-app').classList.add('hidden');
+                document.getElementById('seccion-auth').classList.remove('hidden');
+            }
+        });
+
+        function cerrarSesion() {
+            auth.signOut().then(() => { location.reload(); });
+        }
+
+        function escucharUsuariosPendientes() {
+            database.ref('usuarios').on('value', s => {
+                const data = s.val();
+                const contenedor = document.getElementById('lista-usuarios-pendientes');
+                if (!contenedor) return;
+                contenedor.innerHTML = '';
+                if (!data) return;
+
+                let hay = false;
+                Object.values(data).forEach(u => {
+                    if (!u.aprobado && u.rol !== 'admin') {
+                        hay = true;
+                        contenedor.innerHTML += `
+                            <div class="bg-stone-900 border border-amber-900/60 p-3 rounded-lg flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-amber-300 font-rustic">${u.nombre}</div>
+                                    <div class="text-[10px] text-amber-500">${u.email}</div>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button onclick="aprobarUsuario('${u.uid}')" class="bg-emerald-800 hover:bg-emerald-700 text-emerald-100 px-2.5 py-1 rounded font-bold text-[10px]">🟢 Aprobar</button>
+                                    <button onclick="rechazarUsuario('${u.uid}')" class="bg-red-950 hover:bg-red-900 text-red-200 px-2 py-1 rounded text-[10px]">🔴 Rechazar</button>
+                                </div>
+                            </div>`;
+                    }
+                });
+                if (!hay) contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay usuarios pendientes de aprobación.</p>';
+            });
+        }
+
+        function aprobarUsuario(uid) {
+            database.ref('usuarios/' + uid + '/aprobado').set(true);
+            alert("¡Usuario aprobado correctamente!");
+        }
+
+        function rechazarUsuario(uid) {
+            if (confirm("¿Rechazar y eliminar la solicitud de este usuario?")) {
+                database.ref('usuarios/' + uid).remove();
+            }
+        }
+
+        function cambiarPantalla(pantalla) {
+            ['ventas', 'pedidos', 'licencias', 'comida', 'bebida', 'menus', 'platos-npc', 'productos', 'plantilla', 'aprobaciones'].forEach(p => {
+                const el = document.getElementById('pantalla-' + p);
+                const btn = document.getElementById('btn-tab-' + p);
+                if (el) el.classList.add('hidden');
+                if (btn) btn.classList.remove('active');
+            });
+            const pTarget = document.getElementById('pantalla-' + pantalla);
+            const btnTarget = document.getElementById('btn-tab-' + pantalla);
+            if (pTarget) pTarget.classList.remove('hidden');
+            if (btnTarget) btnTarget.classList.add('active');
+        }
+
+        function modalAjustarCajaBase() {
+            const passInput = prompt("🔒 Introduce la contraseña de Administrador para ajustar la caja:");
+            if (passInput === null) return;
+            if (passInput !== "SuperAdmim") {
+                alert("❌ Contraseña incorrecta. Acceso denegado.");
+                return;
+            }
+
+            let totalVentas = 0;
+            listaFacturasGlobal.forEach(f => { totalVentas += f.total; });
+            let totalPedidos = 0;
+            listaPedidosGlobal.forEach(p => { totalPedidos += p.total; });
+            const dineroActualCalculado = CAJA_INICIAL_BASE + totalVentas - totalPedidos;
+
+            const entrada = prompt("🪙 Contraseña correcta. Introduce el dinero REAL total que hay en la caja (IC):", dineroActualCalculado.toFixed(2));
+            if (entrada !== null && entrada.trim() !== "") {
+                const entradaLimpia = entrada.replace(',', '.').trim();
+                const nuevoMontoTotal = parseFloat(entradaLimpia);
+                if (!isNaN(nuevoMontoTotal)) {
+                    const baseCalculada = nuevoMontoTotal - totalVentas + totalPedidos;
+                    CAJA_INICIAL_BASE = baseCalculada;
+
+                    database.ref('configuracion/caja_base').set(baseCalculada).then(() => {
+                        actualizarCajaTotalDisplay();
+                        alert("¡Caja cuadrada con éxito! Nuevo saldo total en caja: $" + nuevoMontoTotal.toFixed(2));
+                    }).catch(err => {
+                        actualizarCajaTotalDisplay();
+                        alert("Caja ajustada correctamente a $" + nuevoMontoTotal.toFixed(2));
+                    });
+                } else {
+                    alert("Por favor, introduce un número válido.");
+                }
+            }
+        }
+
+        function actualizarCajaTotalDisplay() {
+            let totalVentas = 0;
+            listaFacturasGlobal.forEach(f => { totalVentas += f.total; });
+
+            let totalPedidos = 0;
+            listaPedidosGlobal.forEach(p => { totalPedidos += p.total; });
+
+            const dineroActual = CAJA_INICIAL_BASE + totalVentas - totalPedidos;
+            const el = document.getElementById('caja-total-display');
+            if (el) {
+                el.textContent = `$${dineroActual.toFixed(2)}`;
+                if (dineroActual < 0) {
+                    el.className = "text-base md:text-lg font-black text-red-400 font-mono tracking-wider";
+                } else {
+                    el.className = "text-base md:text-lg font-black text-emerald-400 font-mono tracking-wider";
+                }
+            }
+        }
+
+        function iniciarSincronizacionApp() {
+            database.ref('configuracion/caja_base').on('value', (s) => {
+                const val = s.val();
+                if (val !== null && val !== undefined) {
+                    CAJA_INICIAL_BASE = parseFloat(val);
+                } else {
+                    database.ref('configuracion/caja_base').set(0.00);
+                    CAJA_INICIAL_BASE = 0.00;
+                }
+                actualizarCajaTotalDisplay();
+            });
+
+            database.ref('comida').on('value', (s) => {
+                comida = s.val() || comidaInicial;
+                if (!s.val()) database.ref('comida').set(comidaInicial);
+                renderizarTodo();
+            });
+
+            database.ref('bebida_normal').on('value', (s) => {
+                bebidaNormal = s.val() || bebidaNormalInicial;
+                if (!s.val()) database.ref('bebida_normal').set(bebidaNormalInicial);
+                renderizarTodo();
+            });
+
+            database.ref('bebida_alcohol').on('value', (s) => {
+                bebidaAlcohol = s.val() || bebidaAlcoholInicial;
+                if (!s.val()) database.ref('bebida_alcohol').set(bebidaAlcoholInicial);
+                renderizarTodo();
+            });
+
+            database.ref('menus').on('value', (s) => {
+                menus = s.val() || menusIniciales;
+                if (!s.val()) database.ref('menus').set(menusIniciales);
+                renderizarTodo();
+            });
+
+            database.ref('platos_npc').on('value', (s) => {
+                platosNPC = s.val() || platosNPCIniciales;
+                if (!s.val()) database.ref('platos_npc').set(platosNPCIniciales);
+                renderizarTodo();
+            });
+
+            database.ref('productos_varios').on('value', (s) => {
+                productos = s.val() || productosIniciales;
+                if (!s.val()) database.ref('productos_varios').set(productosIniciales);
+                renderizarTodo();
+            });
+
+            database.ref('pedidos_eeuu').on('value', (s) => {
+                productosEEUU = s.val() || productosEEUUInicial;
+                if (!s.val()) database.ref('pedidos_eeuu').set(productosEEUUInicial);
+                renderizarTodo();
+            });
+
+            database.ref('pedidos_mexico').on('value', (s) => {
+                productosMexico = s.val() || productosMexicoInicial;
+                if (!s.val()) database.ref('pedidos_mexico').set(productosMexicoInicial);
+                renderizarTodo();
+            });
+
+            database.ref('facturas').on('value', (s) => {
+                const data = s.val();
+                listaFacturasGlobal = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        listaFacturasGlobal.push({ ...data[key], keyFirebase: key });
+                    });
+                    listaFacturasGlobal.reverse();
+                }
+                renderizarFacturas();
+                actualizarCajaTotalDisplay();
+            });
+
+            database.ref('pedidos_historial').on('value', (s) => {
+                const data = s.val();
+                listaPedidosGlobal = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        listaPedidosGlobal.push({ ...data[key], keyFirebase: key });
+                    });
+                    listaPedidosGlobal.reverse();
+                }
+                renderizarPedidosHistorial();
+                actualizarCajaTotalDisplay();
+            });
+
+            database.ref('fichajes_historial').on('value', (s) => {
+                const data = s.val();
+                listaFichajesGlobal = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        listaFichajesGlobal.push({ ...data[key], keyFirebase: key });
+                    });
+                    listaFichajesGlobal.reverse();
+                }
+                renderizarFichajesAdmin();
+            });
+
+            database.ref('licencias').on('value', (s) => {
+                const data = s.val();
+                const galeria = document.getElementById('galeria-licencias');
+                if (!galeria) return;
+                galeria.innerHTML = '';
+
+                if (!data) {
+                    galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay licencias archivadas todavía.</p>';
+                    return;
+                }
+
+                Object.keys(data).reverse().forEach(key => {
+                    const lic = data[key];
+                    galeria.innerHTML += `
+                        <div class="bg-stone-900/85 border border-amber-900/60 rounded-xl overflow-hidden shadow-lg flex flex-col justify-between">
+                            <div class="p-3 bg-stone-950/80 border-b border-amber-900/40 flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-amber-300 text-sm font-rustic">${lic.titular}</h4>
+                                    <span class="text-[10px] text-amber-500 font-semibold uppercase">${lic.tipo}</span>
+                                </div>
+                                <button onclick="eliminarLicenciaAdmin('${key}')" title="Borrar Licencia" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                            </div>
+                            <div class="p-2 bg-stone-900 flex justify-center items-center">
+                                <a href="${lic.url}" target="_blank">
+                                    <img src="${lic.url}" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x180?text=Error+al+cargar+imagen';" class="max-h-48 w-full object-contain rounded border border-amber-900/40 hover:opacity-90 transition">
+                                </a>
+                            </div>
+                            <div class="p-2 bg-stone-950/40 text-center border-t border-amber-900/30">
+                                <a href="${lic.url}" target="_blank" class="text-[10px] text-amber-400 hover:underline font-rustic">🔗 Ver Imagen Completa</a>
+                            </div>
+                        </div>`;
+                });
+            });
+
+            actualizarEstadoFichajeUI();
+        }
+
+        function actualizarEstadoFichajeUI() {
+            const btnFichaje = document.getElementById('btn-fichaje');
+            const estadoFichajeText = document.getElementById('estado-fichaje-text');
+            if (!btnFichaje || !estadoFichajeText) return;
+
+            if (turnoActivo) {
+                btnFichaje.textContent = "🔴 Salir de Servicio";
+                btnFichaje.className = "w-full bg-red-800 hover:bg-red-700 text-red-100 font-bold py-2 rounded text-xs border border-red-600 transition font-rustic shadow";
+                
+                const ahora = Date.now();
+                const diffMs = ahora - turnoActivo.inicio;
+                const horas = Math.floor(diffMs / (1000 * 60 * 60));
+                const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                const segundos = Math.floor((diffMs % (1000 * 60)) / 1000);
+                
+                estadoFichajeText.innerHTML = `🟢 En servicio (${turnoActivo.usuario}): <span class="font-mono text-emerald-400 font-bold">${String(horas).padStart(2,'0')}:${String(minutos).padStart(2,'0')}:${String(segundos).padStart(2,'0')}</span>`;
+            } else {
+                btnFichaje.textContent = "🟢 Entrar de Servicio";
+                btnFichaje.className = "w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2 rounded text-xs border border-emerald-600 transition font-rustic shadow";
+                estadoFichajeText.innerHTML = `⚪ Fuera de servicio`;
+            }
+        }
+
+        function toggleFichaje() {
+            if (!auth.currentUser) return;
+            const uid = auth.currentUser.uid;
+            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
+
+            if (!turnoActivo) {
+                const nuevoTurno = {
+                    usuario: usuarioNombre,
+                    inicio: Date.now(),
+                    fechaInicioStr: new Date().toLocaleString()
+                };
+                database.ref('usuarios/' + uid + '/turnoActivo').set(nuevoTurno).then(() => {
+                    alert(`🟢 ¡Has entrado de servicio, ${usuarioNombre}! Buen turno.`);
+                });
+            } else {
+                const fin = Date.now();
+                const diffMs = fin - turnoActivo.inicio;
+                const totalHoras = (diffMs / (1000 * 60 * 60)).toFixed(2);
+                
+                let ventasTurno = 0, cantidadTickets = 0;
+                listaFacturasGlobal.forEach(f => {
+                    if (f.usuario.toLowerCase().includes(turnoActivo.usuario.toLowerCase()) && f.id >= turnoActivo.inicio) {
+                        ventasTurno += f.total;
+                        cantidadTickets++;
+                    }
+                });
+
+                const turnoResumen = {
+                    id: Date.now(),
+                    usuario: turnoActivo.usuario,
+                    inicioStr: turnoActivo.fechaInicioStr,
+                    finStr: new Date().toLocaleString(),
+                    horas: totalHoras,
+                    ventas: ventasTurno,
+                    tickets: cantidadTickets
+                };
+
+                database.ref('fichajes_historial').push(turnoResumen);
+                database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => {
+                    const textoDiscord = "```md\n" +
+                                         "⏱️ **CONTROL DE FICHAJE - THE CORNER**\n" +
+                                         "-----------------------------------\n" +
+                                         "👤 **Empleado:** " + turnoResumen.usuario + "\n" +
+                                         "⏰ **Inicio:** " + turnoResumen.inicioStr + "\n" +
+                                         "🏁 **Fin:** " + turnoResumen.finStr + "\n" +
+                                         "⏳ **Horas Trabajadas:** " + turnoResumen.horas + "h\n" +
+                                         "🧾 **Tickets Emitidos:** " + turnoResumen.tickets + "\n" +
+                                         "💰 **Beneficio Generado:** $" + turnoResumen.ventas.toFixed(2) + "\n" +
+                                         "```";
+
+                    copiarTextoPortapapeles(textoDiscord);
+                    alert(`🔴 Turno finalizado para ${turnoResumen.usuario}.\nHoras: ${turnoResumen.horas}h | Ventas: $${turnoResumen.ventas.toFixed(2)}\n(Resumen copiado para Discord).`);
+                });
+            }
+        }
+
+        setInterval(() => {
+            if (turnoActivo) actualizarEstadoFichajeUI();
+            renderizarPlantillaAdminUI();
+        }, 1000);
+
+        let usuariosPlantillaGlobal = {};
+
+        function escucharPlantillaAdmin() {
+            database.ref('usuarios').on('value', snapshot => {
+                usuariosPlantillaGlobal = snapshot.val() || {};
+                renderizarPlantillaAdminUI();
+            });
+        }
+
+        function renderizarPlantillaAdminUI() {
+            const galeria = document.getElementById('galeria-plantilla-admin');
+            if (!galeria) return;
+
+            let enServicioCount = 0;
+            let fueraServicioCount = 0;
+            let htmlEnServicio = '';
+            let htmlFueraServicio = '';
+
+            const listaUsuarios = Object.values(usuariosPlantillaGlobal).filter(u => u.aprobado || u.rol === 'admin');
+
+            if (listaUsuarios.length === 0) {
+                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay empleados registrados en la plantilla.</p>';
+                document.getElementById('cant-en-servicio').textContent = '0';
+                document.getElementById('cant-fuera-servicio').textContent = '0';
+                return;
+            }
+
+            listaUsuarios.forEach(usr => {
+                const esAdminActual = usuarioActualData && usuarioActualData.rol === 'admin';
+                const botonEliminarHTML = esAdminActual ? `<button onclick="eliminarEmpleadoAdmin('${usr.uid}', '${usr.nombre}')" class="w-full bg-red-950/80 hover:bg-red-900 text-red-200 text-[10px] py-1 rounded border border-red-800 font-rustic font-bold transition">🗑️ Eliminar Empleado</button>` : '';
+
+                if (usr.turnoActivo) {
+                    enServicioCount++;
+                    const ahora = Date.now();
+                    const diffMs = ahora - usr.turnoActivo.inicio;
+                    const horas = Math.floor(diffMs / (1000 * 60 * 60));
+                    const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const segundos = Math.floor((diffMs % (1000 * 60)) / 1000);
+                    const tiempoStr = `${String(horas).padStart(2,'0')}:${String(minutos).padStart(2,'0')}:${String(segundos).padStart(2,'0')}`;
+
+                    htmlEnServicio += `
+                        <div class="bg-stone-950/90 border-2 border-emerald-600 p-3 rounded-xl shadow-lg space-y-2">
+                            <div class="flex justify-between items-center border-b border-amber-900/30 pb-1">
+                                <div>
+                                    <span class="font-black text-amber-300 font-rustic text-sm block">${usr.nombre}</span>
+                                    <span class="text-[9px] text-amber-500">${usr.email}</span>
+                                </div>
+                                <span class="bg-emerald-950 text-emerald-400 font-mono text-[9px] px-2 py-0.5 rounded-full border border-emerald-700 font-bold">🟢 EN SERVICIO</span>
+                            </div>
+                            <div class="text-[10px] text-amber-200/80 space-y-1 bg-stone-900/60 p-2 rounded border border-amber-900/30">
+                                <div>⏰ Fichado desde: <span class="text-amber-300 font-bold">${usr.turnoActivo.fechaInicioStr}</span></div>
+                                <div>⏳ Tiempo Transcurrido: <span class="font-mono text-emerald-400 font-bold text-xs">${tiempoStr}</span></div>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <button onclick="forzarSalidaAdmin('${usr.uid}', '${usr.nombre}')" class="w-full bg-amber-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-rustic font-bold transition">
+                                    🛑 Forzar Salida / Desfichar
+                                </button>
+                                ${botonEliminarHTML}
+                            </div>
+                        </div>`;
+                } else {
+                    fueraServicioCount++;
+                    htmlFueraServicio += `
+                        <div class="bg-stone-900/60 border border-amber-900/40 p-3 rounded-xl space-y-2 opacity-90">
+                            <div class="flex justify-between items-center border-b border-amber-900/30 pb-1">
+                                <div>
+                                    <span class="font-bold text-amber-200/90 font-rustic text-xs block">${usr.nombre}</span>
+                                    <span class="text-[9px] text-amber-500/70">${usr.email}</span>
+                                </div>
+                                <span class="bg-stone-950 text-amber-200/40 font-mono text-[9px] px-2 py-0.5 rounded-full border border-amber-900/50">⚪ FUERA</span>
+                            </div>
+                            <div class="text-[10px] text-amber-200/40 italic">Empleado fuera de servicio actualmente.</div>
+                            ${botonEliminarHTML}
+                        </div>`;
+                }
+            });
+
+            document.getElementById('cant-en-servicio').textContent = enServicioCount;
+            document.getElementById('cant-fuera-servicio').textContent = fueraServicioCount;
+
+            galeria.innerHTML = htmlEnServicio + htmlFueraServicio;
+        }
+
+        function forzarSalidaAdmin(uid, nombre) {
+            if (confirm(`¿Estás seguro de forzar la salida de turno para ${nombre}?`)) {
+                database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => {
+                    alert(`🔴 Se ha sacado de servicio a ${nombre}.`);
+                });
+            }
+        }
+
+        function eliminarEmpleadoAdmin(uid, nombre) {
+            if (confirm(`⚠️ ¿Estás seguro de eliminar permanentemente al empleado "${nombre}" de la plantilla?`)) {
+                database.ref('usuarios/' + uid).remove().then(() => {
+                    alert(`🗑️ Se ha eliminado a ${nombre} de la plantilla.`);
+                });
+            }
+        }
+
+        function setPorcentajeVenta(pct) {
+            document.getElementById('input-porcentaje-venta').value = pct;
+            renderizarResumenVenta();
+        }
+
+        // ================= BUSCADORES EN TIEMPO REAL =================
+        function filtrarCartaVentas() {
+            const filtro = (document.getElementById('buscador-ventas')?.value || '').toLowerCase().trim();
+            
+            const filtrarTabla = (tableId) => {
+                const tbody = document.getElementById(tableId);
+                if (!tbody) return;
+                const filas = tbody.querySelectorAll('tr');
+                filas.forEach(fila => {
+                    const texto = fila.textContent.toLowerCase();
+                    if (texto.includes(filtro)) {
+                        fila.style.display = '';
+                    } else {
+                        fila.style.display = 'none';
+                    }
+                });
+            };
+
+            filtrarTabla('tabla-venta-comida');
+            filtrarTabla('tabla-venta-bebida-normal');
+            filtrarTabla('tabla-venta-bebida-alcohol');
+            filtrarTabla('tabla-venta-menus');
+            filtrarTabla('tabla-venta-platos-npc');
+            filtrarTabla('tabla-venta-productos');
+        }
+
+        function filtrarCatalogoPedidos() {
+            const filtro = (document.getElementById('buscador-catalogo-pedidos')?.value || '').toLowerCase().trim();
+            
+            const filtrarTabla = (tableId) => {
+                const tbody = document.getElementById(tableId);
+                if (!tbody) return;
+                const filas = tbody.querySelectorAll('tr');
+                filas.forEach(fila => {
+                    const texto = fila.textContent.toLowerCase();
+                    if (texto.includes(filtro)) {
+                        fila.style.display = '';
+                    } else {
+                        fila.style.display = 'none';
+                    }
+                });
+            };
+
+            filtrarTabla('tabla-pedidos-eeuu');
+            filtrarTabla('tabla-pedidos-mexico');
+        }
+
+        // ================= HISTORIAL Y FACTURAS =================
+        function renderizarFacturas() {
+            const contenedor = document.getElementById('lista-historial-facturas');
+            if (!contenedor) return;
+            const filtro = (document.getElementById('buscador-tickets')?.value || '').toLowerCase().trim();
+
+            contenedor.innerHTML = '';
+            const facturasFiltradas = listaFacturasGlobal.filter(f => {
+                const usr = (f.usuario || '').toLowerCase();
+                const codigo = (f.codigoTicket || '').toLowerCase();
+                const res = (f.resumen || '').toLowerCase();
+                const fec = (f.fecha || '').toLowerCase();
+                return usr.includes(filtro) || codigo.includes(filtro) || res.includes(filtro) || fec.includes(filtro);
+            });
+
+            if (facturasFiltradas.length === 0) {
+                contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-2 text-center py-4">No se encontraron facturas.</p>';
+                return;
+            }
+
+            facturasFiltradas.forEach(f => {
+                const usr = f.usuario ? f.usuario : 'Sin registro';
+                const idMostrado = f.codigoTicket || f.id;
+                const propinaStr = f.propina && f.propina > 0 ? ` <span class="text-emerald-400 font-bold">(Propina: +$${f.propina.toFixed(2)})</span>` : '';
+
+                const card = document.createElement('div');
+                card.className = 'bg-stone-900/85 border border-amber-900/50 p-3 rounded-lg shadow space-y-1 relative';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center font-bold text-amber-300">
+                        <span>Factura #${idMostrado}</span>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="font-mono text-amber-400 text-sm">$${f.total.toFixed(2)}${propinaStr}</span>
+                            <button class="btn-copiar-factura bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-xs px-1.5 py-0.5 rounded border border-indigo-700" title="Copiar para Discord">📋</button>
+                            ${usuarioActualData && usuarioActualData.rol === 'admin' ? `<button onclick="eliminarFacturaAdmin('${f.keyFirebase}')" title="Borrar Ticket" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>` : ''}
+                        </div>
+                    </div>
+                    <div class="text-[10px] text-amber-400/90 font-bold font-rustic bg-stone-950/60 px-2 py-0.5 rounded w-fit border border-amber-900/40">
+                        👤 Atendido por: <span class="text-amber-200">${usr}</span>
+                    </div>
+                    <div class="text-[11px] text-amber-200/70 leading-tight pt-1">${f.resumen}</div>
+                    <div class="text-[9px] text-amber-500/50 pt-1 border-t border-amber-900/20">${f.fecha}</div>`;
+
+                card.querySelector('.btn-copiar-factura').addEventListener('click', () => {
+                    copiarTicketDiscordTexto(usr, idMostrado, f.resumen, f.total, f.propina || 0);
+                });
+                contenedor.appendChild(card);
+            });
+        }
+
+        function renderizarPedidosHistorial() {
+            const contenedor = document.getElementById('lista-historial-pedidos');
+            if (!contenedor) return;
+            const filtro = (document.getElementById('buscador-pedidos')?.value || '').toLowerCase().trim();
+
+            contenedor.innerHTML = '';
+            const pedidosFiltrados = listaPedidosGlobal.filter(p => {
+                const codigo = (p.codigoPedido || '').toLowerCase();
+                const res = (p.resumen || '').toLowerCase();
+                const fec = (p.fecha || '').toLowerCase();
+                return codigo.includes(filtro) || res.includes(filtro) || fec.includes(filtro);
+            });
+
+            if (pedidosFiltrados.length === 0) {
+                contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay pedidos registrados todavía.</p>';
+                return;
+            }
+
+            pedidosFiltrados.forEach(p => {
+                const idMostrado = p.codigoPedido || p.id;
+
+                const card = document.createElement('div');
+                card.className = 'bg-stone-900/85 border border-amber-900/50 p-3 rounded-lg shadow space-y-1 relative';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center font-bold text-amber-300">
+                        <span>Pedido #${idMostrado}</span>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="font-mono text-amber-400 text-sm">$${p.total.toFixed(2)}</span>
+                            <button class="btn-copiar-pedido bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-xs px-1.5 py-0.5 rounded border border-indigo-700" title="Copiar para Discord">📋</button>
+                            ${usuarioActualData && usuarioActualData.rol === 'admin' ? `<button onclick="eliminarPedidoAdmin('${p.keyFirebase}')" title="Borrar Pedido" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>` : ''}
+                        </div>
+                    </div>
+                    <div class="text-[11px] text-amber-200/70 leading-tight pt-1">${p.resumen}</div>
+                    <div class="text-[9px] text-amber-500/50 pt-1 border-t border-amber-900/20">${p.fecha}</div>`;
+
+                card.querySelector('.btn-copiar-pedido').addEventListener('click', () => {
+                    copiarTextoPortapapeles(generarFormatoDiscordPedido(idMostrado, p.resumen, p.total));
+                });
+                contenedor.appendChild(card);
+            });
+        }
+
+        function filtrarPedidosHistorial() { renderizarPedidosHistorial(); }
+
+        function eliminarPedidoAdmin(keyFirebase) {
+            if (confirm("¿Estás seguro de eliminar este registro de pedido?")) {
+                database.ref('pedidos_historial/' + keyFirebase).remove();
+            }
+        }
+
+        function renderizarFichajesAdmin() {
+            const galeria = document.getElementById('galeria-fichajes-admin');
+            if (!galeria) return;
+            galeria.innerHTML = '';
+
+            if (listaFichajesGlobal.length === 0) {
+                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-3">No hay turnos finalizados aún.</p>';
+                return;
+            }
+
+            listaFichajesGlobal.forEach(t => {
+                galeria.innerHTML += `
+                    <div class="bg-stone-950/80 border border-amber-900/50 p-3 rounded-lg shadow space-y-1">
+                        <div class="flex justify-between items-center border-b border-amber-900/30 pb-1">
+                            <span class="font-bold text-amber-300 font-rustic">👤 ${t.usuario}</span>
+                            <span class="font-mono text-emerald-400 font-bold">${t.horas}h</span>
+                        </div>
+                        <div class="text-[10px] text-amber-200/70 space-y-0.5 pt-1">
+                            <div>⏰ Inicio: ${t.inicioStr}</div>
+                            <div>🏁 Fin: ${t.finStr}</div>
+                            <div>🧾 Tickets: <span class="text-amber-300 font-bold">${t.tickets || 0}</span></div>
+                            <div>💰 Recaudación: <span class="text-amber-400 font-bold">$${(t.ventas || 0).toFixed(2)}</span></div>
+                        </div>
+                        <div class="flex justify-end gap-1 pt-1">
+                            <button onclick="copiarFichajeIndividual('${t.usuario}', '${t.inicioStr}', '${t.finStr}', '${t.horas}', '${t.tickets||0}', '${t.ventas||0}')" class="bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-[10px] px-2 py-0.5 rounded border border-indigo-700">📋 Copiar Discord</button>
+                            <button onclick="eliminarFichajeAdmin('${t.keyFirebase}')" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function copiarFichajeIndividual(usr, inicio, fin, hrs, tickets, ventas) {
+            const textoDiscord = "```md\n" +
+                                 "⏱️ **CONTROL DE FICHAJE - THE CORNER**\n" +
+                                 "-----------------------------------\n" +
+                                 "👤 **Empleado:** " + usr + "\n" +
+                                 "⏰ **Inicio:** " + inicio + "\n" +
+                                 "🏁 **Fin:** " + fin + "\n" +
+                                 "⏳ **Horas Trabajadas:** " + hrs + "h\n" +
+                                 "🧾 **Tickets Emitidos:** " + tickets + "\n" +
+                                 "💰 **Beneficio Generado:** $" + parseFloat(ventas).toFixed(2) + "\n" +
+                                 "```";
+            copiarTextoPortapapeles(textoDiscord);
+        }
+
+        function eliminarFichajeAdmin(keyFirebase) {
+            if (confirm("¿Deseas eliminar este registro de fichaje?")) {
+                database.ref('fichajes_historial/' + keyFirebase).remove();
+            }
+        }
+
+        function filtrarTickets() { renderizarFacturas(); }
+
+        function copiarTextoPortapapeles(texto) {
+            navigator.clipboard.writeText(texto).then(() => {
+                alert("📋 ¡Copiado al portapapeles con éxito! Ya puedes pegarlo en Discord.");
+            }).catch(() => {
+                prompt("Copia este texto manualmente:", texto);
+            });
+        }
+
+        function generarFormatoDiscord(usuario, codigo, resumenItems, subtotal, descuentoMonto, pct, concepto, totalConsumo, propina) {
+            const lineas = resumenItems.split(', ').map(i => "• " + i).join('\n');
+            let infoConvenio = concepto ? `🏛️ **Concepto / Convenio:** ${concepto}\n` : '';
+            let infoDescuento = pct > 0 ? `🏷️ **Descuento Aplicado:** ${pct}% (-$${descuentoMonto.toFixed(2)})\n` : '';
+            let infoPropina = propina > 0 ? `🪙 **Propina / Bote:** +$${propina.toFixed(2)}\n` : '';
+            let totalRealCaja = totalConsumo + propina;
+
+            return "```md\n" +
+                   "🧾 **THE CORNER - SAINT DENIS**\n" +
+                   "👤 **Atendido por:** " + usuario + "\n" +
+                   "📅 **Ticket:** #" + codigo + "\n" +
+                   infoConvenio +
+                   "-----------------------------------\n" +
+                   "📦 **Detalle:**\n" +
+                   lineas + "\n" +
+                   "-----------------------------------\n" +
+                   (pct > 0 ? `💵 **Subtotal:** $${subtotal.toFixed(2)}\n` : '') +
+                   infoDescuento +
+                   (propina > 0 ? `🍽️ **Consumo:** $${totalConsumo.toFixed(2)}\n` + infoPropina : '') +
+                   "💰 **TOTAL EN CAJA:** $" + totalRealCaja.toFixed(2) + "\n" +
+                   "```";
+        }
+
+        function generarFormatoDiscordPedido(codigo, resumenItems, total) {
+            const lineas = resumenItems.split(', ').map(i => "• " + i).join('\n');
+            return "```md\n" +
+                   "📦 **THE CORNER - PEDIDO DE MATERIA PRIMA**\n" +
+                   "📅 **Pedido:** #" + codigo + "\n" +
+                   "-----------------------------------\n" +
+                   "📋 **Detalle:**\n" +
+                   lineas + "\n" +
+                   "-----------------------------------\n" +
+                   "💰 **COSTE TOTAL:** $" + total.toFixed(2) + "\n" +
+                   "```";
+        }
+
+        function copiarTicketDiscordTexto(usuario, codigo, resumen, total, propina) {
+            const consumoReal = total - propina;
+            let infoPropina = propina > 0 ? `🪙 **Propina / Bote:** +$${propina.toFixed(2)}\n` : '';
+            let texto = "```md\n" +
+                        "🧾 **THE CORNER - SAINT DENIS**\n" +
+                        "👤 **Atendido por:** " + usuario + "\n" +
+                        "📅 **Ticket:** #" + codigo + "\n" +
+                        "-----------------------------------\n" +
+                        "📦 **Detalle:**\n" +
+                        resumen.split(', ').map(i => "• " + i).join('\n') + "\n" +
+                        "-----------------------------------\n";
+            if (propina > 0) {
+                texto += `🍽️ **Consumo:** $${consumoReal.toFixed(2)}\n` + infoPropina;
+            }
+            texto += "💰 **TOTAL EN CAJA:** $" + total.toFixed(2) + "\n" +
+                     "```";
+            copiarTextoPortapapeles(texto);
+        }
+
+        function verHistorialFichajesAdmin() {
+            document.getElementById('panel-fichajes-admin').classList.remove('hidden');
+        }
+
+        function cerrarPanelFichajes() {
+            document.getElementById('panel-fichajes-admin').classList.add('hidden');
+        }
+
+        function registrarPedidoContabilidad() {
+            let totalCoste = 0, resumenArray = [];
+            Object.entries(productosEEUU || {}).forEach(([key, item]) => {
+                const itemId = item.id || key;
+                const est = pedidoEEUU[itemId];
+                if (est && est.cantidad > 0) {
+                    let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                    totalCoste += est.cantidad * p;
+                    resumenArray.push(est.cantidad + "x " + item.nombre + " (EEUU)");
+                }
+            });
+            Object.entries(productosMexico || {}).forEach(([key, item]) => {
+                const itemId = item.id || key;
+                const est = pedidoMex[itemId];
+                if (est && est.cantidad > 0) {
+                    let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                    totalCoste += est.cantidad * p;
+                    resumenArray.push(est.cantidad + "x " + item.nombre + " (Mex)");
+                }
+            });
+
+            if (totalCoste === 0) {
+                alert("No hay ningún producto en el pedido actual.");
+                return;
+            }
+
+            const ahora = new Date();
+            const codigoPedido = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0');
+            const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
+
+            const pedidoData = {
+                id: Date.now(),
+                codigoPedido: codigoPedido,
+                total: totalCoste,
+                resumen: resumenArray.join(', '),
+                fecha: fechaStr
+            };
+
+            database.ref('pedidos_historial').push(pedidoData);
+            copiarTextoPortapapeles(generarFormatoDiscordPedido(codigoPedido, resumenArray.join(', '), totalCoste));
+            alert("¡Pedido registrado en contabilidad, descontado de la caja y copiado para Discord!");
+            limpiarPedidos();
+        }
+
+        function generarBalanceSemanalAdmin() {
+            let totalVentas = 0;
+            listaFacturasGlobal.forEach(f => { totalVentas += f.total; });
+
+            let totalPedidos = 0;
+            listaPedidosGlobal.forEach(p => { totalPedidos += p.total; });
+
+            let totalHorasTrabajadas = 0;
+            listaFichajesGlobal.forEach(t => { totalHorasTrabajadas += parseFloat(t.horas || 0); });
+
+            const dineroEnCaja = CAJA_INICIAL_BASE + totalVentas - totalPedidos;
+
+            const textoDiscord = "```md\n" +
+                                 "📊 **BALANCE SEMANAL - THE CORNER**\n" +
+                                 "-----------------------------------\n" +
+                                 "🪙 **Caja Base:** $" + CAJA_INICIAL_BASE.toFixed(2) + "\n" +
+                                 "💰 **Total Entradas Caja (Ventas+Propinas):** $" + totalVentas.toFixed(2) + "\n" +
+                                 "📦 **Total Pedidos:** $" + totalPedidos.toFixed(2) + "\n" +
+                                 "⏳ **Horas Totales:** " + totalHorasTrabajadas.toFixed(2) + "h\n" +
+                                 "-----------------------------------\n" +
+                                 "💵 **DINERO EN CAJA:** $" + dineroEnCaja.toFixed(2) + "\n" +
+                                 "```";
+
+            copiarTextoPortapapeles(textoDiscord);
+        }
+
+        function eliminarFacturaAdmin(keyFirebase) {
+            if (confirm("¿Estás seguro de eliminar este ticket?")) {
+                database.ref('facturas/' + keyFirebase).remove();
+            }
+        }
+
+        function eliminarLicenciaAdmin(keyFirebase) {
+            if (confirm("¿Estás seguro de eliminar esta licencia?")) {
+                database.ref('licencias/' + keyFirebase).remove();
+            }
+        }
+
+        function purgaHistorialAdmin() {
+            if (confirm("⚠️ ¿Estás 100% seguro de que deseas purgar y eliminar TODAS las facturas registradas?")) {
+                database.ref('facturas').remove();
+                alert("¡Purga completada! Historial limpio.");
+            }
+        }
+
+        function ordenarArrayPorNombre(obj) {
+            return Object.values(obj || {}).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+        }
+
+        function renderizarTodo() {
+            renderTablaVenta('tabla-venta-comida', comida, ventaComida, 'comida');
+            renderTablaVenta('tabla-venta-bebida-normal', bebidaNormal, ventaBebidaNormal, 'bebida_normal');
+            renderTablaVenta('tabla-venta-bebida-alcohol', bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
+            renderTablaVenta('tabla-venta-menus', menus, ventaMenus, 'menu');
+            renderTablaVenta('tabla-venta-platos-npc', platosNPC, ventaPlatosNPC, 'platos_npc');
+            renderTablaVenta('tabla-venta-productos', productos, ventaProductos, 'productos');
+
+            renderTablaGestion('tabla-gestion-comida', comida, 'comida');
+            renderTablaGestionBebida('tabla-gestion-bebida-normal', bebidaNormal, 'bebida_normal');
+            renderTablaGestionBebida('tabla-gestion-bebida-alcohol', bebidaAlcohol, 'bebida_alcohol');
+            renderTablaGestionMenu('tabla-gestion-menus', menus);
+            renderTablaGestion('tabla-gestion-platos-npc', platosNPC, 'platos_npc');
+            renderTablaGestion('tabla-gestion-productos', productos, 'productos_varios');
+
+            renderTablaPedidos('tabla-pedidos-eeuu', productosEEUU, pedidoEEUU, 'eeuu');
+            renderTablaPedidos('tabla-pedidos-mexico', productosMexico, pedidoMex, 'mex');
+
+            renderizarResumenVenta();
+            renderizarResumenPedidos();
+
+            filtrarCartaVentas();
+            filtrarCatalogoPedidos();
+        }
+
+        function renderTablaVenta(elementId, items, estadoObj, tipo) {
+            const tbody = document.getElementById(elementId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            const listaOrdenada = ordenarArrayPorNombre(items);
+
+            if (listaOrdenada.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-amber-200/40 italic">No hay productos registrados</td></tr>';
+                return;
+            }
+
+            listaOrdenada.forEach(item => {
+                const est = estadoObj[item.id] || { cantidad: 0, tarifa: 'norm' };
+                let p = 0;
+                if (tipo === 'menu') {
+                    p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                } else {
+                    p = est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm);
+                }
+                let sub = est.cantidad * p;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
+                        <td class="p-2 text-center">
+                            <select onchange="cambiarTarifaVenta('${tipo}', '${item.id}', this.value)" class="rounded text-[11px] p-1">
+                                <option value="min" ${est.tarifa === 'min' ? 'selected' : ''}>Mín ($${item.pMin.toFixed(2)})</option>
+                                ${tipo !== 'menu' ? `<option value="med" ${est.tarifa === 'med' ? 'selected' : ''}>Med ($${item.pMed.toFixed(2)})</option>` : ''}
+                                <option value="norm" ${est.tarifa === 'norm' ? 'selected' : ''}>Máx ($${item.pNorm.toFixed(2)})</option>
+                            </select>
+                        </td>
+                        <td class="p-2 text-center">
+                            <input type="number" min="0" value="${est.cantidad}" onchange="cambiarCantVenta('${tipo}', '${item.id}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
+                        </td>
+                        <td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td>
+                    </tr>`;
+            });
+        }
+
+        function renderTablaGestion(elementId, items, dbPath) {
+            const tbody = document.getElementById(elementId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            const listaOrdenada = ordenarArrayPorNombre(items);
+
+            if (listaOrdenada.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay elementos guardados</td></tr>';
+                return;
+            }
+
+            listaOrdenada.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
+                        <td class="p-2 text-center text-[10px] text-amber-200/70">$${item.pMin.toFixed(2)} / $${item.pMed.toFixed(2)} / $${item.pNorm.toFixed(2)}</td>
+                        <td class="p-2 text-center"><button onclick="eliminarItem('${dbPath}', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
+                    </tr>`;
+            });
+        }
+
+        function renderTablaGestionBebida(elementId, items, dbPath) {
+            const tbody = document.getElementById(elementId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            const listaOrdenada = ordenarArrayPorNombre(items);
+
+            if (listaOrdenada.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay bebidas guardadas</td></tr>';
+                return;
+            }
+
+            listaOrdenada.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
+                        <td class="p-2 text-center text-[10px] text-amber-200/70">$${item.pMin.toFixed(2)} / $${item.pMed.toFixed(2)} / $${item.pNorm.toFixed(2)}</td>
+                        <td class="p-2 text-center"><button onclick="eliminarItem('${dbPath}', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
+                    </tr>`;
+            });
+        }
+
+        function renderTablaGestionMenu(elementId, items) {
+            const tbody = document.getElementById(elementId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            const listaOrdenada = ordenarArrayPorNombre(items);
+
+            if (listaOrdenada.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay menús guardados</td></tr>';
+                return;
+            }
+
+            listaOrdenada.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
+                        <td class="p-2 text-center text-[10px] text-amber-200/70">$${item.pMin.toFixed(2)} / $${item.pNorm.toFixed(2)}</td>
+                        <td class="p-2 text-center"><button onclick="eliminarItem('menus', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
+                    </tr>`;
+            });
+        }
+
+        function renderTablaPedidos(elementId, items, estadoObj, region) {
+            const tbody = document.getElementById(elementId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            const dbPath = region === 'eeuu' ? 'pedidos_eeuu' : 'pedidos_mexico';
+            
+            const listaOrdenada = Object.entries(items || {}).map(([key, item]) => ({
+                ...item,
+                id: item.id || key
+            })).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+
+            listaOrdenada.forEach(item => {
+                const itemId = item.id;
+                const est = estadoObj[itemId] || { cantidad: 0, tarifa: 'min' };
+                let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                let sub = est.cantidad * p;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-amber-900/20">
+                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
+                        <td class="p-2 text-center">
+                            <select onchange="cambiarTarifaPedido('${region}', '${itemId}', this.value)" class="rounded text-[11px] p-1">
+                                <option value="min" ${est.tarifa === 'min' ? 'selected' : ''}>Mín ($${item.pMin.toFixed(2)})</option>
+                                <option value="norm" ${est.tarifa === 'norm' ? 'selected' : ''}>Máx ($${item.pNorm.toFixed(2)})</option>
+                            </select>
+                        </td>
+                        <td class="p-2 text-center">
+                            <input type="number" min="0" value="${est.cantidad}" oninput="cambiarCantPedido('${region}', '${itemId}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
+                        </td>
+                        <td class="p-2 text-right font-mono font-bold text-amber-400" id="subtotal-${region}-${itemId}">$${sub.toFixed(2)}</td>
+                        <td class="p-2 text-center">
+                            <button onclick="eliminarItem('${dbPath}', '${itemId}')" title="Eliminar Producto" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function cambiarCantVenta(tipo, id, val) {
+            let obj;
+            if (tipo === 'comida') obj = ventaComida;
+            else if (tipo === 'bebida_normal') obj = ventaBebidaNormal;
+            else if (tipo === 'bebida_alcohol') obj = ventaBebidaAlcohol;
+            else if (tipo === 'menu') obj = ventaMenus;
+            else if (tipo === 'platos_npc') obj = ventaPlatosNPC;
+            else obj = ventaProductos;
+
+            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' };
+            obj[id].cantidad = Math.max(0, parseInt(val) || 0);
+            renderizarTodo();
+        }
+
+        function cambiarTarifaVenta(tipo, id, tarifa) {
+            let obj;
+            if (tipo === 'comida') obj = ventaComida;
+            else if (tipo === 'bebida_normal') obj = ventaBebidaNormal;
+            else if (tipo === 'bebida_alcohol') obj = ventaBebidaAlcohol;
+            else if (tipo === 'menu') obj = ventaMenus;
+            else if (tipo === 'platos_npc') obj = ventaPlatosNPC;
+            else obj = ventaProductos;
+
+            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' };
+            obj[id].tarifa = tarifa;
+            renderizarTodo();
+        }
+
+        function cambiarCantPedido(region, id, val) {
+            let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex;
+            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' };
+            const cant = Math.max(0, parseInt(val) || 0);
+            obj[id].cantidad = cant;
+
+            const items = region === 'eeuu' ? productosEEUU : productosMexico;
+            const item = items[id];
+            if (item) {
+                let p = obj[id].tarifa === 'min' ? item.pMin : item.pNorm;
+                let sub = cant * p;
+                const subEl = document.getElementById(`subtotal-${region}-${id}`);
+                if (subEl) subEl.textContent = `$${sub.toFixed(2)}`;
+            }
+
+            renderizarResumenPedidos();
+        }
+
+        function cambiarTarifaPedido(region, id, tarifa) {
+            let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex;
+            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' };
+            obj[id].tarifa = tarifa;
+
+            const items = region === 'eeuu' ? productosEEUU : productosMexico;
+            const item = items[id];
+            if (item) {
+                let p = tarifa === 'min' ? item.pMin : item.pNorm;
+                let sub = obj[id].cantidad * p;
+                const subEl = document.getElementById(`subtotal-${region}-${id}`);
+                if (subEl) subEl.textContent = `$${sub.toFixed(2)}`;
+            }
+
+            renderizarResumenPedidos();
+        }
+
+        function renderizarResumenVenta() {
+            const contenedor = document.getElementById('lista-resumen-venta');
+            if (!contenedor) return;
+            contenedor.innerHTML = '';
+            let subtotalBase = 0, hay = false;
+
+            const sumarAlResumen = (items, estadoObj, tipo) => {
+                Object.values(items || {}).forEach(item => {
+                    const est = estadoObj[item.id];
+                    if (est && est.cantidad > 0) {
+                        hay = true;
+                        let p = tipo === 'menu' ? (est.tarifa === 'min' ? item.pMin : item.pNorm) : (est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm));
+                        let sub = est.cantidad * p;
+                        subtotalBase += sub;
+                        contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>${item.nombre} (${est.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
+                    }
+                });
+            };
+
+            sumarAlResumen(comida, ventaComida, 'comida');
+            sumarAlResumen(bebidaNormal, ventaBebidaNormal, 'bebida_normal');
+            sumarAlResumen(bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
+            sumarAlResumen(menus, ventaMenus, 'menu');
+            sumarAlResumen(platosNPC, ventaPlatosNPC, 'platos_npc');
+            sumarAlResumen(productos, ventaProductos, 'productos');
+
+            if (!hay) contenedor.innerHTML = '<p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>';
+
+            const pctInput = parseFloat(document.getElementById('input-porcentaje-venta').value);
+            const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
+            const descuentoMonto = subtotalBase * (pct / 100);
+            const totalVenta = Math.max(0, subtotalBase - descuentoMonto);
+
+            // Cálculo de propina en tiempo real
+            const efectivoInput = parseFloat(document.getElementById('input-efectivo-entregado').value);
+            const efectivoEntregado = isNaN(efectivoInput) ? 0 : efectivoInput;
+            const divPropina = document.getElementById('info-propina-calculada');
+            const spanPropina = document.getElementById('valor-propina-calc');
+
+            let propina = 0;
+            if (efectivoEntregado > totalVenta) {
+                propina = efectivoEntregado - totalVenta;
+                if (divPropina && spanPropina) {
+                    spanPropina.textContent = `+$${propina.toFixed(2)}`;
+                    divPropina.classList.remove('hidden');
+                }
+            } else {
+                if (divPropina) divPropina.classList.add('hidden');
+            }
+
+            const totalIngresadoCaja = totalVenta + propina;
+
+            document.getElementById('subtotal-base-venta').textContent = `$${subtotalBase.toFixed(2)}`;
+            document.getElementById('descuento-monto-venta').textContent = `-$${descuentoMonto.toFixed(2)} (${pct}%)`;
+            
+            const elTotal = document.getElementById('total-precio-venta');
+            if (elTotal) {
+                if (propina > 0) {
+                    elTotal.textContent = `$${totalIngresadoCaja.toFixed(2)} (incl. $${propina.toFixed(2)} propina)`;
+                    elTotal.className = "text-base md:text-xl font-black text-emerald-400 font-rustic pt-1";
+                } else {
+                    elTotal.textContent = `$${totalIngresadoCaja.toFixed(2)}`;
+                    elTotal.className = "text-xl md:text-2xl font-black text-amber-400 font-rustic pt-1";
+                }
+            }
+        }
+
+        function renderizarResumenPedidos() {
+            let totalCoste = 0;
+            Object.entries(productosEEUU || {}).forEach(([key, item]) => {
+                const itemId = item.id || key;
+                const est = pedidoEEUU[itemId];
+                if (est && est.cantidad > 0) {
+                    let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                    totalCoste += est.cantidad * p;
+                }
+            });
+            Object.entries(productosMexico || {}).forEach(([key, item]) => {
+                const itemId = item.id || key;
+                const est = pedidoMex[itemId];
+                if (est && est.cantidad > 0) {
+                    let p = est.tarifa === 'min' ? item.pMin : item.pNorm;
+                    totalCoste += est.cantidad * p;
+                }
+            });
+            const el = document.getElementById('total-coste-pedidos');
+            if (el) el.textContent = `$${totalCoste.toFixed(2)}`;
+        }
+
+        function limpiarPedidos() {
+            pedidoEEUU = {}; pedidoMex = {};
+            renderizarTodo();
+        }
+
+        document.getElementById('btn-registrar-venta').addEventListener('click', () => {
+            let subtotalBase = 0, resumenArray = [];
+            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
+
+            const recolectarVenta = (items, estadoObj, tipo) => {
+                Object.values(items || {}).forEach(item => {
+                    const est = estadoObj[item.id];
+                    if (est && est.cantidad > 0) {
+                        let p = tipo === 'menu' ? (est.tarifa === 'min' ? item.pMin : item.pNorm) : (est.tarifa === 'min' ? item.pMin : (est.tarifa === 'med' ? item.pMed : item.pNorm));
+                        subtotalBase += est.cantidad * p;
+                        resumenArray.push(est.cantidad + "x " + item.nombre);
+                    }
+                });
+            };
+
+            recolectarVenta(comida, ventaComida, 'comida');
+            recolectarVenta(bebidaNormal, ventaBebidaNormal, 'bebida_normal');
+            recolectarVenta(bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
+            recolectarVenta(menus, ventaMenus, 'menu');
+            recolectarVenta(platosNPC, ventaPlatosNPC, 'platos_npc');
+            recolectarVenta(productos, ventaProductos, 'productos');
+
+            if (subtotalBase === 0) {
+                alert("No hay ningún producto en la venta actual.");
+                return;
+            }
+
+            const pctInput = parseFloat(document.getElementById('input-porcentaje-venta').value);
+            const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
+            const descuentoMonto = subtotalBase * (pct / 100);
+            const totalVenta = Math.max(0, subtotalBase - descuentoMonto);
+            const concepto = document.getElementById('input-concepto-convenio').value.trim();
+
+            const efectivoInput = parseFloat(document.getElementById('input-efectivo-entregado').value);
+            const efectivoEntregado = isNaN(efectivoInput) ? 0 : efectivoInput;
+            const propina = efectivoEntregado > totalVenta ? efectivoEntregado - totalVenta : 0;
+            const totalIngresadoCaja = totalVenta + propina;
+
+            const ahora = new Date();
+            const codigoTicket = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0');
+
+            let resumenFinalStr = resumenArray.join(', ');
+            if (concepto) resumenFinalStr += ` [Convenio/Concepto: ${concepto}]`;
+            if (pct > 0) resumenFinalStr += ` [Desc: ${pct}%]`;
+            if (propina > 0) resumenFinalStr += ` [Propina: +$${propina.toFixed(2)}]`;
+
+            const facturaData = {
+                id: Date.now(),
+                codigoTicket: codigoTicket,
+                usuario: usuarioNombre,
+                total: totalIngresadoCaja,
+                consumo: totalVenta,
+                propina: propina,
+                resumen: resumenFinalStr,
+                fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
+            };
+
+            database.ref('facturas').push(facturaData);
+            copiarTextoPortapapeles(generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), subtotalBase, descuentoMonto, pct, concepto, totalVenta, propina));
+
+            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {};
+            document.getElementById('input-porcentaje-venta').value = '0';
+            document.getElementById('input-concepto-convenio').value = '';
+            document.getElementById('input-efectivo-entregado').value = '';
+            renderizarTodo();
+        });
+
+        document.getElementById('btn-limpiar-venta').addEventListener('click', () => {
+            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {};
+            document.getElementById('input-porcentaje-venta').value = '0';
+            document.getElementById('input-concepto-convenio').value = '';
+            document.getElementById('input-efectivo-entregado').value = '';
+            renderizarTodo();
+        });
+
+        document.getElementById('form-nuevo-pedido-eeuu').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = 'e_' + Date.now().toString();
+            database.ref('pedidos_eeuu/' + id).set({
+                id, nombre: document.getElementById('p-eeuu-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('p-eeuu-min').value),
+                pNorm: parseFloat(document.getElementById('p-eeuu-norm').value)
+            });
+            this.reset();
+            alert("¡Producto añadido a EEUU!");
+        });
+
+        document.getElementById('form-nuevo-pedido-mex').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = 'm_' + Date.now().toString();
+            database.ref('pedidos_mexico/' + id).set({
+                id, nombre: document.getElementById('p-mex-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('p-mex-min').value),
+                pNorm: parseFloat(document.getElementById('p-mex-norm').value)
+            });
+            this.reset();
+            alert("¡Producto añadido a México!");
+        });
+
+        document.getElementById('form-nueva-licencia').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('licencias/' + id).set({
+                id,
+                titular: document.getElementById('licencia-titular').value.trim(),
+                tipo: document.getElementById('licencia-tipo').value,
+                url: document.getElementById('licencia-url').value.trim()
+            });
+            this.reset();
+            alert("¡Licencia archivada correctamente!");
+        });
+
+        document.getElementById('form-nueva-comida').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('comida/' + id).set({
+                id, nombre: document.getElementById('comida-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('comida-min').value),
+                pMed: parseFloat(document.getElementById('comida-med').value),
+                pNorm: parseFloat(document.getElementById('comida-norm').value)
+            });
+            this.reset();
+            alert("¡Plato añadido!");
+        });
+
+        document.getElementById('form-nueva-bebida').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const tipoBebida = document.getElementById('bebida-tipo').value;
+            const dbRef = tipoBebida === 'normal' ? 'bebida_normal' : 'bebida_alcohol';
+            const id = Date.now().toString();
+            database.ref(dbRef + '/' + id).set({
+                id, nombre: document.getElementById('bebida-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('bebida-min').value),
+                pMed: parseFloat(document.getElementById('bebida-med').value),
+                pNorm: parseFloat(document.getElementById('bebida-norm').value)
+            });
+            this.reset();
+            alert("¡Bebida añadida!");
+        });
+
+        document.getElementById('form-nuevo-menu').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('menus/' + id).set({
+                id, nombre: document.getElementById('menu-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('menu-min').value),
+                pNorm: parseFloat(document.getElementById('menu-norm').value)
+            });
+            this.reset();
+            alert("¡Menú añadido!");
+        });
+
+        document.getElementById('form-nuevo-plato-npc').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('platos_npc/' + id).set({
+                id, nombre: document.getElementById('plato-npc-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('plato-npc-min').value),
+                pMed: parseFloat(document.getElementById('plato-npc-med').value),
+                pNorm: parseFloat(document.getElementById('plato-npc-norm').value)
+            });
+            this.reset();
+            alert("¡Plato NPC añadido!");
+        });
+
+        document.getElementById('form-nuevo-producto').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = Date.now().toString();
+            database.ref('productos_varios/' + id).set({
+                id, nombre: document.getElementById('producto-nombre').value.trim(),
+                pMin: parseFloat(document.getElementById('producto-min').value),
+                pMed: parseFloat(document.getElementById('producto-med').value),
+                pNorm: parseFloat(document.getElementById('producto-norm').value)
+            });
+            this.reset();
+            alert("¡Producto añadido!");
+        });
+
+        function eliminarItem(dbPath, id) {
+            if (confirm("¿Estás seguro de eliminar este elemento?")) {
+                database.ref(dbPath + '/' + id).remove();
+            }
+        }
+    </script>
+</body>
+</html>
