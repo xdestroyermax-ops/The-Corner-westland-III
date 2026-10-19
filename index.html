@@ -20,7 +20,7 @@
         body { 
             background-color: #0e0906;
             background-image: linear-gradient(rgba(14, 9, 6, 0.70), rgba(8, 5, 3, 0.85)), 
-                              url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1920&auto=format&fit=crop');
+                              url('fondo.jpg');
             background-repeat: no-repeat;
             background-position: center center;
             background-attachment: fixed;
@@ -871,7 +871,6 @@
         const auth = firebase.auth();
         const database = firebase.database();
 
-        // AQUÍ ESTÁ TU CORREO EXACTO DE ADMINISTRADOR
         const ADMIN_EMAILS = ['xdestroyermax@gmail.com'];
 
         let usuarioActualData = null;
@@ -1421,7 +1420,9 @@
             select.innerHTML = '<option value="">-- No cargar a convenio (Pago al contado) --</option>';
             
             Object.values(conveniosGlobal).filter(Boolean).sort((a,b) => (a.nombre || '').localeCompare(b.nombre || '')).forEach(c => {
-                select.innerHTML += `<option value="${c.id}">🏛️ ${c.nombre} (Deuda actual: $${numSeguro(c.saldoDeuda).toFixed(2)})</option>`;
+                if (c && c.nombre) {
+                    select.innerHTML += `<option value="${c.id}">🏛️ ${c.nombre} (Deuda actual: $${numSeguro(c.saldoDeuda).toFixed(2)})</option>`;
+                }
             });
         }
 
@@ -1430,7 +1431,7 @@
             if (!galeria) return;
             galeria.innerHTML = '';
 
-            const listaConvenios = Object.values(conveniosGlobal).filter(Boolean).sort((a,b) => (a.nombre || '').localeCompare(b.nombre || ''));
+            const listaConvenios = Object.values(conveniosGlobal).filter(Boolean);
 
             if (listaConvenios.length === 0) {
                 galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay cuentas de convenios creadas aún.</p>';
@@ -1438,6 +1439,8 @@
             }
 
             listaConvenios.forEach(c => {
+                if (!c || !c.id) return;
+                const nombreConvenio = c.nombre || 'Convenio sin nombre';
                 const deuda = numSeguro(c.saldoDeuda);
                 const consumos = c.historialConsumos ? Object.values(c.historialConsumos).filter(Boolean).reverse() : [];
 
@@ -1461,8 +1464,8 @@
                     <div class="western-panel rounded-xl p-3.5 flex flex-col justify-between space-y-3 border-amber-700">
                         <div class="space-y-2">
                             <div class="flex justify-between items-center border-b border-amber-900/60 pb-1.5">
-                                <h3 class="font-bold text-amber-300 font-rustic text-sm">🏛️ ${c.nombre}</h3>
-                                <button onclick="eliminarConvenioAdmin('${c.id}', '${c.nombre}')" title="Eliminar Convenio" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                                <h3 class="font-bold text-amber-300 font-rustic text-sm">🏛️ ${nombreConvenio}</h3>
+                                <button onclick="eliminarConvenioAdmin('${c.id}', '${nombreConvenio}')" title="Eliminar Convenio" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
                             </div>
 
                             <div class="bg-stone-950/90 p-2.5 rounded-lg border border-amber-900/60 text-center">
@@ -1488,7 +1491,7 @@
                         </div>
 
                         <div class="pt-2 border-t border-amber-900/60">
-                            <button onclick="cobrarDeudaConvenio('${c.id}', '${c.nombre}', ${deuda})" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 text-xs py-2 rounded font-rustic font-bold border border-emerald-600 shadow transition">
+                            <button onclick="cobrarDeudaConvenio('${c.id}', '${nombreConvenio}', ${deuda})" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 text-xs py-2 rounded font-rustic font-bold border border-emerald-600 shadow transition">
                                 💵 Liquidar Deuda (Cobrar e Ingresar a Caja)
                             </button>
                         </div>
@@ -1528,7 +1531,7 @@
             database.ref(`convenios/${idConvenio}/historialConsumos/${idConsumo}`).set(consumoItem).then(() => {
                 descEl.value = '';
                 montoEl.value = '';
-                alert(`➕ Se han añadido $${monto.toFixed(2)} a la deuda de ${convenio.nombre}.`);
+                alert(`➕ Se han añadido $${monto.toFixed(2)} a la deuda de ${convenio.nombre || 'Convenio'}.`);
             });
         }
 
@@ -1564,7 +1567,11 @@
 
         function eliminarConvenioAdmin(idConvenio, nombre) {
             if (confirm(`⚠️ ¿Estás seguro de eliminar el convenio "${nombre}"?`)) {
-                database.ref('convenios/' + idConvenio).remove();
+                database.ref('convenios/' + idConvenio).remove().then(() => {
+                    alert("🗑️ Convenio eliminado correctamente.");
+                }).catch(err => {
+                    alert("❌ Error al eliminar: " + err.message);
+                });
             }
         }
 
@@ -2625,10 +2632,6 @@
             });
             this.reset();
             alert("¡Menú añadido!");
-        });
-
-        document.getElementById('form-nuevo-plato-npc').addEventListener('submit', function5 => {
-            // plato npc form
         });
 
         document.getElementById('form-nuevo-plato-npc').addEventListener('submit', function(e) {
