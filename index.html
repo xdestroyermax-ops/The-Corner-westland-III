@@ -156,13 +156,10 @@
             </div>
         </header>
 
-        <!-- NAVEGACIÓN PRINCIPAL -->
+        <!-- NAVEGACIÓN PRINCIPAL REORDENADA -->
         <div class="grid grid-cols-3 md:grid-cols-12 gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
             <button onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>💰</span> <span>Ventas</span>
-            </button>
-            <button onclick="cambiarPantalla('mas-vendidos')" id="btn-tab-mas-vendidos" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
-                <span>🏆</span> <span>Más Vendidos</span>
             </button>
             <button onclick="cambiarPantalla('convenios')" id="btn-tab-convenios" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🏛️</span> <span>Convenios</span>
@@ -190,6 +187,9 @@
             </button>
             <button id="btn-tab-plantilla" onclick="cambiarPantalla('plantilla')" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
                 <span>📋</span> <span>Plantilla</span>
+            </button>
+            <button onclick="cambiarPantalla('mas-vendidos')" id="btn-tab-mas-vendidos" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+                <span>🏆</span> <span>Más Vendidos</span>
             </button>
             <button id="btn-tab-aprobaciones" onclick="cambiarPantalla('aprobaciones')" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
                 <span>👥</span> <span>Aprobar</span>
@@ -1208,7 +1208,7 @@
         }
 
         function cambiarPantalla(pantalla) {
-            ['ventas', 'mas-vendidos', 'convenios', 'pedidos', 'licencias', 'comida', 'bebida', 'menus', 'platos-npc', 'productos', 'plantilla', 'aprobaciones'].forEach(p => {
+            ['ventas', 'convenios', 'pedidos', 'comida', 'bebida', 'menus', 'platos-npc', 'productos', 'licencias', 'plantilla', 'mas-vendidos', 'aprobaciones'].forEach(p => {
                 const el = document.getElementById('pantalla-' + p);
                 const btn = document.getElementById('btn-tab-' + p);
                 if (el) el.classList.add('hidden');
@@ -1442,7 +1442,6 @@
 
             listaFacturasGlobal.forEach(f => {
                 if (!f || !f.resumen) return;
-                // Extraemos líneas con formato "Nx NombreProducto"
                 const partes = f.resumen.split(',');
                 partes.forEach(parte => {
                     const limpia = parte.trim();
@@ -1451,7 +1450,6 @@
                     if (match) {
                         const cantidad = parseInt(match[1]) || 0;
                         let nombreProd = match[2].trim();
-                        // Limpiamos etiquetas adicionales si las hubiera
                         nombreProd = nombreProd.replace(/\[.*?\]/g, '').trim();
 
                         if (cantidad > 0 && nombreProd) {
