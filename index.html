@@ -412,12 +412,22 @@
                 </div>
             </div>
 
-            <!-- PANEL: HISTORIAL DE FICHAJES -->
+            <!-- PANEL: HISTORIAL DE FICHAJES (ADMIN) -->
             <div id="panel-fichajes-admin" class="western-panel rounded-xl p-4 space-y-3 hidden">
-                <div class="flex justify-between items-center border-b border-amber-900/60 pb-2">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-amber-900/60 pb-2 gap-2">
                     <h2 class="text-base font-extrabold text-amber-400 font-rustic">⏱️ Historial de Fichajes y Horas de Empleados</h2>
-                    <button onclick="cerrarPanelFichajes()" class="text-xs bg-stone-900 hover:bg-stone-800 text-amber-200 px-2 py-1 rounded border border-amber-800">✖ Cerrar</button>
+                    <div class="flex gap-2">
+                        <button onclick="purgarHistorialFichajesAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition">🧹 Purgar Historial Turnos</button>
+                        <button onclick="cerrarPanelFichajes()" class="text-xs bg-stone-900 hover:bg-stone-800 text-amber-200 px-2 py-1 rounded border border-amber-800">✖ Cerrar</button>
+                    </div>
                 </div>
+
+                <!-- BUSCADOR EN HISTORIAL DE FICHAJES -->
+                <div class="bg-stone-900/70 p-2 rounded-lg border border-amber-900/40 flex items-center space-x-2">
+                    <span class="text-sm">🔍</span>
+                    <input type="text" id="buscador-fichajes-admin" placeholder="Buscar por empleado, fecha o hora..." class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="renderizarFichajesAdmin()">
+                </div>
+
                 <div id="galeria-fichajes-admin" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
                     <p class="italic text-amber-200/40 col-span-full text-center py-3">No hay turnos finalizados aún.</p>
                 </div>
@@ -1460,7 +1470,6 @@
                     });
                 }
 
-                // Usamos escape para evitar problemas con nombres que tengan comillas
                 const nombreEscapado = nombreConvenio.replace(/'/g, "\\'");
 
                 galeria.innerHTML += `
@@ -1928,13 +1937,21 @@
             if (!galeria) return;
             galeria.innerHTML = '';
 
-            if (listaFichajesGlobal.length === 0) {
-                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-3">No hay turnos finalizados aún.</p>';
+            const filtro = (document.getElementById('buscador-fichajes-admin')?.value || '').toLowerCase().trim();
+            const fichajesFiltrados = listaFichajesGlobal.filter(t => {
+                if (!t) return false;
+                const usr = (t.usuario || '').toLowerCase();
+                const inicio = (t.inicioStr || '').toLowerCase();
+                const fin = (t.finStr || '').toLowerCase();
+                return usr.includes(filtro) || inicio.includes(filtro) || fin.includes(filtro);
+            });
+
+            if (fichajesFiltrados.length === 0) {
+                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-3">No hay turnos finalizados que coincidan.</p>';
                 return;
             }
 
-            listaFichajesGlobal.forEach(t => {
-                if (!t) return;
+            fichajesFiltrados.forEach(t => {
                 galeria.innerHTML += `
                     <div class="bg-stone-950/80 border border-amber-900/50 p-3 rounded-lg shadow space-y-1">
                         <div class="flex justify-between items-center border-b border-amber-900/30 pb-1">
@@ -1953,6 +1970,16 @@
                         </div>
                     </div>`;
             });
+        }
+
+        function purgarHistorialFichajesAdmin() {
+            if (confirm("⚠️ ¿Estás 100% seguro de que deseas purgar y eliminar TODO el historial de turnos y fichajes de los empleados?")) {
+                database.ref('fichajes_historial').remove().then(() => {
+                    alert("🧹 ¡Historial de turnos purgado correctamente!");
+                }).catch(err => {
+                    alert("❌ Error al purgar: " + err.message);
+                });
+            }
         }
 
         function copiarFichajeIndividual(usr, inicio, fin, hrs, tickets, ventas) {
