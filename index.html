@@ -454,19 +454,17 @@
                         <button id="btn-admin-purga" onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🧹 Purga (Admin)</button>
                     </div>
                 </div>
-
                 <div class="bg-stone-900/70 p-2 rounded-lg border border-amber-900/40 flex items-center space-x-2">
                     <span class="text-sm">🔍</span>
                     <input type="text" id="buscador-tickets" placeholder="Buscar por usuario, fecha, hora o producto..." class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarTickets()">
                 </div>
-
                 <div id="lista-historial-facturas" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-amber-200/80">
                     <p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay facturas registradas todavía.</p>
                 </div>
             </div>
         </div>
 
-        <!-- ================= PANTALLA DE CONVENIOS ================= -->
+        <!-- ================= PANTALLA: CONVENIOS ================= -->
         <div id="pantalla-convenios" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-amber-900/60 pb-2 gap-2">
@@ -479,7 +477,7 @@
                 <form id="form-nuevo-convenio" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
                     <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Crear Nueva Cuenta de Convenio</h3>
                     <div class="flex flex-col md:flex-row gap-2">
-                        <input type="text" id="convenio-nombre" placeholder="Nombre de la Organización / Colectivo (Ej: Sheriffs, Médicos...)" required class="w-full p-2 rounded text-xs">
+                        <input type="text" id="convenio-nombre" placeholder="Nombre de la Organización / Colectivo" required class="w-full p-2 rounded text-xs">
                         <button type="submit" class="bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold px-4 py-2 rounded text-xs border border-amber-600 font-rustic whitespace-nowrap">Crear Convenio</button>
                     </div>
                 </form>
@@ -490,7 +488,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 2: PEDIDOS ================= -->
+        <!-- ================= PANTALLA: PEDIDOS ================= -->
         <div id="pantalla-pedidos" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-3 flex items-center space-x-2">
                 <span class="text-base">🔍</span>
@@ -540,7 +538,6 @@
                             </table>
                         </div>
                     </div>
-
                     <div>
                         <h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🇲🇽 Agricultura México</h3>
                         <div class="overflow-x-auto">
@@ -585,7 +582,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLAS DE GESTIÓN (COMIDA, BEBIDA, MENÚS, NPC, PRODUCTOS, LICENCIAS) ================= -->
+        <!-- ================= PANTALLAS DE GESTIÓN CARTA ================= -->
         <div id="pantalla-comida" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🥩 Gestión de Comida (3 Tarifas)</h2>
@@ -1338,14 +1335,53 @@
                 actualizarCajaTotalDisplay();
             });
 
-            database.ref('comida').on('value', (s) => { comida = s.val() || comidaInicial; if (!s.val()) database.ref('comida').set(comidaInicial); renderizarTodo(); });
-            database.ref('bebida_normal').on('value', (s) => { bebidaNormal = s.val() || bebidaNormalInicial; if (!s.val()) database.ref('bebida_normal').set(bebidaNormalInicial); renderizarTodo(); });
-            database.ref('bebida_alcohol').on('value', (s) => { bebidaAlcohol = s.val() || bebidaAlcoholInicial; if (!s.val()) database.ref('bebida_alcohol').set(bebidaAlcoholInicial); renderizarTodo(); });
-            database.ref('menus').on('value', (s) => { menus = s.val() || menusIniciales; if (!s.val()) database.ref('menus').set(menusIniciales); renderizarTodo(); });
-            database.ref('platos_npc').on('value', (s) => { platosNPC = s.val() || platosNPCIniciales; if (!s.val()) database.ref('platos_npc').set(platosNPCIniciales); renderizarTodo(); });
-            database.ref('productos_varios').on('value', (s) => { productos = s.val() || productosIniciales; if (!s.val()) database.ref('productos_varios').set(productosIniciales); renderizarTodo(); });
-            database.ref('pedidos_eeuu').on('value', (s) => { productosEEUU = s.val() || productosEEUUInicial; if (!s.val()) database.ref('pedidos_eeuu').set(productosEEUUInicial); renderizarTodo(); });
-            database.ref('pedidos_mexico').on('value', (s) => { productosMexico = s.val() || productosMexicoInicial; if (!s.val()) database.ref('pedidos_mexico').set(productosMexicoInicial); renderizarTodo(); });
+            database.ref('comida').on('value', (s) => {
+                comida = s.val() || comidaInicial;
+                if (!s.val()) database.ref('comida').set(comidaInicial);
+                renderizarTodo();
+            });
+
+            database.ref('bebida_normal').on('value', (s) => {
+                bebidaNormal = s.val() || bebidaNormalInicial;
+                if (!s.val()) database.ref('bebida_normal').set(bebidaNormalInicial);
+                renderizarTodo();
+            });
+
+            database.ref('bebida_alcohol').on('value', (s) => {
+                bebidaAlcohol = s.val() || bebidaAlcoholInicial;
+                if (!s.val()) database.ref('bebida_alcohol').set(bebidaAlcoholInicial);
+                renderizarTodo();
+            });
+
+            database.ref('menus').on('value', (s) => {
+                menus = s.val() || menusIniciales;
+                if (!s.val()) database.ref('menus').set(menusIniciales);
+                renderizarTodo();
+            });
+
+            database.ref('platos_npc').on('value', (s) => {
+                platosNPC = s.val() || platosNPCIniciales;
+                if (!s.val()) database.ref('platos_npc').set(platosNPCIniciales);
+                renderizarTodo();
+            });
+
+            database.ref('productos_varios').on('value', (s) => {
+                productos = s.val() || productosIniciales;
+                if (!s.val()) database.ref('productos_varios').set(productosIniciales);
+                renderizarTodo();
+            });
+
+            database.ref('pedidos_eeuu').on('value', (s) => {
+                productosEEUU = s.val() || productosEEUUInicial;
+                if (!s.val()) database.ref('pedidos_eeuu').set(productosEEUUInicial);
+                renderizarTodo();
+            });
+
+            database.ref('pedidos_mexico').on('value', (s) => {
+                productosMexico = s.val() || productosMexicoInicial;
+                if (!s.val()) database.ref('pedidos_mexico').set(productosMexicoInicial);
+                renderizarTodo();
+            });
 
             database.ref('convenios').on('value', (s) => {
                 conveniosGlobal = s.val() || {};
@@ -1357,7 +1393,9 @@
                 const data = s.val();
                 listaFacturasGlobal = [];
                 if (data) {
-                    Object.keys(data).forEach(key => { listaFacturasGlobal.push({ ...data[key], keyFirebase: key }); });
+                    Object.keys(data).forEach(key => {
+                        listaFacturasGlobal.push({ ...data[key], keyFirebase: key });
+                    });
                     listaFacturasGlobal.reverse();
                 }
                 renderizarFacturas();
@@ -1371,7 +1409,9 @@
                 const data = s.val();
                 listaPedidosGlobal = [];
                 if (data) {
-                    Object.keys(data).forEach(key => { listaPedidosGlobal.push({ ...data[key], keyFirebase: key }); });
+                    Object.keys(data).forEach(key => {
+                        listaPedidosGlobal.push({ ...data[key], keyFirebase: key });
+                    });
                     listaPedidosGlobal.reverse();
                 }
                 renderizarPedidosHistorial();
@@ -1382,7 +1422,9 @@
                 const data = s.val();
                 listaMermasGlobal = [];
                 if (data) {
-                    Object.keys(data).forEach(key => { listaMermasGlobal.push({ ...data[key], keyFirebase: key }); });
+                    Object.keys(data).forEach(key => {
+                        listaMermasGlobal.push({ ...data[key], keyFirebase: key });
+                    });
                     listaMermasGlobal.reverse();
                 }
                 renderizarMermas();
@@ -1393,7 +1435,9 @@
                 const data = s.val();
                 listaEventosGlobal = [];
                 if (data) {
-                    Object.keys(data).forEach(key => { listaEventosGlobal.push({ ...data[key], keyFirebase: key }); });
+                    Object.keys(data).forEach(key => {
+                        listaEventosGlobal.push({ ...data[key], keyFirebase: key });
+                    });
                     listaEventosGlobal.reverse();
                 }
                 renderizarEventos();
@@ -1456,7 +1500,10 @@
             const desc = document.getElementById('merma-desc').value.trim();
             const monto = parseFloat(document.getElementById('merma-monto').value);
             
-            if (!desc || isNaN(monto) || monto <= 0) return;
+            if (!desc || isNaN(monto) || monto <= 0) {
+                alert("Introduce un motivo y un importe válido mayor a 0.");
+                return;
+            }
 
             const ahora = new Date();
             const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
@@ -1472,6 +1519,8 @@
                 const txtDiscord = "```md\n📉 **MERMA / ACCIDENTE - THE CORNER**\n-----------------------------------\n👤 **Registrado por:** " + usuarioNombre + "\n📝 **Motivo:** " + desc + "\n💰 **Pérdida (Restado de Caja):** -$" + monto.toFixed(2) + "\n```";
                 copiarTextoPortapapeles(txtDiscord);
                 alert("📉 Merma registrada. Dinero restado de la caja correctamente.");
+            }).catch(err => {
+                alert("Error al guardar: " + err.message);
             });
         });
 
@@ -1480,7 +1529,10 @@
             const desc = document.getElementById('evento-desc').value.trim();
             const monto = parseFloat(document.getElementById('evento-monto').value);
             
-            if (!desc || isNaN(monto) || monto <= 0) return;
+            if (!desc || isNaN(monto) || monto <= 0) {
+                alert("Introduce un concepto y un gasto válido mayor a 0.");
+                return;
+            }
 
             const ahora = new Date();
             const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
@@ -1496,6 +1548,8 @@
                 const txtDiscord = "```md\n🎭 **GASTO DE EVENTO - THE CORNER**\n-----------------------------------\n👤 **Registrado por:** " + usuarioNombre + "\n🎉 **Concepto/Evento:** " + desc + "\n💰 **Retiro de Caja:** -$" + monto.toFixed(2) + "\n```";
                 copiarTextoPortapapeles(txtDiscord);
                 alert("🎭 Gasto de evento registrado. Dinero descontado de la caja.");
+            }).catch(err => {
+                alert("Error al guardar: " + err.message);
             });
         });
 
@@ -1518,7 +1572,9 @@
                         </div>
                         <div class="text-xs text-amber-100 font-semibold pt-1">${m.descripcion}</div>
                         <div class="flex justify-between items-end pt-1">
-                            <div class="text-[9px] text-amber-500/70">👤 ${m.usuario} <br> 🕒 ${m.fecha}</div>
+                            <div class="text-[9px] text-amber-500/70">
+                                👤 ${m.usuario} <br> 🕒 ${m.fecha}
+                            </div>
                             <button onclick="eliminarRegistroAdmin('mermas_historial', '${m.keyFirebase}')" title="Borrar Merma" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
                         </div>
                     </div>`;
@@ -1544,7 +1600,9 @@
                         </div>
                         <div class="text-xs text-amber-100 font-semibold pt-1">${ev.descripcion}</div>
                         <div class="flex justify-between items-end pt-1">
-                            <div class="text-[9px] text-amber-500/70">👤 ${ev.usuario} <br> 🕒 ${ev.fecha}</div>
+                            <div class="text-[9px] text-amber-500/70">
+                                👤 ${ev.usuario} <br> 🕒 ${ev.fecha}
+                            </div>
                             <button onclick="eliminarRegistroAdmin('eventos_historial', '${ev.keyFirebase}')" title="Borrar Evento" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
                         </div>
                     </div>`;
@@ -1557,6 +1615,7 @@
             }
         }
 
+        // ================= JS: CÁLCULO DE MÁS VENDIDOS =================
         function calcularMasVendidos() {
             const contenedor = document.getElementById('lista-mas-vendidos');
             if (!contenedor) return;
@@ -1619,7 +1678,6 @@
         }
 
         // ================= RESTO DE LÓGICAS (Convenios, Pedidos, Comida...) =================
-        
         document.getElementById('form-nuevo-convenio').addEventListener('submit', (e) => {
             e.preventDefault();
             const nombre = document.getElementById('convenio-nombre').value.trim();
@@ -1724,6 +1782,7 @@
             const descEl = document.getElementById(`desc-item-${idConvenio}`);
             const montoEl = document.getElementById(`monto-item-${idConvenio}`);
             if (!descEl || !montoEl) return;
+
             const desc = descEl.value.trim();
             const monto = parseFloat(montoEl.value);
 
@@ -2690,6 +2749,105 @@
             pedidoEEUU = {}; pedidoMex = {};
             renderizarTodo();
         }
+
+        document.getElementById('btn-registrar-venta').addEventListener('click', () => {
+            let subtotalBase = 0, resumenArray = [];
+            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
+
+            const recolectarVenta = (items, estadoObj, tipo) => {
+                ordenarArrayPorNombre(items).forEach(item => {
+                    const est = estadoObj[item.id];
+                    if (est && est.cantidad > 0) {
+                        const pMin = numSeguro(item.pMin);
+                        const pNorm = numSeguro(item.pNorm);
+                        const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2);
+                        let p = tipo === 'menu' ? (est.tarifa === 'min' ? pMin : pNorm) : (est.tarifa === 'min' ? pMin : (est.tarifa === 'med' ? pMed : pNorm));
+                        subtotalBase += est.cantidad * p;
+                        resumenArray.push(est.cantidad + "x " + item.nombre);
+                    }
+                });
+            };
+
+            recolectarVenta(comida, ventaComida, 'comida');
+            recolectarVenta(bebidaNormal, ventaBebidaNormal, 'bebida_normal');
+            recolectarVenta(bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
+            recolectarVenta(menus, ventaMenus, 'menu');
+            recolectarVenta(platosNPC, ventaPlatosNPC, 'platos_npc');
+            recolectarVenta(productos, ventaProductos, 'productos');
+
+            if (subtotalBase === 0) {
+                alert("No hay ningún producto en la venta actual.");
+                return;
+            }
+
+            const pctInput = parseFloat(document.getElementById('input-porcentaje-venta').value);
+            const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
+            const descuentoMonto = subtotalBase * (pct / 100);
+            const totalVenta = Math.max(0, subtotalBase - descuentoMonto);
+
+            const idConvenioSel = document.getElementById('select-convenio-venta').value;
+            const esDeudaConvenio = Boolean(idConvenioSel);
+            const convenioObjeto = idConvenioSel ? conveniosGlobal[idConvenioSel] : null;
+            const convenioNombre = convenioObjeto ? convenioObjeto.nombre : '';
+
+            const efectivoInput = parseFloat(document.getElementById('input-efectivo-entregado').value);
+            const efectivoEntregado = isNaN(efectivoInput) ? 0 : efectivoInput;
+            const propina = (!esDeudaConvenio && efectivoEntregado > totalVenta) ? (efectivoEntregado - totalVenta) : 0;
+            const totalIngresadoCaja = esDeudaConvenio ? 0 : (totalVenta + propina);
+
+            const ahora = new Date();
+            const codigoTicket = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0');
+
+            let resumenFinalStr = resumenArray.join(', ');
+            if (convenioNombre) resumenFinalStr += ` [Convenio: ${convenioNombre}${esDeudaConvenio ? ' (A Cuenta/Deuda)' : ''}]`;
+            if (pct > 0) resumenFinalStr += ` [Desc: ${pct}%]`;
+            if (propina > 0) resumenFinalStr += ` [Propina: +$${propina.toFixed(2)}]`;
+
+            const facturaData = {
+                id: Date.now(),
+                codigoTicket: codigoTicket,
+                usuario: usuarioNombre,
+                total: totalIngresadoCaja,
+                consumo: totalVenta,
+                propina: propina,
+                esDeudaConvenio: esDeudaConvenio,
+                convenioNombre: convenioNombre,
+                resumen: resumenFinalStr,
+                fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
+            };
+
+            database.ref('facturas').push(facturaData);
+
+            if (esDeudaConvenio && idConvenioSel && convenioObjeto) {
+                const nuevaDeuda = numSeguro(convenioObjeto.saldoDeuda) + totalVenta;
+                const idConsumo = Date.now().toString();
+                const consumoItem = {
+                    id: idConsumo,
+                    descripcion: resumenArray.join(', '),
+                    monto: totalVenta,
+                    usuario: usuarioNombre,
+                    fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
+                };
+                database.ref(`convenios/${idConvenioSel}/saldoDeuda`).set(nuevaDeuda);
+                database.ref(`convenios/${idConvenioSel}/historialConsumos/${idConsumo}`).set(consumoItem);
+            }
+
+            copiarTextoPortapapeles(generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), subtotalBase, descuentoMonto, pct, convenioNombre, totalVenta, propina, esDeudaConvenio));
+
+            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {};
+            document.getElementById('input-porcentaje-venta').value = '0';
+            document.getElementById('select-convenio-venta').value = '';
+            document.getElementById('input-efectivo-entregado').value = '';
+            renderizarTodo();
+        });
+
+        document.getElementById('btn-limpiar-venta').addEventListener('click', () => {
+            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {};
+            document.getElementById('input-porcentaje-venta').value = '0';
+            document.getElementById('select-convenio-venta').value = '';
+            document.getElementById('input-efectivo-entregado').value = '';
+            renderizarTodo();
+        });
 
         document.getElementById('form-nuevo-pedido-eeuu').addEventListener('submit', function(e) {
             e.preventDefault();
