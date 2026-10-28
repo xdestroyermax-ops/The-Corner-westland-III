@@ -161,7 +161,7 @@
             </div>
         </header>
 
-        <!-- NAVEGACIÓN PRINCIPAL -->
+        <!-- NAVEGACIÓN PRINCIPAL ORDENADA -->
         <div class="flex flex-wrap justify-center gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
             <button type="button" onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>💰</span> <span>Ventas</span>
@@ -212,6 +212,7 @@
 
         <!-- ================= PANTALLA 1: VENTAS ================= -->
         <div id="pantalla-ventas" class="space-y-4">
+            <!-- BUSCADOR RÁPIDO EN VENTAS -->
             <div class="western-panel rounded-xl p-3 flex items-center space-x-2">
                 <span class="text-base">🔍</span>
                 <input type="text" id="buscador-ventas" placeholder="Buscar en la carta (platos, bebidas, menús, platos NPC...)" class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarCartaVentas()">
@@ -456,10 +457,12 @@
                         <button type="button" id="btn-admin-purga" onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🧹 Purga (Admin)</button>
                     </div>
                 </div>
+
                 <div class="bg-stone-900/70 p-2 rounded-lg border border-amber-900/40 flex items-center space-x-2">
                     <span class="text-sm">🔍</span>
                     <input type="text" id="buscador-tickets" placeholder="Buscar por usuario, fecha, hora o producto..." class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarTickets()">
                 </div>
+
                 <div id="lista-historial-facturas" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-amber-200/80">
                     <p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay facturas registradas todavía.</p>
                 </div>
@@ -479,7 +482,7 @@
                 <form id="form-nuevo-convenio" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
                     <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Crear Nueva Cuenta de Convenio</h3>
                     <div class="flex flex-col md:flex-row gap-2">
-                        <input type="text" id="convenio-nombre" placeholder="Nombre de la Organización / Colectivo" required class="w-full p-2 rounded text-xs">
+                        <input type="text" id="convenio-nombre" placeholder="Nombre de la Organización / Colectivo (Ej: Sheriffs, Médicos...)" required class="w-full p-2 rounded text-xs">
                         <button type="submit" class="bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold px-4 py-2 rounded text-xs border border-amber-600 font-rustic whitespace-nowrap">Crear Convenio</button>
                     </div>
                 </form>
@@ -1040,7 +1043,7 @@
         let listaFacturasGlobal = [], listaPedidosGlobal = [], listaFichajesGlobal = [], listaMermasGlobal = [], listaEventosGlobal = [], listaNominasGlobal = [];
         let turnoActivo = null, usuariosPlantillaGlobal = {};
 
-        // HELPERS
+        // ================= HELPERS Y FORMATOS =================
         function numSeguro(val) { return isNaN(parseFloat(val)) ? 0 : parseFloat(val); }
         function ordenarArrayPorNombre(obj) { return Object.entries(obj || {}).filter(([, item]) => item && typeof item === 'object').map(([key, item]) => ({ ...item, id: item.id || key, nombre: item.nombre || 'Sin nombre' })).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })); }
         function copiarTextoPortapapeles(texto) { 
@@ -1050,7 +1053,62 @@
                 prompt("Copia este texto manualmente:", texto); 
             }); 
         }
-        
+
+        function generarFormatoDiscord(usuario, codigo, resumenItems, subtotal, descuentoMonto, pct, convenioNombre, totalConsumo, propina, esDeuda) {
+            const lineas = resumenItems.split(', ').map(i => "• " + i).join('\n');
+            let infoConvenio = convenioNombre ? `🏛️ **Convenio:** ${convenioNombre} ${esDeuda ? '(Fiado a cuenta)' : ''}\n` : '';
+            let infoDescuento = pct > 0 ? `🏷️ **Descuento Aplicado:** ${pct}% (-$${descuentoMonto.toFixed(2)})\n` : '';
+            let infoPropina = propina > 0 ? `🪙 **Propina / Bote:** +$${propina.toFixed(2)}\n` : '';
+            let totalRealCaja = esDeuda ? 0 : (totalConsumo + propina);
+
+            return "```md\n" +
+                   "🧾 **THE CORNER - SAINT DENIS**\n" +
+                   "👤 **Atendido por:** " + usuario + "\n" +
+                   "📅 **Ticket:** #" + codigo + "\n" +
+                   infoConvenio +
+                   "-----------------------------------\n" +
+                   "📦 **Detalle:**\n" +
+                   lineas + "\n" +
+                   "-----------------------------------\n" +
+                   (pct > 0 ? `💵 **Subtotal:** $${subtotal.toFixed(2)}\n` : '') +
+                   infoDescuento +
+                   (propina > 0 ? `🍽️ **Consumo:** $${totalConsumo.toFixed(2)}\n` + infoPropina : '') +
+                   (esDeuda ? `⚠️ **CARGADO A DEUDA:** $${totalConsumo.toFixed(2)}\n` : `💰 **TOTAL EN CAJA:** $${totalRealCaja.toFixed(2)}\n`) +
+                   "```";
+        }
+
+        function generarFormatoDiscordPedido(codigo, resumenItems, total) {
+            const lineas = resumenItems.split(', ').map(i => "• " + i).join('\n');
+            return "```md\n" +
+                   "📦 **THE CORNER - PEDIDO DE MATERIA PRIMA**\n" +
+                   "📅 **Pedido:** #" + codigo + "\n" +
+                   "-----------------------------------\n" +
+                   "📋 **Detalle:**\n" +
+                   lineas + "\n" +
+                   "-----------------------------------\n" +
+                   "💰 **COSTE TOTAL:** $" + numSeguro(total).toFixed(2) + "\n" +
+                   "```";
+        }
+
+        function copiarTicketDiscordTexto(usuario, codigo, resumen, total, propina) {
+            const consumoReal = total - propina;
+            let infoPropina = propina > 0 ? `🪙 **Propina / Bote:** +$${propina.toFixed(2)}\n` : '';
+            let texto = "```md\n" +
+                        "🧾 **THE CORNER - SAINT DENIS**\n" +
+                        "👤 **Atendido por:** " + usuario + "\n" +
+                        "📅 **Ticket:** #" + codigo + "\n" +
+                        "-----------------------------------\n" +
+                        "📦 **Detalle:**\n" +
+                        resumen.split(', ').map(i => "• " + i).join('\n') + "\n" +
+                        "-----------------------------------\n";
+            if (propina > 0) {
+                texto += `🍽️ **Consumo:** $${consumoReal.toFixed(2)}\n` + infoPropina;
+            }
+            texto += "💰 **TOTAL EN CAJA:** $" + total.toFixed(2) + "\n" +
+                     "```";
+            copiarTextoPortapapeles(texto);
+        }
+
         function toggleSeccion(idSeccion) {
             const sec = document.getElementById(idSeccion);
             const btn = document.getElementById('btn-' + idSeccion);
@@ -1088,7 +1146,7 @@
             if (pantalla === 'sueldos') renderizarSueldosAdmin();
         }
 
-        // AUTH & INIT
+        // ================= AUTH & INIT =================
         document.getElementById('form-login').addEventListener('submit', (e) => {
             e.preventDefault(); const email = document.getElementById('login-email').value.trim(); const pass = document.getElementById('login-password').value;
             mostrarMensajeAuth("⏳ Verificando credenciales...", false);
@@ -1134,7 +1192,7 @@
 
         function cerrarSesion() { auth.signOut().then(() => { location.reload(); }); }
 
-        // ADMIN USUARIOS
+        // ================= ADMIN USUARIOS =================
         function escucharUsuariosPendientes() {
             database.ref('usuarios').on('value', s => {
                 const data = s.val(); const contenedor = document.getElementById('lista-usuarios-pendientes'); if (!contenedor) return; contenedor.innerHTML = ''; if (!data) return;
@@ -1171,10 +1229,9 @@
             document.getElementById('cant-en-servicio').textContent = enServicioCount; document.getElementById('cant-fuera-servicio').textContent = fueraServicioCount; galeria.innerHTML = htmlEnServicio + htmlFueraServicio;
         }
 
-        // ====== EL RELOJ INTERNO ======
+        // ================= EL RELOJ INTERNO =================
         setInterval(() => {
             if (turnoActivo) actualizarEstadoFichajeUI();
-            
             if (!document.getElementById('pantalla-plantilla').classList.contains('hidden')) {
                 renderizarPlantillaAdminUI();
             }
@@ -1183,7 +1240,7 @@
         function forzarSalidaAdmin(uid, nombre) { if (confirm(`¿Estás seguro de forzar la salida de turno para ${nombre}?`)) { database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => { alert(`🔴 Se ha sacado de servicio a ${nombre}.`); }).catch(err => { alert("❌ Error: " + err.message); }); } }
         function eliminarEmpleadoAdmin(uid, nombre) { if (confirm(`⚠️ ¿Estás seguro de eliminar permanentemente al empleado "${nombre}" de la plantilla?`)) { database.ref('usuarios/' + uid).remove().then(() => { alert(`🗑️ Se ha eliminado a ${nombre} de la plantilla.`); }).catch(err => { alert("❌ Error: " + err.message); }); } }
 
-        // SYNC E INICIO DE DB
+        // ================= SYNC E INICIO DE DB =================
         function iniciarSincronizacionApp() {
             database.ref('configuracion/caja_base').on('value', (s) => { const val = s.val(); if (val !== null && val !== undefined) { CAJA_INICIAL_BASE = numSeguro(val); } else { database.ref('configuracion/caja_base').set(0.00); CAJA_INICIAL_BASE = 0.00; } actualizarCajaTotalDisplay(); });
             database.ref('comida').on('value', (s) => { comida = s.val() || comidaInicial; if (!s.val()) database.ref('comida').set(comidaInicial); renderizarTodo(); });
@@ -1210,7 +1267,7 @@
             actualizarEstadoFichajeUI();
         }
 
-        // CAJA BALANCE
+        // ================= CAJA BALANCE =================
         function modalAjustarCajaBase() {
             const passInput = prompt("🔒 Introduce la contraseña de Administrador para ajustar la caja:");
             if (passInput === null) return; if (passInput !== "SuperAdmim") { alert("❌ Contraseña incorrecta. Acceso denegado."); return; }
@@ -1256,7 +1313,7 @@
             copiarTextoPortapapeles(textoDiscord);
         }
 
-        // RENDER VENTAS Y GESTIÓN
+        // ================= RENDER VENTAS Y GESTIÓN =================
         function renderizarTodo() {
             try {
                 renderTablaVenta('tabla-venta-comida', comida, ventaComida, 'comida'); renderTablaVenta('tabla-venta-bebida-normal', bebidaNormal, ventaBebidaNormal, 'bebida_normal'); renderTablaVenta('tabla-venta-bebida-alcohol', bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol'); renderTablaVenta('tabla-venta-menus', menus, ventaMenus, 'menu'); renderTablaVenta('tabla-venta-platos-npc', platosNPC, ventaPlatosNPC, 'platos_npc'); renderTablaVenta('tabla-venta-productos', productos, ventaProductos, 'productos');
@@ -1329,7 +1386,7 @@
             ranking.forEach(([producto, cantidad], index) => { const porcentaje = totalUnidadesVendidas > 0 ? ((cantidad / totalUnidadesVendidas) * 100).toFixed(1) : 0; let medalla = '🔹'; if (index === 0) medalla = '🥇'; else if (index === 1) medalla = '🥈'; else if (index === 2) medalla = '🥉'; contenedor.innerHTML += `<div class="bg-stone-900/90 border border-amber-900/60 p-3 rounded-xl shadow space-y-2 flex flex-col justify-between"><div class="flex justify-between items-center"><span class="font-bold text-amber-300 font-rustic text-xs">${medalla} ${producto}</span><span class="bg-amber-950 text-amber-400 font-mono font-bold text-[10px] px-2 py-0.5 rounded border border-amber-800">${cantidad} uds.</span></div><div class="space-y-1"><div class="flex justify-between text-[10px] text-amber-200/70"><span>Porcentaje de ventas:</span><span class="font-bold text-emerald-400">${porcentaje}%</span></div><div class="w-full bg-stone-950 rounded-full h-1.5 border border-amber-900/40 overflow-hidden"><div class="bg-amber-500 h-full rounded-full" style="width: ${porcentaje}%"></div></div></div></div>`; });
         }
 
-        // RENDER HISTORIALES
+        // ================= RENDER HISTORIALES =================
         function renderizarFacturas() {
             const contenedor = document.getElementById('lista-historial-facturas'); if (!contenedor) return; const filtro = (document.getElementById('buscador-tickets')?.value || '').toLowerCase().trim(); contenedor.innerHTML = '';
             const facturasFiltradas = listaFacturasGlobal.filter(f => { if (!f) return false; const usr = (f.usuario || '').toLowerCase(); const codigo = String(f.codigoTicket || '').toLowerCase(); const res = (f.resumen || '').toLowerCase(); const fec = (f.fecha || '').toLowerCase(); return usr.includes(filtro) || codigo.includes(filtro) || res.includes(filtro) || fec.includes(filtro); });
@@ -1354,7 +1411,7 @@
             });
         }
 
-        // INTERACTIONS
+        // ================= INTERACTIONS Y ELIMINACIONES =================
         function cambiarCantVenta(tipo, id, val) {
             let obj; if (tipo === 'comida') obj = ventaComida; else if (tipo === 'bebida_normal') obj = ventaBebidaNormal; else if (tipo === 'bebida_alcohol') obj = ventaBebidaAlcohol; else if (tipo === 'menu') obj = ventaMenus; else if (tipo === 'platos_npc') obj = ventaPlatosNPC; else obj = ventaProductos;
             if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' }; obj[id].cantidad = Math.max(0, parseInt(val) || 0); renderizarTodo();
@@ -1374,8 +1431,6 @@
             Object.values(conveniosGlobal).filter(Boolean).sort((a,b) => (a.nombre || '').localeCompare(b.nombre || '')).forEach(c => { if (c && c.nombre) { select.innerHTML += `<option value="${c.id}">🏛️ ${c.nombre} (Deuda actual: $${numSeguro(c.saldoDeuda).toFixed(2)})</option>`; } });
         }
         
-        // DELETIONS
-        function eliminarRegistroAdmin(ruta, keyFirebase) { if (confirm("¿Estás seguro de eliminar este registro? El dinero volverá a sumarse a la caja si corresponde.")) { database.ref(ruta + '/' + keyFirebase).remove(); } }
         function eliminarFacturaAdmin(keyFirebase) { if (confirm("¿Estás seguro de eliminar este ticket?")) { database.ref('facturas/' + keyFirebase).remove(); } }
         function eliminarLicenciaAdmin(keyFirebase) { if (confirm("¿Estás seguro de eliminar esta licencia?")) { database.ref('licencias/' + keyFirebase).remove(); } }
         function purgaHistorialAdmin() { if (confirm("⚠️ ¿Estás 100% seguro de que deseas purgar y eliminar TODAS las facturas registradas?")) { database.ref('facturas').remove(); alert("¡Purga completada! Historial limpio."); } }
@@ -1391,7 +1446,7 @@
         function filtrarTickets() { renderizarFacturas(); }
         function filtrarPedidosHistorial() { renderizarPedidosHistorial(); }
 
-        // ================= EVENT LISTENERS PRINCIPALES (BOTONES Y FORMS) =================
+        // ================= FINAL EVENT LISTENERS (FORMS Y BOTONES) =================
         document.getElementById('btn-registrar-venta').addEventListener('click', () => {
             let subtotalBase = 0, resumenArray = []; const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
             const recolectarVenta = (items, estadoObj, tipo) => { ordenarArrayPorNombre(items).forEach(item => { const est = estadoObj[item.id]; if (est && est.cantidad > 0) { const pMin = numSeguro(item.pMin); const pNorm = numSeguro(item.pNorm); const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2); let p = tipo === 'menu' ? (est.tarifa === 'min' ? pMin : pNorm) : (est.tarifa === 'min' ? pMin : (est.tarifa === 'med' ? pMed : pNorm)); subtotalBase += est.cantidad * p; resumenArray.push(est.cantidad + "x " + item.nombre); } }); };
@@ -1438,17 +1493,26 @@
             });
         }
         
+        document.getElementById('form-nuevo-convenio').addEventListener('submit', (e) => { e.preventDefault(); const nombre = document.getElementById('convenio-nombre').value.trim(); if (!nombre) return; const id = 'conv_' + Date.now().toString(); database.ref('convenios/' + id).set({ id: id, nombre: nombre, saldoDeuda: 0.00, historialConsumos: {} }).then(() => { document.getElementById('convenio-nombre').value = ''; alert(`🏛️ Convenio "${nombre}" creado con éxito.`); }); });
+        
         document.getElementById('form-nuevo-pedido-eeuu').addEventListener('submit', function(e) { e.preventDefault(); const id = 'e_' + Date.now().toString(); database.ref('pedidos_eeuu/' + id).set({ id, nombre: document.getElementById('p-eeuu-nombre').value.trim(), pMin: parseFloat(document.getElementById('p-eeuu-min').value), pNorm: parseFloat(document.getElementById('p-eeuu-norm').value) }).then(() => { this.reset(); alert("¡Producto añadido a EEUU!"); }); });
         document.getElementById('form-nuevo-pedido-mex').addEventListener('submit', function(e) { e.preventDefault(); const id = 'm_' + Date.now().toString(); database.ref('pedidos_mexico/' + id).set({ id, nombre: document.getElementById('p-mex-nombre').value.trim(), pMin: parseFloat(document.getElementById('p-mex-min').value), pNorm: parseFloat(document.getElementById('p-mex-norm').value) }).then(() => { this.reset(); alert("¡Producto añadido a México!"); }); });
+        
         document.getElementById('form-nueva-merma').addEventListener('submit', function(e) { e.preventDefault(); const desc = document.getElementById('merma-desc').value.trim(); const monto = parseFloat(document.getElementById('merma-monto').value); if (!desc || isNaN(monto) || monto <= 0) { alert("Introduce un motivo y un importe válido mayor a 0."); return; } const ahora = new Date(); const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString(); const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Admin'; database.ref('mermas_historial').push({ descripcion: desc, monto: monto, usuario: usuarioNombre, fecha: fechaStr }).then(() => { this.reset(); const txtDiscord = "```md\n📉 **MERMA / ACCIDENTE - THE CORNER**\n-----------------------------------\n👤 **Registrado por:** " + usuarioNombre + "\n📝 **Motivo:** " + desc + "\n💰 **Pérdida (Restado de Caja):** -$" + monto.toFixed(2) + "\n```"; copiarTextoPortapapeles(txtDiscord); alert("📉 Merma registrada. Dinero restado de la caja correctamente."); }).catch(err => { alert("Error al guardar: " + err.message); }); });
+        
         document.getElementById('form-nuevo-evento').addEventListener('submit', function(e) { e.preventDefault(); const desc = document.getElementById('evento-desc').value.trim(); const monto = parseFloat(document.getElementById('evento-monto').value); if (!desc || isNaN(monto) || monto <= 0) { alert("Introduce un concepto y un gasto válido mayor a 0."); return; } const ahora = new Date(); const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString(); const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Admin'; database.ref('eventos_historial').push({ descripcion: desc, monto: monto, usuario: usuarioNombre, fecha: fechaStr }).then(() => { this.reset(); const txtDiscord = "```md\n🎭 **GASTO DE EVENTO - THE CORNER**\n-----------------------------------\n👤 **Registrado por:** " + usuarioNombre + "\n🎉 **Concepto/Evento:** " + desc + "\n💰 **Retiro de Caja:** -$" + monto.toFixed(2) + "\n```"; copiarTextoPortapapeles(txtDiscord); alert("🎭 Gasto de evento registrado. Dinero descontado de la caja."); }).catch(err => { alert("Error al guardar: " + err.message); }); });
+        
         document.getElementById('form-nueva-licencia').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('licencias/' + id).set({ id, titular: document.getElementById('licencia-titular').value.trim(), tipo: document.getElementById('licencia-tipo').value, url: document.getElementById('licencia-url').value.trim() }).then(() => { this.reset(); alert("¡Licencia archivada correctamente!"); }); });
+        
         document.getElementById('form-nueva-comida').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('comida/' + id).set({ id, nombre: document.getElementById('comida-nombre').value.trim(), pMin: parseFloat(document.getElementById('comida-min').value), pMed: parseFloat(document.getElementById('comida-med').value), pNorm: parseFloat(document.getElementById('comida-norm').value) }).then(() => { this.reset(); alert("¡Plato añadido!"); }); });
+        
         document.getElementById('form-nueva-bebida').addEventListener('submit', function(e) { e.preventDefault(); const tipoBebida = document.getElementById('bebida-tipo').value; const dbRef = tipoBebida === 'normal' ? 'bebida_normal' : 'bebida_alcohol'; const id = Date.now().toString(); database.ref(dbRef + '/' + id).set({ id, nombre: document.getElementById('bebida-nombre').value.trim(), pMin: parseFloat(document.getElementById('bebida-min').value), pMed: parseFloat(document.getElementById('bebida-med').value), pNorm: parseFloat(document.getElementById('bebida-norm').value) }).then(() => { this.reset(); alert("¡Bebida añadida!"); }); });
+        
         document.getElementById('form-nuevo-menu').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('menus/' + id).set({ id, nombre: document.getElementById('menu-nombre').value.trim(), pMin: parseFloat(document.getElementById('menu-min').value), pNorm: parseFloat(document.getElementById('menu-norm').value) }).then(() => { this.reset(); alert("¡Menú añadido!"); }); });
+        
         document.getElementById('form-nuevo-plato-npc').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('platos_npc/' + id).set({ id, nombre: document.getElementById('plato-npc-nombre').value.trim(), pMin: parseFloat(document.getElementById('plato-npc-min').value), pMed: parseFloat(document.getElementById('plato-npc-med').value), pNorm: parseFloat(document.getElementById('plato-npc-norm').value) }).then(() => { this.reset(); alert("¡Plato NPC añadido!"); }); });
+        
         document.getElementById('form-nuevo-producto').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('productos_varios/' + id).set({ id, nombre: document.getElementById('producto-nombre').value.trim(), pMin: parseFloat(document.getElementById('producto-min').value), pMed: parseFloat(document.getElementById('producto-med').value), pNorm: parseFloat(document.getElementById('producto-norm').value) }).then(() => { this.reset(); alert("¡Producto añadido!"); }); });
-
     </script>
 </body>
 </html>
