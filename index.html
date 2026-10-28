@@ -1091,6 +1091,16 @@
             if (pantalla === 'sueldos') renderizarSueldosAdmin();
         }
 
+        function verHistorialFichajesAdmin() {
+            const panel = document.getElementById('panel-fichajes-admin');
+            if (panel) panel.classList.remove('hidden');
+        }
+
+        function cerrarPanelFichajes() {
+            const panel = document.getElementById('panel-fichajes-admin');
+            if (panel) panel.classList.add('hidden');
+        }
+
         // AUTH & INIT
         document.getElementById('form-login').addEventListener('submit', (e) => {
             e.preventDefault(); const email = document.getElementById('login-email').value.trim(); const pass = document.getElementById('login-password').value;
@@ -1584,6 +1594,17 @@
         document.getElementById('form-nuevo-plato-npc').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('platos_npc/' + id).set({ id, nombre: document.getElementById('plato-npc-nombre').value.trim(), pMin: parseFloat(document.getElementById('plato-npc-min').value), pMed: parseFloat(document.getElementById('plato-npc-med').value), pNorm: parseFloat(document.getElementById('plato-npc-norm').value) }); this.reset(); alert("¡Plato NPC añadido!"); });
         
         document.getElementById('form-nuevo-producto').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('productos_varios/' + id).set({ id, nombre: document.getElementById('producto-nombre').value.trim(), pMin: parseFloat(document.getElementById('producto-min').value), pMed: parseFloat(document.getElementById('producto-med').value), pNorm: parseFloat(document.getElementById('producto-norm').value) }); this.reset(); alert("¡Producto añadido!"); });
+
+        // ================= TEMPORIZADOR DE TIEMPO REAL =================
+        setInterval(() => {
+            if (turnoActivo) {
+                actualizarEstadoFichajeUI();
+            }
+            const pantallaPlantilla = document.getElementById('pantalla-plantilla');
+            if (pantallaPlantilla && !pantallaPlantilla.classList.contains('hidden')) {
+                renderizarPlantillaAdminUI();
+            }
+        }, 1000);
     </script>
 </body>
 </html>
