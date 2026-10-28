@@ -455,6 +455,7 @@
                         <button type="button" id="btn-admin-fichajes" onclick="verHistorialFichajesAdmin()" class="bg-amber-900 hover:bg-amber-800 text-amber-100 border border-amber-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">⏱️ Ver Turnos (Admin)</button>
                         <button type="button" id="btn-admin-balance" onclick="generarBalanceSemanalAdmin()" class="bg-indigo-900 hover:bg-indigo-800 text-indigo-100 border border-indigo-600 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">📊 Balance Semanal (Admin)</button>
                         <button type="button" id="btn-admin-purga" onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🧹 Purga (Admin)</button>
+                        <button type="button" id="btn-admin-wipe" onclick="reinicioTotalAdmin()" class="bg-red-700 hover:bg-red-600 text-white border border-red-500 text-[11px] px-3 py-1.5 rounded font-rustic font-black transition hidden shadow-[0_0_10px_rgba(220,38,38,0.8)]">⚠️ REINICIO TOTAL</button>
                     </div>
                 </div>
 
@@ -1137,7 +1138,7 @@
             document.getElementById('user-display-name').textContent = usuarioActualData.nombre || 'Usuario'; document.getElementById('user-display-role').textContent = (usuarioActualData.rol || 'empleado').toUpperCase(); document.getElementById('usuario-activo').value = usuarioActualData.nombre || 'Usuario';
 
             if (usuarioActualData.rol === 'admin') {
-                ['btn-tab-plantilla', 'btn-tab-aprobaciones', 'btn-admin-caja-base', 'btn-admin-fichajes', 'btn-admin-balance', 'btn-admin-purga', 'btn-tab-sueldos', 'btn-tab-mermas', 'btn-tab-eventos'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('hidden'); });
+                ['btn-tab-plantilla', 'btn-tab-aprobaciones', 'btn-admin-caja-base', 'btn-admin-fichajes', 'btn-admin-balance', 'btn-admin-purga', 'btn-admin-wipe', 'btn-tab-sueldos', 'btn-tab-mermas', 'btn-tab-eventos'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('hidden'); });
                 escucharUsuariosPendientes(); escucharPlantillaAdmin();
             }
 
@@ -1460,24 +1461,41 @@
         }
 
         function toggleFichaje() {
-            if (!auth.currentUser) return; const uid = auth.currentUser.uid; const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
+            if (!auth.currentUser) return; 
+            const uid = auth.currentUser.uid; 
+            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
+            
             if (!turnoActivo) {
                 const nuevoTurno = { usuario: usuarioNombre, inicio: Date.now(), fechaInicioStr: new Date().toLocaleString() };
-                database.ref('usuarios/' + uid + '/turnoActivo').set(nuevoTurno).then(() => { alert(`🟢 ¡Has entrado de servicio, ${usuarioNombre}! Buen turno.`); });
+                database.ref('usuarios/' + uid + '/turnoActivo').set(nuevoTurno).then(() => { 
+                    alert(`🟢 ¡Has entrado de servicio, ${usuarioNombre}! Buen turno.`); 
+                });
             } else {
-                const fin = Date.now(); const diffMs = fin - turnoActivo.inicio; const totalHoras = (diffMs / (1000 * 60 * 60)).toFixed(2);
+                const fin = Date.now(); 
+                const diffMs = fin - turnoActivo.inicio; 
+                const totalHoras = (diffMs / (1000 * 60 * 60)).toFixed(2);
+                
                 let ventasTurno = 0, cantidadTickets = 0;
-                listaFacturasGlobal.forEach(f => { if ((f.usuario || '').toLowerCase().includes((turnoActivo.usuario || '').toLowerCase()) && f.id >= turnoActivo.inicio) { ventasTurno += numSeguro(f.total); cantidadTickets++; } });
+                listaFacturasGlobal.forEach(f => { 
+                    if ((f.usuario || '').toLowerCase().includes((turnoActivo.usuario || '').toLowerCase()) && f.id >= turnoActivo.inicio) { 
+                        ventasTurno += numSeguro(f.total); 
+                        cantidadTickets++; 
+                    } 
+                });
                 const turnoResumen = { id: Date.now(), usuario: turnoActivo.usuario, inicioStr: turnoActivo.fechaInicioStr, finStr: new Date().toLocaleString(), horas: totalHoras, ventas: ventasTurno, tickets: cantidadTickets };
                 
-                let horasPrevias = numSeguro(usuariosPlantillaGlobal[uid]?.horasPendientes);
-                let nuevasHoras = horasPrevias + parseFloat(totalHoras);
-                
-                database.ref('fichajes_historial').push(turnoResumen);
-                database.ref(`usuarios/${uid}/horasPendientes`).set(nuevasHoras);
-                database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => {
-                    const textoDiscord = "```md\n⏱️ **CONTROL DE FICHAJE - THE CORNER**\n-----------------------------------\n👤 **Empleado:** " + turnoResumen.usuario + "\n⏰ **Inicio:** " + turnoResumen.inicioStr + "\n🏁 **Fin:** " + turnoResumen.finStr + "\n⏳ **Horas Trabajadas:** " + turnoResumen.horas + "h\n🧾 **Tickets Emitidos:** " + turnoResumen.tickets + "\n💰 **Beneficio Generado:** $" + turnoResumen.ventas.toFixed(2) + "\n```";
-                    copiarTextoPortapapeles(textoDiscord); alert(`🔴 Turno finalizado para ${turnoResumen.usuario}.\nHoras: ${turnoResumen.horas}h | Ventas: $${turnoResumen.ventas.toFixed(2)}\n(Resumen copiado para Discord).`);
+                // CORRECCIÓN: Leemos las horas reales de la Base de Datos antes de sumar
+                database.ref('usuarios/' + uid + '/horasPendientes').once('value').then(snapshot => {
+                    let horasPrevias = numSeguro(snapshot.val());
+                    let nuevasHoras = horasPrevias + parseFloat(totalHoras);
+                    
+                    database.ref('fichajes_historial').push(turnoResumen);
+                    database.ref(`usuarios/${uid}/horasPendientes`).set(nuevasHoras);
+                    database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => {
+                        const textoDiscord = "```md\n⏱️ **CONTROL DE FICHAJE - THE CORNER**\n-----------------------------------\n👤 **Empleado:** " + turnoResumen.usuario + "\n⏰ **Inicio:** " + turnoResumen.inicioStr + "\n🏁 **Fin:** " + turnoResumen.finStr + "\n⏳ **Horas Trabajadas:** " + turnoResumen.horas + "h\n🧾 **Tickets Emitidos:** " + turnoResumen.tickets + "\n💰 **Beneficio Generado:** $" + turnoResumen.ventas.toFixed(2) + "\n```";
+                        copiarTextoPortapapeles(textoDiscord); 
+                        alert(`🔴 Turno finalizado para ${turnoResumen.usuario}.\nHoras: ${turnoResumen.horas}h | Ventas: $${turnoResumen.ventas.toFixed(2)}\n(Resumen copiado para Discord).`);
+                    });
                 });
             }
         }
@@ -1487,7 +1505,7 @@
             copiarTextoPortapapeles(textoDiscord);
         }
 
-        // DELETIONS
+        // DELETIONS & WIPE
         function eliminarRegistroAdmin(ruta, keyFirebase) { if (confirm("¿Estás seguro de eliminar este registro? El dinero volverá a sumarse a la caja si corresponde.")) { database.ref(ruta + '/' + keyFirebase).remove(); } }
         function eliminarFacturaAdmin(keyFirebase) { if (confirm("¿Estás seguro de eliminar este ticket?")) { database.ref('facturas/' + keyFirebase).remove(); } }
         function eliminarLicenciaAdmin(keyFirebase) { if (confirm("¿Estás seguro de eliminar esta licencia?")) { database.ref('licencias/' + keyFirebase).remove(); } }
@@ -1496,6 +1514,29 @@
         function eliminarItem(dbPath, id) { if (confirm("¿Estás seguro de eliminar este elemento?")) { database.ref(dbPath + '/' + id).remove(); } }
         function eliminarPedidoAdmin(keyFirebase) { if (confirm("¿Estás seguro de eliminar este registro de pedido?")) { database.ref('pedidos_historial/' + keyFirebase).remove(); } }
         function eliminarFichajeAdmin(keyFirebase) { if (confirm("¿Deseas eliminar este registro de fichaje?")) { database.ref('fichajes_historial/' + keyFirebase).remove(); } }
+
+        function reinicioTotalAdmin() {
+            const passInput = prompt("⚠️ ATENCIÓN: Vas a borrar todo el historial de ventas, pedidos, mermas, eventos, nóminas y el registro de fichajes finalizados. La caja pasará a 0.\n\nLos empleados, sus horas acumuladas para cobrar y los que estén fichados ahora mismo NO se verán afectados.\n\nEscribe la contraseña de Administrador para confirmar:");
+            
+            if (passInput === null) return; 
+            if (passInput !== "SuperAdmim") { 
+                alert("❌ Contraseña incorrecta. Reinicio cancelado."); 
+                return; 
+            }
+            
+            if (confirm("🚨 ÚLTIMO AVISO: ¿Estás 100% seguro de vaciar la contabilidad? Esta acción no se puede deshacer.")) {
+                database.ref('facturas').remove();
+                database.ref('pedidos_historial').remove();
+                database.ref('mermas_historial').remove();
+                database.ref('eventos_historial').remove();
+                database.ref('nominas_historial').remove();
+                database.ref('fichajes_historial').remove(); 
+                database.ref('configuracion/caja_base').set(0.00);
+                CAJA_INICIAL_BASE = 0.00;
+                
+                alert("✅ REINICIO COMPLETADO. La contabilidad y los historiales están a cero.");
+            }
+        }
 
         // SUELDOS Y NOMINAS
         function renderizarSueldosAdmin() {
