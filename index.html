@@ -57,6 +57,11 @@
             outline: none;
         }
 
+        .tab-btn {
+            flex: 1 1 auto;
+            min-width: 65px;
+        }
+
         .tab-btn.active {
             background-color: #78350f;
             border-color: #d4af37;
@@ -156,42 +161,48 @@
             </div>
         </header>
 
-        <!-- NAVEGACIÓN PRINCIPAL REORDENADA -->
-        <div class="grid grid-cols-3 md:grid-cols-12 gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
-            <button onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+        <!-- NAVEGACIÓN PRINCIPAL -->
+        <div class="flex flex-wrap justify-center gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
+            <button onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>💰</span> <span>Ventas</span>
             </button>
-            <button onclick="cambiarPantalla('convenios')" id="btn-tab-convenios" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+            <button onclick="cambiarPantalla('convenios')" id="btn-tab-convenios" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🏛️</span> <span>Convenios</span>
             </button>
-            <button onclick="cambiarPantalla('pedidos')" id="btn-tab-pedidos" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+            <button onclick="cambiarPantalla('pedidos')" id="btn-tab-pedidos" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🌾</span> <span>Pedidos</span>
             </button>
-            <button onclick="cambiarPantalla('comida')" id="btn-tab-comida" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+            <button onclick="cambiarPantalla('comida')" id="btn-tab-comida" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🥩</span> <span>Comida</span>
             </button>
-            <button onclick="cambiarPantalla('bebida')" id="btn-tab-bebida" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+            <button onclick="cambiarPantalla('bebida')" id="btn-tab-bebida" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🍺</span> <span>Bebidas</span>
             </button>
-            <button onclick="cambiarPantalla('menus')" id="btn-tab-menus" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+            <button onclick="cambiarPantalla('menus')" id="btn-tab-menus" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🍲</span> <span>Menús</span>
             </button>
-            <button onclick="cambiarPantalla('platos-npc')" id="btn-tab-platos-npc" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+            <button onclick="cambiarPantalla('platos-npc')" id="btn-tab-platos-npc" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🎩</span> <span>Platos NPC</span>
             </button>
-            <button onclick="cambiarPantalla('productos')" id="btn-tab-productos" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+            <button onclick="cambiarPantalla('productos')" id="btn-tab-productos" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>📦</span> <span>Productos</span>
             </button>
-            <button onclick="cambiarPantalla('licencias')" id="btn-tab-licencias" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+            <button onclick="cambiarPantalla('licencias')" id="btn-tab-licencias" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>📜</span> <span>Licencias</span>
             </button>
-            <button id="btn-tab-plantilla" onclick="cambiarPantalla('plantilla')" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
+            <button id="btn-tab-plantilla" onclick="cambiarPantalla('plantilla')" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
                 <span>📋</span> <span>Plantilla</span>
             </button>
-            <button onclick="cambiarPantalla('mas-vendidos')" id="btn-tab-mas-vendidos" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
+            <button onclick="cambiarPantalla('mas-vendidos')" id="btn-tab-mas-vendidos" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🏆</span> <span>Más Vendidos</span>
             </button>
-            <button id="btn-tab-aprobaciones" onclick="cambiarPantalla('aprobaciones')" class="tab-btn py-2 px-1 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
+            <button id="btn-tab-mermas" onclick="cambiarPantalla('mermas')" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
+                <span>📉</span> <span>Mermas</span>
+            </button>
+            <button id="btn-tab-eventos" onclick="cambiarPantalla('eventos')" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
+                <span>🎭</span> <span>Eventos</span>
+            </button>
+            <button id="btn-tab-aprobaciones" onclick="cambiarPantalla('aprobaciones')" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
                 <span>👥</span> <span>Aprobar</span>
             </button>
         </div>
@@ -425,7 +436,6 @@
                     </div>
                 </div>
 
-                <!-- BUSCADOR EN HISTORIAL DE FICHAJES -->
                 <div class="bg-stone-900/70 p-2 rounded-lg border border-amber-900/40 flex items-center space-x-2">
                     <span class="text-sm">🔍</span>
                     <input type="text" id="buscador-fichajes-admin" placeholder="Buscar por empleado, fecha o hora..." class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="renderizarFichajesAdmin()">
@@ -592,261 +602,107 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA 3: COMIDA ================= -->
+        <!-- ================= PANTALLAS DE GESTIÓN (COMIDA, BEBIDA, MENÚS, NPC, PRODUCTOS, LICENCIAS) ================= -->
         <div id="pantalla-comida" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🥩 Gestión de Comida (3 Tarifas)</h2>
-                
                 <form id="form-nueva-comida" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
                     <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Plato de Comida</h3>
                     <input type="text" id="comida-nombre" placeholder="Nombre del plato" required class="w-full p-2 rounded text-xs">
                     <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Mín ($)</label>
-                            <input type="number" step="0.01" id="comida-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Med ($)</label>
-                            <input type="number" step="0.01" id="comida-med" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Máx ($)</label>
-                            <input type="number" step="0.01" id="comida-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Mín ($)</label><input type="number" step="0.01" id="comida-min" required class="w-full p-2 rounded text-xs"></div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Med ($)</label><input type="number" step="0.01" id="comida-med" required class="w-full p-2 rounded text-xs"></div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Máx ($)</label><input type="number" step="0.01" id="comida-norm" required class="w-full p-2 rounded text-xs"></div>
                     </div>
                     <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Comida</button>
                 </form>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="table-header uppercase font-rustic">
-                            <tr>
-                                <th class="p-2">Plato</th>
-                                <th class="p-2 text-center">Mín / Med / Máx</th>
-                                <th class="p-2 text-center">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabla-gestion-comida" class="divide-y divide-amber-900/40"></tbody>
-                    </table>
-                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="table-header uppercase font-rustic"><tr><th class="p-2">Plato</th><th class="p-2 text-center">Mín / Med / Máx</th><th class="p-2 text-center">Acción</th></tr></thead><tbody id="tabla-gestion-comida" class="divide-y divide-amber-900/40"></tbody></table></div>
             </div>
         </div>
 
-        <!-- ================= PANTALLA 4: BEBIDA ================= -->
         <div id="pantalla-bebida" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🍺 Gestión de Bebidas</h2>
-                
                 <form id="form-nueva-bebida" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
                     <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Bebida</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <input type="text" id="bebida-nombre" placeholder="Nombre de la bebida" required class="p-2 rounded text-xs">
-                        <select id="bebida-tipo" required class="p-2 rounded text-xs">
-                            <option value="normal">🥤 Bebida Normal / Sin Alcohol</option>
-                            <option value="alcohol">🍺 Bebida Alcohólica</option>
-                        </select>
-                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2"><input type="text" id="bebida-nombre" placeholder="Nombre de la bebida" required class="p-2 rounded text-xs"><select id="bebida-tipo" required class="p-2 rounded text-xs"><option value="normal">🥤 Normal / Sin Alcohol</option><option value="alcohol">🍺 Alcohólica</option></select></div>
                     <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Mín ($)</label>
-                            <input type="number" step="0.01" id="bebida-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Med ($)</label>
-                            <input type="number" step="0.01" id="bebida-med" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Máx ($)</label>
-                            <input type="number" step="0.01" id="bebida-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Mín ($)</label><input type="number" step="0.01" id="bebida-min" required class="w-full p-2 rounded text-xs"></div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Med ($)</label><input type="number" step="0.01" id="bebida-med" required class="w-full p-2 rounded text-xs"></div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Máx ($)</label><input type="number" step="0.01" id="bebida-norm" required class="w-full p-2 rounded text-xs"></div>
                     </div>
                     <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Bebida</button>
                 </form>
-
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div>
-                        <h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🥤 Bebidas Normales</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead class="table-header uppercase font-rustic">
-                                    <tr>
-                                        <th class="p-2">Bebida</th>
-                                        <th class="p-2 text-center">Mín / Med / Máx</th>
-                                        <th class="p-2 text-center">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabla-gestion-bebida-normal" class="divide-y divide-amber-900/40"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🍺 Bebidas Alcohólicas</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead class="table-header uppercase font-rustic">
-                                    <tr>
-                                        <th class="p-2">Bebida</th>
-                                        <th class="p-2 text-center">Mín / Med / Máx</th>
-                                        <th class="p-2 text-center">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabla-gestion-bebida-alcohol" class="divide-y divide-amber-900/40"></tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <div><h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🥤 Normales</h3><div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="table-header uppercase font-rustic"><tr><th class="p-2">Bebida</th><th class="p-2 text-center">Tarifas</th><th class="p-2 text-center">Acción</th></tr></thead><tbody id="tabla-gestion-bebida-normal" class="divide-y divide-amber-900/40"></tbody></table></div></div>
+                    <div><h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🍺 Alcohólicas</h3><div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="table-header uppercase font-rustic"><tr><th class="p-2">Bebida</th><th class="p-2 text-center">Tarifas</th><th class="p-2 text-center">Acción</th></tr></thead><tbody id="tabla-gestion-bebida-alcohol" class="divide-y divide-amber-900/40"></tbody></table></div></div>
                 </div>
             </div>
         </div>
 
-        <!-- ================= PANTALLA 5: MENÚS ================= -->
         <div id="pantalla-menus" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🍲 Gestión de Menús (2 Tarifas)</h2>
-                
                 <form id="form-nuevo-menu" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
                     <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Menú</h3>
                     <input type="text" id="menu-nombre" placeholder="Nombre del menú" required class="w-full p-2 rounded text-xs">
                     <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Mínimo ($)</label>
-                            <input type="number" step="0.01" id="menu-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Máximo ($)</label>
-                            <input type="number" step="0.01" id="menu-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Mínimo ($)</label><input type="number" step="0.01" id="menu-min" required class="w-full p-2 rounded text-xs"></div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Máximo ($)</label><input type="number" step="0.01" id="menu-norm" required class="w-full p-2 rounded text-xs"></div>
                     </div>
                     <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Menú</button>
                 </form>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="table-header uppercase font-rustic">
-                            <tr>
-                                <th class="p-2">Menú</th>
-                                <th class="p-2 text-center">Mín / Máx</th>
-                                <th class="p-2 text-center">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabla-gestion-menus" class="divide-y divide-amber-900/40"></tbody>
-                    </table>
-                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="table-header uppercase font-rustic"><tr><th class="p-2">Menú</th><th class="p-2 text-center">Mín / Máx</th><th class="p-2 text-center">Acción</th></tr></thead><tbody id="tabla-gestion-menus" class="divide-y divide-amber-900/40"></tbody></table></div>
             </div>
         </div>
 
-        <!-- ================= PANTALLA 6: PLATOS NPC ================= -->
         <div id="pantalla-platos-npc" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🎩 Gestión de Platos NPC (3 Tarifas)</h2>
-                
                 <form id="form-nuevo-plato-npc" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
                     <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Plato NPC</h3>
-                    <input type="text" id="plato-npc-nombre" placeholder="Nombre del plato NPC" required class="w-full p-2 rounded text-xs">
+                    <input type="text" id="plato-npc-nombre" placeholder="Nombre" required class="w-full p-2 rounded text-xs">
                     <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Mín ($)</label>
-                            <input type="number" step="0.01" id="plato-npc-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Med ($)</label>
-                            <input type="number" step="0.01" id="plato-npc-med" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Máx ($)</label>
-                            <input type="number" step="0.01" id="plato-npc-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Mín ($)</label><input type="number" step="0.01" id="plato-npc-min" required class="w-full p-2 rounded text-xs"></div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Med ($)</label><input type="number" step="0.01" id="plato-npc-med" required class="w-full p-2 rounded text-xs"></div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Máx ($)</label><input type="number" step="0.01" id="plato-npc-norm" required class="w-full p-2 rounded text-xs"></div>
                     </div>
                     <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Plato NPC</button>
                 </form>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="table-header uppercase font-rustic">
-                            <tr>
-                                <th class="p-2">Plato NPC</th>
-                                <th class="p-2 text-center">Mín / Med / Máx</th>
-                                <th class="p-2 text-center">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabla-gestion-platos-npc" class="divide-y divide-amber-900/40"></tbody>
-                    </table>
-                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="table-header uppercase font-rustic"><tr><th class="p-2">Plato NPC</th><th class="p-2 text-center">Mín / Med / Máx</th><th class="p-2 text-center">Acción</th></tr></thead><tbody id="tabla-gestion-platos-npc" class="divide-y divide-amber-900/40"></tbody></table></div>
             </div>
         </div>
 
-        <!-- ================= PANTALLA 7: PRODUCTOS ================= -->
         <div id="pantalla-productos" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
-                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📦 Gestión de Productos Varios (3 Tarifas)</h2>
-                
+                <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📦 Gestión Productos Varios</h2>
                 <form id="form-nuevo-producto" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
-                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Nuevo Producto</h3>
-                    <input type="text" id="producto-nombre" placeholder="Nombre del producto" required class="w-full p-2 rounded text-xs">
+                    <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Añadir Producto</h3>
+                    <input type="text" id="producto-nombre" placeholder="Nombre" required class="w-full p-2 rounded text-xs">
                     <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Mín ($)</label>
-                            <input type="number" step="0.01" id="producto-min" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Med ($)</label>
-                            <input type="number" step="0.01" id="producto-med" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">P. Máx ($)</label>
-                            <input type="number" step="0.01" id="producto-norm" placeholder="0.00" required class="w-full p-2 rounded text-xs">
-                        </div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Mín ($)</label><input type="number" step="0.01" id="producto-min" required class="w-full p-2 rounded text-xs"></div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Med ($)</label><input type="number" step="0.01" id="producto-med" required class="w-full p-2 rounded text-xs"></div>
+                        <div><label class="text-[10px] text-amber-200/70">P. Máx ($)</label><input type="number" step="0.01" id="producto-norm" required class="w-full p-2 rounded text-xs"></div>
                     </div>
                     <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Añadir Producto</button>
                 </form>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="table-header uppercase font-rustic">
-                            <tr>
-                                <th class="p-2">Producto</th>
-                                <th class="p-2 text-center">Mín / Med / Máx</th>
-                                <th class="p-2 text-center">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabla-gestion-productos" class="divide-y divide-amber-900/40"></tbody>
-                    </table>
-                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="table-header uppercase font-rustic"><tr><th class="p-2">Producto</th><th class="p-2 text-center">Mín / Med / Máx</th><th class="p-2 text-center">Acción</th></tr></thead><tbody id="tabla-gestion-productos" class="divide-y divide-amber-900/40"></tbody></table></div>
             </div>
         </div>
 
-        <!-- ================= PANTALLA 8: LICENCIAS ================= -->
         <div id="pantalla-licencias" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">📜 Archivador de Licencias</h2>
-                
                 <form id="form-nueva-licencia" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
                     <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Archivar Nueva Licencia</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">Titular / Nombre del Personaje</label>
-                            <input type="text" id="licencia-titular" placeholder="Ej: John Doe" required class="w-full p-2 rounded text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-amber-200/70">Tipo de Licencia</label>
-                            <select id="licencia-tipo" required class="w-full p-2 rounded text-xs">
-                                <option value="Licencia de Alcohol y Saloon">🍺 Alcohol / Saloon</option>
-                                <option value="Licencia de Armas">🔫 Armas</option>
-                                <option value="Licencia de Comercio">💼 Comercio</option>
-                                <option value="Licencia Sanitaria">⚕️ Sanidad / Medicina</option>
-                                <option value="Otro">📜 Otra Licencia</option>
-                            </select>
-                        </div>
+                        <div><label class="text-[10px] text-amber-200/70">Titular</label><input type="text" id="licencia-titular" required class="w-full p-2 rounded text-xs"></div>
+                        <div><label class="text-[10px] text-amber-200/70">Tipo</label><select id="licencia-tipo" required class="w-full p-2 rounded text-xs"><option value="Licencia de Alcohol y Saloon">🍺 Alcohol / Saloon</option><option value="Licencia de Armas">🔫 Armas</option><option value="Licencia de Comercio">💼 Comercio</option><option value="Licencia Sanitaria">⚕️ Sanidad</option><option value="Otro">📜 Otro</option></select></div>
                     </div>
-                    <div>
-                        <label class="text-[10px] text-amber-200/70">URL de la Imagen de la Licencia</label>
-                        <input type="url" id="licencia-url" placeholder="https://i.imgur.com/ejemplo.png" required class="w-full p-2 rounded text-xs">
-                    </div>
+                    <div><label class="text-[10px] text-amber-200/70">URL de la Imagen</label><input type="url" id="licencia-url" required class="w-full p-2 rounded text-xs"></div>
                     <button type="submit" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold py-2 rounded text-xs border border-amber-600 font-rustic">Guardar Licencia</button>
                 </form>
-
-                <div id="galeria-licencias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <p class="italic text-amber-200/40 col-span-full text-center py-4">No hay licencias archivadas todavía.</p>
-                </div>
+                <div id="galeria-licencias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"><p class="italic text-amber-200/40 col-span-full text-center py-4">No hay licencias archivadas todavía.</p></div>
             </div>
         </div>
 
@@ -863,14 +719,60 @@
                         <span class="bg-stone-900 text-amber-200/60 px-2.5 py-1 rounded border border-amber-900">⚪ Fuera de Servicio: <span id="cant-fuera-servicio">0</span></span>
                     </div>
                 </div>
-
                 <div id="galeria-plantilla-admin" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
                     <p class="italic text-amber-200/40 col-span-full text-center py-4">Cargando plantilla de empleados...</p>
                 </div>
             </div>
         </div>
 
-        <!-- ================= PANTALLA 10: APROBACIONES (EXCLUSIVO ADMIN) ================= -->
+        <!-- ================= PANTALLAS ADMIN EXTRAS (MERMAS Y EVENTOS) ================= -->
+        <div id="pantalla-mermas" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-amber-900/60 pb-2 gap-2">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-amber-400 font-rustic">📉 Registro de Mermas y Accidentes</h2>
+                        <p class="text-xs text-amber-200/60">Declara pérdidas de dinero o mercancía. Se restará de la Caja Total.</p>
+                    </div>
+                </div>
+                <form id="form-nueva-merma" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <div class="flex flex-col md:flex-row gap-2">
+                        <input type="text" id="merma-desc" placeholder="Motivo o accidente (Ej: Botella rota por cliente)" required class="w-full p-2 rounded text-xs">
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <input type="number" step="0.01" id="merma-monto" placeholder="Importe ($)" required class="w-32 p-2 rounded text-xs text-center font-bold">
+                            <button type="submit" class="bg-red-900 hover:bg-red-800 text-red-100 font-bold px-4 py-2 rounded text-xs border border-red-600 font-rustic whitespace-nowrap shadow-lg w-full md:w-auto">Restar a Caja</button>
+                        </div>
+                    </div>
+                </form>
+                <div id="lista-mermas" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <p class="italic text-amber-200/40 col-span-full text-center py-4">No hay mermas registradas.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="pantalla-eventos" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-amber-900/60 pb-2 gap-2">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-amber-400 font-rustic">🎭 Gastos de Eventos</h2>
+                        <p class="text-xs text-amber-200/60">Registra retiros de dinero de la caja para pagar a músicos, decoración, etc.</p>
+                    </div>
+                </div>
+                <form id="form-nuevo-evento" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
+                    <div class="flex flex-col md:flex-row gap-2">
+                        <input type="text" id="evento-desc" placeholder="Concepto del evento (Ej: Pago banda de música)" required class="w-full p-2 rounded text-xs">
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <input type="number" step="0.01" id="evento-monto" placeholder="Gasto ($)" required class="w-32 p-2 rounded text-xs text-center font-bold">
+                            <button type="submit" class="bg-indigo-900 hover:bg-indigo-800 text-indigo-100 font-bold px-4 py-2 rounded text-xs border border-indigo-600 font-rustic whitespace-nowrap shadow-lg w-full md:w-auto">Registrar Gasto</button>
+                        </div>
+                    </div>
+                </form>
+                <div id="lista-eventos" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <p class="italic text-amber-200/40 col-span-full text-center py-4">No hay gastos de eventos registrados.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANTALLA 10: APROBACIONES ================= -->
         <div id="pantalla-aprobaciones" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">👥 Solicitudes de Aprobación de Usuarios</h2>
@@ -982,6 +884,7 @@
         let ventaComida = {}, ventaBebidaNormal = {}, ventaBebidaAlcohol = {}, ventaMenus = {}, ventaPlatosNPC = {}, ventaProductos = {};
         let pedidoEEUU = {}, pedidoMex = {};
         let listaFacturasGlobal = [], listaPedidosGlobal = [], listaFichajesGlobal = [];
+        let listaMermasGlobal = [], listaEventosGlobal = [];
         let turnoActivo = null;
 
         function numSeguro(val) {
@@ -1101,6 +1004,11 @@
                 document.getElementById('btn-admin-fichajes').classList.remove('hidden');
                 document.getElementById('btn-admin-balance').classList.remove('hidden');
                 document.getElementById('btn-admin-purga').classList.remove('hidden');
+                
+                // Mostrar botones admin extras
+                document.getElementById('btn-tab-mermas').classList.remove('hidden');
+                document.getElementById('btn-tab-eventos').classList.remove('hidden');
+
                 escucharUsuariosPendientes();
                 escucharPlantillaAdmin();
             }
@@ -1208,7 +1116,7 @@
         }
 
         function cambiarPantalla(pantalla) {
-            ['ventas', 'convenios', 'pedidos', 'comida', 'bebida', 'menus', 'platos-npc', 'productos', 'licencias', 'plantilla', 'mas-vendidos', 'aprobaciones'].forEach(p => {
+            ['ventas', 'convenios', 'pedidos', 'comida', 'bebida', 'menus', 'platos-npc', 'productos', 'licencias', 'plantilla', 'mas-vendidos', 'mermas', 'eventos', 'aprobaciones'].forEach(p => {
                 const el = document.getElementById('pantalla-' + p);
                 const btn = document.getElementById('btn-tab-' + p);
                 if (el) el.classList.add('hidden');
@@ -1232,22 +1140,20 @@
                 return;
             }
 
-            let totalVentas = 0;
-            listaFacturasGlobal.forEach(f => {
-                if (!f.esDeudaConvenio) {
-                    totalVentas += numSeguro(f.total);
-                }
-            });
-            let totalPedidos = 0;
+            let totalVentas = 0, totalPedidos = 0, totalMermas = 0, totalEventos = 0;
+            listaFacturasGlobal.forEach(f => { if (!f.esDeudaConvenio) totalVentas += numSeguro(f.total); });
             listaPedidosGlobal.forEach(p => { totalPedidos += numSeguro(p.total); });
-            const dineroActualCalculado = CAJA_INICIAL_BASE + totalVentas - totalPedidos;
+            listaMermasGlobal.forEach(m => { totalMermas += numSeguro(m.monto); });
+            listaEventosGlobal.forEach(ev => { totalEventos += numSeguro(ev.monto); });
+
+            const dineroActualCalculado = CAJA_INICIAL_BASE + totalVentas - totalPedidos - totalMermas - totalEventos;
 
             const entrada = prompt("🪙 Contraseña correcta. Introduce el dinero REAL total que hay en la caja (IC):", dineroActualCalculado.toFixed(2));
             if (entrada !== null && entrada.trim() !== "") {
                 const entradaLimpia = entrada.replace(',', '.').trim();
                 const nuevoMontoTotal = parseFloat(entradaLimpia);
                 if (!isNaN(nuevoMontoTotal)) {
-                    const baseCalculada = nuevoMontoTotal - totalVentas + totalPedidos;
+                    const baseCalculada = nuevoMontoTotal - totalVentas + totalPedidos + totalMermas + totalEventos;
                     CAJA_INICIAL_BASE = baseCalculada;
 
                     database.ref('configuracion/caja_base').set(baseCalculada).then(() => {
@@ -1264,17 +1170,14 @@
         }
 
         function actualizarCajaTotalDisplay() {
-            let totalVentas = 0;
-            listaFacturasGlobal.forEach(f => {
-                if (!f.esDeudaConvenio) {
-                    totalVentas += numSeguro(f.total);
-                }
-            });
-
-            let totalPedidos = 0;
+            let totalVentas = 0, totalPedidos = 0, totalMermas = 0, totalEventos = 0;
+            listaFacturasGlobal.forEach(f => { if (!f.esDeudaConvenio) totalVentas += numSeguro(f.total); });
             listaPedidosGlobal.forEach(p => { totalPedidos += numSeguro(p.total); });
+            listaMermasGlobal.forEach(m => { totalMermas += numSeguro(m.monto); });
+            listaEventosGlobal.forEach(ev => { totalEventos += numSeguro(ev.monto); });
 
-            const dineroActual = CAJA_INICIAL_BASE + totalVentas - totalPedidos;
+            const dineroActual = CAJA_INICIAL_BASE + totalVentas - totalPedidos - totalMermas - totalEventos;
+            
             const el = document.getElementById('caja-total-display');
             if (el) {
                 el.textContent = `$${dineroActual.toFixed(2)}`;
@@ -1298,53 +1201,14 @@
                 actualizarCajaTotalDisplay();
             });
 
-            database.ref('comida').on('value', (s) => {
-                comida = s.val() || comidaInicial;
-                if (!s.val()) database.ref('comida').set(comidaInicial);
-                renderizarTodo();
-            });
-
-            database.ref('bebida_normal').on('value', (s) => {
-                bebidaNormal = s.val() || bebidaNormalInicial;
-                if (!s.val()) database.ref('bebida_normal').set(bebidaNormalInicial);
-                renderizarTodo();
-            });
-
-            database.ref('bebida_alcohol').on('value', (s) => {
-                bebidaAlcohol = s.val() || bebidaAlcoholInicial;
-                if (!s.val()) database.ref('bebida_alcohol').set(bebidaAlcoholInicial);
-                renderizarTodo();
-            });
-
-            database.ref('menus').on('value', (s) => {
-                menus = s.val() || menusIniciales;
-                if (!s.val()) database.ref('menus').set(menusIniciales);
-                renderizarTodo();
-            });
-
-            database.ref('platos_npc').on('value', (s) => {
-                platosNPC = s.val() || platosNPCIniciales;
-                if (!s.val()) database.ref('platos_npc').set(platosNPCIniciales);
-                renderizarTodo();
-            });
-
-            database.ref('productos_varios').on('value', (s) => {
-                productos = s.val() || productosIniciales;
-                if (!s.val()) database.ref('productos_varios').set(productosIniciales);
-                renderizarTodo();
-            });
-
-            database.ref('pedidos_eeuu').on('value', (s) => {
-                productosEEUU = s.val() || productosEEUUInicial;
-                if (!s.val()) database.ref('pedidos_eeuu').set(productosEEUUInicial);
-                renderizarTodo();
-            });
-
-            database.ref('pedidos_mexico').on('value', (s) => {
-                productosMexico = s.val() || productosMexicoInicial;
-                if (!s.val()) database.ref('pedidos_mexico').set(productosMexicoInicial);
-                renderizarTodo();
-            });
+            database.ref('comida').on('value', (s) => { comida = s.val() || comidaInicial; if (!s.val()) database.ref('comida').set(comidaInicial); renderizarTodo(); });
+            database.ref('bebida_normal').on('value', (s) => { bebidaNormal = s.val() || bebidaNormalInicial; if (!s.val()) database.ref('bebida_normal').set(bebidaNormalInicial); renderizarTodo(); });
+            database.ref('bebida_alcohol').on('value', (s) => { bebidaAlcohol = s.val() || bebidaAlcoholInicial; if (!s.val()) database.ref('bebida_alcohol').set(bebidaAlcoholInicial); renderizarTodo(); });
+            database.ref('menus').on('value', (s) => { menus = s.val() || menusIniciales; if (!s.val()) database.ref('menus').set(menusIniciales); renderizarTodo(); });
+            database.ref('platos_npc').on('value', (s) => { platosNPC = s.val() || platosNPCIniciales; if (!s.val()) database.ref('platos_npc').set(platosNPCIniciales); renderizarTodo(); });
+            database.ref('productos_varios').on('value', (s) => { productos = s.val() || productosIniciales; if (!s.val()) database.ref('productos_varios').set(productosIniciales); renderizarTodo(); });
+            database.ref('pedidos_eeuu').on('value', (s) => { productosEEUU = s.val() || productosEEUUInicial; if (!s.val()) database.ref('pedidos_eeuu').set(productosEEUUInicial); renderizarTodo(); });
+            database.ref('pedidos_mexico').on('value', (s) => { productosMexico = s.val() || productosMexicoInicial; if (!s.val()) database.ref('pedidos_mexico').set(productosMexicoInicial); renderizarTodo(); });
 
             database.ref('convenios').on('value', (s) => {
                 conveniosGlobal = s.val() || {};
@@ -1356,9 +1220,7 @@
                 const data = s.val();
                 listaFacturasGlobal = [];
                 if (data) {
-                    Object.keys(data).forEach(key => {
-                        listaFacturasGlobal.push({ ...data[key], keyFirebase: key });
-                    });
+                    Object.keys(data).forEach(key => { listaFacturasGlobal.push({ ...data[key], keyFirebase: key }); });
                     listaFacturasGlobal.reverse();
                 }
                 renderizarFacturas();
@@ -1372,12 +1234,33 @@
                 const data = s.val();
                 listaPedidosGlobal = [];
                 if (data) {
-                    Object.keys(data).forEach(key => {
-                        listaPedidosGlobal.push({ ...data[key], keyFirebase: key });
-                    });
+                    Object.keys(data).forEach(key => { listaPedidosGlobal.push({ ...data[key], keyFirebase: key }); });
                     listaPedidosGlobal.reverse();
                 }
                 renderizarPedidosHistorial();
+                actualizarCajaTotalDisplay();
+            });
+
+            // Listeners Mermas y Eventos
+            database.ref('mermas_historial').on('value', (s) => {
+                const data = s.val();
+                listaMermasGlobal = [];
+                if (data) {
+                    Object.keys(data).forEach(key => { listaMermasGlobal.push({ ...data[key], keyFirebase: key }); });
+                    listaMermasGlobal.reverse();
+                }
+                renderizarMermas();
+                actualizarCajaTotalDisplay();
+            });
+
+            database.ref('eventos_historial').on('value', (s) => {
+                const data = s.val();
+                listaEventosGlobal = [];
+                if (data) {
+                    Object.keys(data).forEach(key => { listaEventosGlobal.push({ ...data[key], keyFirebase: key }); });
+                    listaEventosGlobal.reverse();
+                }
+                renderizarEventos();
                 actualizarCajaTotalDisplay();
             });
 
@@ -1430,6 +1313,120 @@
 
             actualizarEstadoFichajeUI();
         }
+
+        // ================= GESTIÓN DE MERMAS Y EVENTOS =================
+        document.getElementById('form-nueva-merma').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const desc = document.getElementById('merma-desc').value.trim();
+            const monto = parseFloat(document.getElementById('merma-monto').value);
+            
+            if (!desc || isNaN(monto) || monto <= 0) return;
+
+            const ahora = new Date();
+            const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
+            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Admin';
+
+            database.ref('mermas_historial').push({
+                descripcion: desc,
+                monto: monto,
+                usuario: usuarioNombre,
+                fecha: fechaStr
+            }).then(() => {
+                this.reset();
+                
+                const txtDiscord = "```md\n📉 **MERMA / ACCIDENTE - THE CORNER**\n-----------------------------------\n👤 **Registrado por:** " + usuarioNombre + "\n📝 **Motivo:** " + desc + "\n💰 **Pérdida (Restado de Caja):** -$" + monto.toFixed(2) + "\n```";
+                copiarTextoPortapapeles(txtDiscord);
+                alert("📉 Merma registrada. Dinero restado de la caja correctamente.");
+            });
+        });
+
+        document.getElementById('form-nuevo-evento').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const desc = document.getElementById('evento-desc').value.trim();
+            const monto = parseFloat(document.getElementById('evento-monto').value);
+            
+            if (!desc || isNaN(monto) || monto <= 0) return;
+
+            const ahora = new Date();
+            const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
+            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Admin';
+
+            database.ref('eventos_historial').push({
+                descripcion: desc,
+                monto: monto,
+                usuario: usuarioNombre,
+                fecha: fechaStr
+            }).then(() => {
+                this.reset();
+                
+                const txtDiscord = "```md\n🎭 **GASTO DE EVENTO - THE CORNER**\n-----------------------------------\n👤 **Registrado por:** " + usuarioNombre + "\n🎉 **Concepto/Evento:** " + desc + "\n💰 **Retiro de Caja:** -$" + monto.toFixed(2) + "\n```";
+                copiarTextoPortapapeles(txtDiscord);
+                alert("🎭 Gasto de evento registrado. Dinero descontado de la caja.");
+            });
+        });
+
+        function renderizarMermas() {
+            const galeria = document.getElementById('lista-mermas');
+            if (!galeria) return;
+            galeria.innerHTML = '';
+            
+            if (listaMermasGlobal.length === 0) {
+                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay mermas registradas.</p>';
+                return;
+            }
+
+            listaMermasGlobal.forEach(m => {
+                galeria.innerHTML += `
+                    <div class="bg-stone-900/80 border border-red-900/50 p-3 rounded-lg shadow space-y-1 relative">
+                        <div class="flex justify-between items-center border-b border-red-900/30 pb-1">
+                            <span class="font-bold text-red-400 font-rustic text-sm">📉 Merma</span>
+                            <span class="font-mono text-red-400 font-bold">-$${numSeguro(m.monto).toFixed(2)}</span>
+                        </div>
+                        <div class="text-xs text-amber-100 font-semibold pt-1">${m.descripcion}</div>
+                        <div class="flex justify-between items-end pt-1">
+                            <div class="text-[9px] text-amber-500/70">
+                                👤 ${m.usuario} <br> 🕒 ${m.fecha}
+                            </div>
+                            <button onclick="eliminarRegistroAdmin('mermas_historial', '${m.keyFirebase}')" title="Borrar Merma" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function renderizarEventos() {
+            const galeria = document.getElementById('lista-eventos');
+            if (!galeria) return;
+            galeria.innerHTML = '';
+            
+            if (listaEventosGlobal.length === 0) {
+                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay gastos de eventos registrados.</p>';
+                return;
+            }
+
+            listaEventosGlobal.forEach(ev => {
+                galeria.innerHTML += `
+                    <div class="bg-stone-900/80 border border-indigo-900/50 p-3 rounded-lg shadow space-y-1 relative">
+                        <div class="flex justify-between items-center border-b border-indigo-900/30 pb-1">
+                            <span class="font-bold text-indigo-400 font-rustic text-sm">🎭 Gasto de Evento</span>
+                            <span class="font-mono text-indigo-400 font-bold">-$${numSeguro(ev.monto).toFixed(2)}</span>
+                        </div>
+                        <div class="text-xs text-amber-100 font-semibold pt-1">${ev.descripcion}</div>
+                        <div class="flex justify-between items-end pt-1">
+                            <div class="text-[9px] text-amber-500/70">
+                                👤 ${ev.usuario} <br> 🕒 ${ev.fecha}
+                            </div>
+                            <button onclick="eliminarRegistroAdmin('eventos_historial', '${ev.keyFirebase}')" title="Borrar Evento" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function eliminarRegistroAdmin(ruta, keyFirebase) {
+            if (confirm("¿Estás seguro de eliminar este registro? El dinero volverá a sumarse a la caja.")) {
+                database.ref(ruta + '/' + keyFirebase).remove();
+            }
+        }
+
 
         // ================= CÁLCULO DE MÁS VENDIDOS =================
         function calcularMasVendidos() {
@@ -1493,7 +1490,9 @@
             });
         }
 
-        // ================= LÓGICA DE CONVENIOS Y DEUDAS =================
+        // ================= RESTO DE LÓGICAS (Convenios, Pedidos, Comida...) =================
+        
+        // Convenios
         document.getElementById('form-nuevo-convenio').addEventListener('submit', (e) => {
             e.preventDefault();
             const nombre = document.getElementById('convenio-nombre').value.trim();
@@ -1515,11 +1514,8 @@
             const select = document.getElementById('select-convenio-venta');
             if (!select) return;
             select.innerHTML = '<option value="">-- No cargar a convenio (Pago al contado) --</option>';
-            
             Object.values(conveniosGlobal).filter(Boolean).sort((a,b) => (a.nombre || '').localeCompare(b.nombre || '')).forEach(c => {
-                if (c && c.nombre) {
-                    select.innerHTML += `<option value="${c.id}">🏛️ ${c.nombre} (Deuda actual: $${numSeguro(c.saldoDeuda).toFixed(2)})</option>`;
-                }
+                if (c && c.nombre) { select.innerHTML += `<option value="${c.id}">🏛️ ${c.nombre} (Deuda actual: $${numSeguro(c.saldoDeuda).toFixed(2)})</option>`; }
             });
         }
 
@@ -1527,73 +1523,34 @@
             const galeria = document.getElementById('galeria-convenios');
             if (!galeria) return;
             galeria.innerHTML = '';
-
             const listaConvenios = Object.values(conveniosGlobal).filter(Boolean);
-
             if (listaConvenios.length === 0) {
                 galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay cuentas de convenios creadas aún.</p>';
                 return;
             }
-
             listaConvenios.forEach(c => {
                 if (!c || !c.id) return;
                 const nombreConvenio = c.nombre || 'Convenio sin nombre';
                 const deuda = numSeguro(c.saldoDeuda);
                 const consumos = c.historialConsumos ? Object.values(c.historialConsumos).filter(Boolean).reverse() : [];
-
                 let htmlConsumos = '';
                 if (consumos.length === 0) {
                     htmlConsumos = '<p class="text-[10px] text-amber-200/40 italic text-center py-2">Sin consumos fiados acumulados.</p>';
                 } else {
                     consumos.slice(0, 5).forEach(item => {
-                        htmlConsumos += `
-                            <div class="flex justify-between items-center text-[10px] border-b border-amber-900/30 pb-1">
-                                <div>
-                                    <span class="text-amber-200 font-semibold block">${item.descripcion || ''}</span>
-                                    <span class="text-[8px] text-amber-500">${item.fecha || ''} (${item.usuario || ''})</span>
-                                </div>
-                                <span class="font-mono font-bold text-amber-400">+$${numSeguro(item.monto).toFixed(2)}</span>
-                            </div>`;
+                        htmlConsumos += `<div class="flex justify-between items-center text-[10px] border-b border-amber-900/30 pb-1"><div><span class="text-amber-200 font-semibold block">${item.descripcion || ''}</span><span class="text-[8px] text-amber-500">${item.fecha || ''} (${item.usuario || ''})</span></div><span class="font-mono font-bold text-amber-400">+$${numSeguro(item.monto).toFixed(2)}</span></div>`;
                     });
                 }
-
                 const nombreEscapado = nombreConvenio.replace(/'/g, "\\'");
-
                 galeria.innerHTML += `
                     <div class="western-panel rounded-xl p-3.5 flex flex-col justify-between space-y-3 border-amber-700">
                         <div class="space-y-2">
-                            <div class="flex justify-between items-center border-b border-amber-900/60 pb-1.5">
-                                <h3 class="font-bold text-amber-300 font-rustic text-sm">🏛️ ${nombreConvenio}</h3>
-                                <button onclick="eliminarConvenioAdmin('${c.id}', '${nombreEscapado}')" title="Eliminar Convenio" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
-                            </div>
-
-                            <div class="bg-stone-950/90 p-2.5 rounded-lg border border-amber-900/60 text-center">
-                                <span class="text-[9px] uppercase font-bold text-amber-400/80 font-rustic block">💰 Deuda Total Pendiente:</span>
-                                <span class="text-lg font-black ${deuda > 0 ? 'text-red-400' : 'text-emerald-400'} font-mono">$${deuda.toFixed(2)}</span>
-                            </div>
-
-                            <div class="bg-stone-900/80 p-2 rounded-lg border border-amber-900/40 space-y-1.5">
-                                <span class="text-[10px] font-bold text-amber-300 block">➕ Añadir Consumo Directo:</span>
-                                <div class="flex gap-1">
-                                    <input type="text" id="desc-item-${c.id}" placeholder="Ej: 2x Menú Medio Muerto" class="w-2/3 p-1 rounded text-[10px]">
-                                    <input type="number" step="0.01" id="monto-item-${c.id}" placeholder="$" class="w-1/3 p-1 rounded text-[10px] text-center">
-                                </div>
-                                <button onclick="agregarConsumoAConvenio('${c.id}')" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 text-[10px] py-1 rounded font-rustic font-bold border border-amber-600">
-                                    ➕ Sumar a la Deuda
-                                </button>
-                            </div>
-
-                            <div class="space-y-1 max-h-32 overflow-y-auto pr-1">
-                                <span class="text-[9px] uppercase font-bold text-amber-400/70 font-rustic block">📋 Últimos Consumos:</span>
-                                ${htmlConsumos}
-                            </div>
+                            <div class="flex justify-between items-center border-b border-amber-900/60 pb-1.5"><h3 class="font-bold text-amber-300 font-rustic text-sm">🏛️ ${nombreConvenio}</h3><button onclick="eliminarConvenioAdmin('${c.id}', '${nombreEscapado}')" title="Eliminar Convenio" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button></div>
+                            <div class="bg-stone-950/90 p-2.5 rounded-lg border border-amber-900/60 text-center"><span class="text-[9px] uppercase font-bold text-amber-400/80 font-rustic block">💰 Deuda Total Pendiente:</span><span class="text-lg font-black ${deuda > 0 ? 'text-red-400' : 'text-emerald-400'} font-mono">$${deuda.toFixed(2)}</span></div>
+                            <div class="bg-stone-900/80 p-2 rounded-lg border border-amber-900/40 space-y-1.5"><span class="text-[10px] font-bold text-amber-300 block">➕ Añadir Consumo Directo:</span><div class="flex gap-1"><input type="text" id="desc-item-${c.id}" placeholder="Ej: 2x Menú Medio Muerto" class="w-2/3 p-1 rounded text-[10px]"><input type="number" step="0.01" id="monto-item-${c.id}" placeholder="$" class="w-1/3 p-1 rounded text-[10px] text-center"></div><button onclick="agregarConsumoAConvenio('${c.id}')" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 text-[10px] py-1 rounded font-rustic font-bold border border-amber-600">➕ Sumar a la Deuda</button></div>
+                            <div class="space-y-1 max-h-32 overflow-y-auto pr-1"><span class="text-[9px] uppercase font-bold text-amber-400/70 font-rustic block">📋 Últimos Consumos:</span>${htmlConsumos}</div>
                         </div>
-
-                        <div class="pt-2 border-t border-amber-900/60">
-                            <button onclick="cobrarDeudaConvenio('${c.id}', '${nombreEscapado}', ${deuda})" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 text-xs py-2 rounded font-rustic font-bold border border-emerald-600 shadow transition">
-                                💵 Liquidar Deuda (Cobrar e Ingresar a Caja)
-                            </button>
-                        </div>
+                        <div class="pt-2 border-t border-amber-900/60"><button onclick="cobrarDeudaConvenio('${c.id}', '${nombreEscapado}', ${deuda})" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 text-xs py-2 rounded font-rustic font-bold border border-emerald-600 shadow transition">💵 Liquidar Deuda (Cobrar e Ingresar a Caja)</button></div>
                     </div>`;
             });
         }
@@ -1602,60 +1559,28 @@
             const descEl = document.getElementById(`desc-item-${idConvenio}`);
             const montoEl = document.getElementById(`monto-item-${idConvenio}`);
             if (!descEl || !montoEl) return;
-
             const desc = descEl.value.trim();
             const monto = parseFloat(montoEl.value);
-
-            if (!desc || isNaN(monto) || monto <= 0) {
-                alert("Introduce una descripción válida y un importe positivo.");
-                return;
-            }
-
+            if (!desc || isNaN(monto) || monto <= 0) { alert("Introduce una descripción válida y un importe positivo."); return; }
             const convenio = conveniosGlobal[idConvenio];
             if (!convenio) return;
-
             const nuevaDeuda = numSeguro(convenio.saldoDeuda) + monto;
             const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
             const idConsumo = Date.now().toString();
-
-            const consumoItem = {
-                id: idConsumo,
-                descripcion: desc,
-                monto: monto,
-                usuario: usuarioNombre,
-                fecha: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date().toLocaleDateString()
-            };
-
+            const consumoItem = { id: idConsumo, descripcion: desc, monto: monto, usuario: usuarioNombre, fecha: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date().toLocaleDateString() };
             database.ref(`convenios/${idConvenio}/saldoDeuda`).set(nuevaDeuda);
             database.ref(`convenios/${idConvenio}/historialConsumos/${idConsumo}`).set(consumoItem).then(() => {
-                descEl.value = '';
-                montoEl.value = '';
-                alert(`➕ Se han añadido $${monto.toFixed(2)} a la deuda de ${convenio.nombre || 'Convenio'}.`);
+                descEl.value = ''; montoEl.value = ''; alert(`➕ Se han añadido $${monto.toFixed(2)} a la deuda de ${convenio.nombre || 'Convenio'}.`);
             });
         }
 
         function cobrarDeudaConvenio(idConvenio, nombreConvenio, deudaActual) {
-            if (deudaActual <= 0) {
-                alert("Este convenio no tiene ninguna deuda pendiente.");
-                return;
-            }
-
+            if (deudaActual <= 0) { alert("Este convenio no tiene ninguna deuda pendiente."); return; }
             if (confirm(`💵 ¿Confirmar el cobro de $${deudaActual.toFixed(2)} para la cuenta de "${nombreConvenio}"?\n\nEste dinero se ingresará a la Caja Total y la deuda quedará a $0.00.`)) {
                 const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
                 const ahora = new Date();
                 const codigoTicket = "PAGO-CONVENIO-" + String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0');
-
-                const facturaData = {
-                    id: Date.now(),
-                    codigoTicket: codigoTicket,
-                    usuario: usuarioNombre,
-                    total: deudaActual,
-                    consumo: deudaActual,
-                    propina: 0,
-                    resumen: `🏛️ LIQUIDACIÓN DE DEUDA CONVENIO: ${nombreConvenio}`,
-                    fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
-                };
-
+                const facturaData = { id: Date.now(), codigoTicket: codigoTicket, usuario: usuarioNombre, total: deudaActual, consumo: deudaActual, propina: 0, resumen: `🏛️ LIQUIDACIÓN DE DEUDA CONVENIO: ${nombreConvenio}`, fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString() };
                 database.ref('facturas').push(facturaData);
                 database.ref(`convenios/${idConvenio}/saldoDeuda`).set(0.00);
                 database.ref(`convenios/${idConvenio}/historialConsumos`).remove().then(() => {
@@ -1666,29 +1591,23 @@
 
         function eliminarConvenioAdmin(idConvenio, nombre) {
             if (confirm(`⚠️ ¿Estás seguro de eliminar el convenio "${nombre}"?`)) {
-                database.ref('convenios/' + idConvenio).remove().then(() => {
-                    alert("🗑️ Convenio eliminado correctamente.");
-                }).catch(err => {
-                    alert("❌ Error al eliminar: " + err.message);
-                });
+                database.ref('convenios/' + idConvenio).remove().then(() => { alert("🗑️ Convenio eliminado correctamente."); });
             }
         }
 
+        // Fichajes y Plantilla
         function actualizarEstadoFichajeUI() {
             const btnFichaje = document.getElementById('btn-fichaje');
             const estadoFichajeText = document.getElementById('estado-fichaje-text');
             if (!btnFichaje || !estadoFichajeText) return;
-
             if (turnoActivo) {
                 btnFichaje.textContent = "🔴 Salir de Servicio";
                 btnFichaje.className = "w-full bg-red-800 hover:bg-red-700 text-red-100 font-bold py-2 rounded text-xs border border-red-600 transition font-rustic shadow";
-                
                 const ahora = Date.now();
                 const diffMs = ahora - turnoActivo.inicio;
                 const horas = Math.floor(diffMs / (1000 * 60 * 60));
                 const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
                 const segundos = Math.floor((diffMs % (1000 * 60)) / 1000);
-                
                 estadoFichajeText.innerHTML = `🟢 En servicio (${turnoActivo.usuario}): <span class="font-mono text-emerald-400 font-bold">${String(horas).padStart(2,'0')}:${String(minutos).padStart(2,'0')}:${String(segundos).padStart(2,'0')}</span>`;
             } else {
                 btnFichaje.textContent = "🟢 Entrar de Servicio";
@@ -1701,52 +1620,23 @@
             if (!auth.currentUser) return;
             const uid = auth.currentUser.uid;
             const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
-
             if (!turnoActivo) {
-                const nuevoTurno = {
-                    usuario: usuarioNombre,
-                    inicio: Date.now(),
-                    fechaInicioStr: new Date().toLocaleString()
-                };
-                database.ref('usuarios/' + uid + '/turnoActivo').set(nuevoTurno).then(() => {
-                    alert(`🟢 ¡Has entrado de servicio, ${usuarioNombre}! Buen turno.`);
-                });
+                const nuevoTurno = { usuario: usuarioNombre, inicio: Date.now(), fechaInicioStr: new Date().toLocaleString() };
+                database.ref('usuarios/' + uid + '/turnoActivo').set(nuevoTurno).then(() => { alert(`🟢 ¡Has entrado de servicio, ${usuarioNombre}! Buen turno.`); });
             } else {
                 const fin = Date.now();
                 const diffMs = fin - turnoActivo.inicio;
                 const totalHoras = (diffMs / (1000 * 60 * 60)).toFixed(2);
-                
                 let ventasTurno = 0, cantidadTickets = 0;
                 listaFacturasGlobal.forEach(f => {
                     if ((f.usuario || '').toLowerCase().includes((turnoActivo.usuario || '').toLowerCase()) && f.id >= turnoActivo.inicio) {
-                        ventasTurno += numSeguro(f.total);
-                        cantidadTickets++;
+                        ventasTurno += numSeguro(f.total); cantidadTickets++;
                     }
                 });
-
-                const turnoResumen = {
-                    id: Date.now(),
-                    usuario: turnoActivo.usuario,
-                    inicioStr: turnoActivo.fechaInicioStr,
-                    finStr: new Date().toLocaleString(),
-                    horas: totalHoras,
-                    ventas: ventasTurno,
-                    tickets: cantidadTickets
-                };
-
+                const turnoResumen = { id: Date.now(), usuario: turnoActivo.usuario, inicioStr: turnoActivo.fechaInicioStr, finStr: new Date().toLocaleString(), horas: totalHoras, ventas: ventasTurno, tickets: cantidadTickets };
                 database.ref('fichajes_historial').push(turnoResumen);
                 database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => {
-                    const textoDiscord = "```md\n" +
-                                         "⏱️ **CONTROL DE FICHAJE - THE CORNER**\n" +
-                                         "-----------------------------------\n" +
-                                         "👤 **Empleado:** " + turnoResumen.usuario + "\n" +
-                                         "⏰ **Inicio:** " + turnoResumen.inicioStr + "\n" +
-                                         "🏁 **Fin:** " + turnoResumen.finStr + "\n" +
-                                         "⏳ **Horas Trabajadas:** " + turnoResumen.horas + "h\n" +
-                                         "🧾 **Tickets Emitidos:** " + turnoResumen.tickets + "\n" +
-                                         "💰 **Beneficio Generado:** $" + turnoResumen.ventas.toFixed(2) + "\n" +
-                                         "```";
-
+                    const textoDiscord = "```md\n⏱️ **CONTROL DE FICHAJE - THE CORNER**\n-----------------------------------\n👤 **Empleado:** " + turnoResumen.usuario + "\n⏰ **Inicio:** " + turnoResumen.inicioStr + "\n🏁 **Fin:** " + turnoResumen.finStr + "\n⏳ **Horas Trabajadas:** " + turnoResumen.horas + "h\n🧾 **Tickets Emitidos:** " + turnoResumen.tickets + "\n💰 **Beneficio Generado:** $" + turnoResumen.ventas.toFixed(2) + "\n```";
                     copiarTextoPortapapeles(textoDiscord);
                     alert(`🔴 Turno finalizado para ${turnoResumen.usuario}.\nHoras: ${turnoResumen.horas}h | Ventas: $${turnoResumen.ventas.toFixed(2)}\n(Resumen copiado para Discord).`);
                 });
@@ -1759,23 +1649,12 @@
         }, 1000);
 
         let usuariosPlantillaGlobal = {};
-
-        function escucharPlantillaAdmin() {
-            database.ref('usuarios').on('value', snapshot => {
-                usuariosPlantillaGlobal = snapshot.val() || {};
-                renderizarPlantillaAdminUI();
-            });
-        }
+        function escucharPlantillaAdmin() { database.ref('usuarios').on('value', snapshot => { usuariosPlantillaGlobal = snapshot.val() || {}; renderizarPlantillaAdminUI(); }); }
 
         function renderizarPlantillaAdminUI() {
             const galeria = document.getElementById('galeria-plantilla-admin');
             if (!galeria) return;
-
-            let enServicioCount = 0;
-            let fueraServicioCount = 0;
-            let htmlEnServicio = '';
-            let htmlFueraServicio = '';
-
+            let enServicioCount = 0; let fueraServicioCount = 0; let htmlEnServicio = ''; let htmlFueraServicio = '';
             const listaUsuarios = Object.values(usuariosPlantillaGlobal).filter(u => u && (u.aprobado || u.rol === 'admin'));
 
             if (listaUsuarios.length === 0) {
@@ -1801,35 +1680,15 @@
 
                     htmlEnServicio += `
                         <div class="bg-stone-950/90 border-2 border-emerald-600 p-3 rounded-xl shadow-lg space-y-2">
-                            <div class="flex justify-between items-center border-b border-amber-900/30 pb-1">
-                                <div>
-                                    <span class="font-black text-amber-300 font-rustic text-sm block">${usr.nombre || ''}</span>
-                                    <span class="text-[9px] text-amber-500">${usr.email || ''}</span>
-                                </div>
-                                <span class="bg-emerald-950 text-emerald-400 font-mono text-[9px] px-2 py-0.5 rounded-full border border-emerald-700 font-bold">🟢 EN SERVICIO</span>
-                            </div>
-                            <div class="text-[10px] text-amber-200/80 space-y-1 bg-stone-900/60 p-2 rounded border border-amber-900/30">
-                                <div>⏰ Fichado desde: <span class="text-amber-300 font-bold">${usr.turnoActivo.fechaInicioStr || ''}</span></div>
-                                <div>⏳ Tiempo Transcurrido: <span class="font-mono text-emerald-400 font-bold text-xs">${tiempoStr}</span></div>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <button onclick="forzarSalidaAdmin('${usr.uid}', '${nombreSeguro}')" class="w-full bg-amber-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-rustic font-bold transition">
-                                    🛑 Forzar Salida / Desfichar
-                                </button>
-                                ${botonEliminarHTML}
-                            </div>
+                            <div class="flex justify-between items-center border-b border-amber-900/30 pb-1"><div><span class="font-black text-amber-300 font-rustic text-sm block">${usr.nombre || ''}</span><span class="text-[9px] text-amber-500">${usr.email || ''}</span></div><span class="bg-emerald-950 text-emerald-400 font-mono text-[9px] px-2 py-0.5 rounded-full border border-emerald-700 font-bold">🟢 EN SERVICIO</span></div>
+                            <div class="text-[10px] text-amber-200/80 space-y-1 bg-stone-900/60 p-2 rounded border border-amber-900/30"><div>⏰ Fichado desde: <span class="text-amber-300 font-bold">${usr.turnoActivo.fechaInicioStr || ''}</span></div><div>⏳ Tiempo Transcurrido: <span class="font-mono text-emerald-400 font-bold text-xs">${tiempoStr}</span></div></div>
+                            <div class="flex flex-col gap-1"><button onclick="forzarSalidaAdmin('${usr.uid}', '${nombreSeguro}')" class="w-full bg-amber-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-rustic font-bold transition">🛑 Forzar Salida / Desfichar</button>${botonEliminarHTML}</div>
                         </div>`;
                 } else {
                     fueraServicioCount++;
                     htmlFueraServicio += `
                         <div class="bg-stone-900/60 border border-amber-900/40 p-3 rounded-xl space-y-2 opacity-90">
-                            <div class="flex justify-between items-center border-b border-amber-900/30 pb-1">
-                                <div>
-                                    <span class="font-bold text-amber-200/90 font-rustic text-xs block">${usr.nombre || ''}</span>
-                                    <span class="text-[9px] text-amber-500/70">${usr.email || ''}</span>
-                                </div>
-                                <span class="bg-stone-950 text-amber-200/40 font-mono text-[9px] px-2 py-0.5 rounded-full border border-amber-900/50">⚪ FUERA</span>
-                            </div>
+                            <div class="flex justify-between items-center border-b border-amber-900/30 pb-1"><div><span class="font-bold text-amber-200/90 font-rustic text-xs block">${usr.nombre || ''}</span><span class="text-[9px] text-amber-500/70">${usr.email || ''}</span></div><span class="bg-stone-950 text-amber-200/40 font-mono text-[9px] px-2 py-0.5 rounded-full border border-amber-900/50">⚪ FUERA</span></div>
                             <div class="text-[10px] text-amber-200/40 italic">Empleado fuera de servicio actualmente.</div>
                             ${botonEliminarHTML}
                         </div>`;
@@ -1838,95 +1697,56 @@
 
             document.getElementById('cant-en-servicio').textContent = enServicioCount;
             document.getElementById('cant-fuera-servicio').textContent = fueraServicioCount;
-
             galeria.innerHTML = htmlEnServicio + htmlFueraServicio;
         }
 
         function forzarSalidaAdmin(uid, nombre) {
             if (confirm(`¿Estás seguro de forzar la salida de turno para ${nombre}?`)) {
-                database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => {
-                    alert(`🔴 Se ha sacado de servicio a ${nombre}.`);
-                }).catch(err => {
-                    alert("❌ Error: " + err.message);
-                });
+                database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => { alert(`🔴 Se ha sacado de servicio a ${nombre}.`); });
             }
         }
-
         function eliminarEmpleadoAdmin(uid, nombre) {
             if (confirm(`⚠️ ¿Estás seguro de eliminar permanentemente al empleado "${nombre}" de la plantilla?`)) {
-                database.ref('usuarios/' + uid).remove().then(() => {
-                    alert(`🗑️ Se ha eliminado a ${nombre} de la plantilla.`);
-                }).catch(err => {
-                    alert("❌ Error: " + err.message);
-                });
+                database.ref('usuarios/' + uid).remove().then(() => { alert(`🗑️ Se ha eliminado a ${nombre} de la plantilla.`); });
             }
         }
 
-        function setPorcentajeVenta(pct) {
-            document.getElementById('input-porcentaje-venta').value = pct;
-            renderizarResumenVenta();
-        }
-
-        // ================= BUSCADORES EN TIEMPO REAL =================
+        // Buscadores
         function filtrarCartaVentas() {
             const filtro = (document.getElementById('buscador-ventas')?.value || '').toLowerCase().trim();
-            
             const filtrarTabla = (tableId) => {
-                const tbody = document.getElementById(tableId);
-                if (!tbody) return;
+                const tbody = document.getElementById(tableId); if (!tbody) return;
                 const filas = tbody.querySelectorAll('tr');
                 filas.forEach(fila => {
                     const texto = fila.textContent.toLowerCase();
-                    if (texto.includes(filtro)) {
-                        fila.style.display = '';
-                    } else {
-                        fila.style.display = 'none';
-                    }
+                    if (texto.includes(filtro)) { fila.style.display = ''; } else { fila.style.display = 'none'; }
                 });
             };
-
-            filtrarTabla('tabla-venta-comida');
-            filtrarTabla('tabla-venta-bebida-normal');
-            filtrarTabla('tabla-venta-bebida-alcohol');
-            filtrarTabla('tabla-venta-menus');
-            filtrarTabla('tabla-venta-platos-npc');
-            filtrarTabla('tabla-venta-productos');
+            filtrarTabla('tabla-venta-comida'); filtrarTabla('tabla-venta-bebida-normal'); filtrarTabla('tabla-venta-bebida-alcohol'); filtrarTabla('tabla-venta-menus'); filtrarTabla('tabla-venta-platos-npc'); filtrarTabla('tabla-venta-productos');
         }
 
         function filtrarCatalogoPedidos() {
             const filtro = (document.getElementById('buscador-catalogo-pedidos')?.value || '').toLowerCase().trim();
-            
             const filtrarTabla = (tableId) => {
-                const tbody = document.getElementById(tableId);
-                if (!tbody) return;
+                const tbody = document.getElementById(tableId); if (!tbody) return;
                 const filas = tbody.querySelectorAll('tr');
                 filas.forEach(fila => {
                     const texto = fila.textContent.toLowerCase();
-                    if (texto.includes(filtro)) {
-                        fila.style.display = '';
-                    } else {
-                        fila.style.display = 'none';
-                    }
+                    if (texto.includes(filtro)) { fila.style.display = ''; } else { fila.style.display = 'none'; }
                 });
             };
-
-            filtrarTabla('tabla-pedidos-eeuu');
-            filtrarTabla('tabla-pedidos-mexico');
+            filtrarTabla('tabla-pedidos-eeuu'); filtrarTabla('tabla-pedidos-mexico');
         }
 
-        // ================= HISTORIAL Y FACTURAS =================
+        // Facturas y Resumen
         function renderizarFacturas() {
             const contenedor = document.getElementById('lista-historial-facturas');
             if (!contenedor) return;
             const filtro = (document.getElementById('buscador-tickets')?.value || '').toLowerCase().trim();
-
             contenedor.innerHTML = '';
             const facturasFiltradas = listaFacturasGlobal.filter(f => {
                 if (!f) return false;
-                const usr = (f.usuario || '').toLowerCase();
-                const codigo = String(f.codigoTicket || '').toLowerCase();
-                const res = (f.resumen || '').toLowerCase();
-                const fec = (f.fecha || '').toLowerCase();
+                const usr = (f.usuario || '').toLowerCase(); const codigo = String(f.codigoTicket || '').toLowerCase(); const res = (f.resumen || '').toLowerCase(); const fec = (f.fecha || '').toLowerCase();
                 return usr.includes(filtro) || codigo.includes(filtro) || res.includes(filtro) || fec.includes(filtro);
             });
 
@@ -1954,15 +1774,11 @@
                             ${usuarioActualData && usuarioActualData.rol === 'admin' ? `<button onclick="eliminarFacturaAdmin('${f.keyFirebase}')" title="Borrar Ticket" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>` : ''}
                         </div>
                     </div>
-                    <div class="text-[10px] text-amber-400/90 font-bold font-rustic bg-stone-950/60 px-2 py-0.5 rounded w-fit border border-amber-900/40">
-                        👤 Atendido por: <span class="text-amber-200">${usr}</span>
-                    </div>
+                    <div class="text-[10px] text-amber-400/90 font-bold font-rustic bg-stone-950/60 px-2 py-0.5 rounded w-fit border border-amber-900/40">👤 Atendido por: <span class="text-amber-200">${usr}</span></div>
                     <div class="text-[11px] text-amber-200/70 leading-tight pt-1">${f.resumen || ''}</div>
                     <div class="text-[9px] text-amber-500/50 pt-1 border-t border-amber-900/20">${f.fecha || ''}</div>`;
 
-                card.querySelector('.btn-copiar-factura').addEventListener('click', () => {
-                    copiarTicketDiscordTexto(usr, idMostrado, f.resumen || '', totalNum, propinaNum);
-                });
+                card.querySelector('.btn-copiar-factura').addEventListener('click', () => { copiarTicketDiscordTexto(usr, idMostrado, f.resumen || '', totalNum, propinaNum); });
                 contenedor.appendChild(card);
             });
         }
@@ -1971,13 +1787,10 @@
             const contenedor = document.getElementById('lista-historial-pedidos');
             if (!contenedor) return;
             const filtro = (document.getElementById('buscador-pedidos')?.value || '').toLowerCase().trim();
-
             contenedor.innerHTML = '';
             const pedidosFiltrados = listaPedidosGlobal.filter(p => {
                 if (!p) return false;
-                const codigo = String(p.codigoPedido || '').toLowerCase();
-                const res = (p.resumen || '').toLowerCase();
-                const fec = (p.fecha || '').toLowerCase();
+                const codigo = String(p.codigoPedido || '').toLowerCase(); const res = (p.resumen || '').toLowerCase(); const fec = (p.fecha || '').toLowerCase();
                 return codigo.includes(filtro) || res.includes(filtro) || fec.includes(filtro);
             });
 
@@ -2004,9 +1817,7 @@
                     <div class="text-[11px] text-amber-200/70 leading-tight pt-1">${p.resumen || ''}</div>
                     <div class="text-[9px] text-amber-500/50 pt-1 border-t border-amber-900/20">${p.fecha || ''}</div>`;
 
-                card.querySelector('.btn-copiar-pedido').addEventListener('click', () => {
-                    copiarTextoPortapapeles(generarFormatoDiscordPedido(idMostrado, p.resumen || '', totalNum));
-                });
+                card.querySelector('.btn-copiar-pedido').addEventListener('click', () => { copiarTextoPortapapeles(generarFormatoDiscordPedido(idMostrado, p.resumen || '', totalNum)); });
                 contenedor.appendChild(card);
             });
         }
@@ -2023,13 +1834,10 @@
             const galeria = document.getElementById('galeria-fichajes-admin');
             if (!galeria) return;
             galeria.innerHTML = '';
-
             const filtro = (document.getElementById('buscador-fichajes-admin')?.value || '').toLowerCase().trim();
             const fichajesFiltrados = listaFichajesGlobal.filter(t => {
                 if (!t) return false;
-                const usr = (t.usuario || '').toLowerCase();
-                const inicio = (t.inicioStr || '').toLowerCase();
-                const fin = (t.finStr || '').toLowerCase();
+                const usr = (t.usuario || '').toLowerCase(); const inicio = (t.inicioStr || '').toLowerCase(); const fin = (t.finStr || '').toLowerCase();
                 return usr.includes(filtro) || inicio.includes(filtro) || fin.includes(filtro);
             });
 
@@ -2041,16 +1849,8 @@
             fichajesFiltrados.forEach(t => {
                 galeria.innerHTML += `
                     <div class="bg-stone-950/80 border border-amber-900/50 p-3 rounded-lg shadow space-y-1">
-                        <div class="flex justify-between items-center border-b border-amber-900/30 pb-1">
-                            <span class="font-bold text-amber-300 font-rustic">👤 ${t.usuario || ''}</span>
-                            <span class="font-mono text-emerald-400 font-bold">${t.horas || 0}h</span>
-                        </div>
-                        <div class="text-[10px] text-amber-200/70 space-y-0.5 pt-1">
-                            <div>⏰ Inicio: ${t.inicioStr || ''}</div>
-                            <div>🏁 Fin: ${t.finStr || ''}</div>
-                            <div>🧾 Tickets: <span class="text-amber-300 font-bold">${t.tickets || 0}</span></div>
-                            <div>💰 Recaudación: <span class="text-amber-400 font-bold">$${numSeguro(t.ventas).toFixed(2)}</span></div>
-                        </div>
+                        <div class="flex justify-between items-center border-b border-amber-900/30 pb-1"><span class="font-bold text-amber-300 font-rustic">👤 ${t.usuario || ''}</span><span class="font-mono text-emerald-400 font-bold">${t.horas || 0}h</span></div>
+                        <div class="text-[10px] text-amber-200/70 space-y-0.5 pt-1"><div>⏰ Inicio: ${t.inicioStr || ''}</div><div>🏁 Fin: ${t.finStr || ''}</div><div>🧾 Tickets: <span class="text-amber-300 font-bold">${t.tickets || 0}</span></div><div>💰 Recaudación: <span class="text-amber-400 font-bold">$${numSeguro(t.ventas).toFixed(2)}</span></div></div>
                         <div class="flex justify-end gap-1 pt-1">
                             <button onclick="copiarFichajeIndividual('${t.usuario}', '${t.inicioStr}', '${t.finStr}', '${t.horas}', '${t.tickets||0}', '${t.ventas||0}')" class="bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-[10px] px-2 py-0.5 rounded border border-indigo-700">📋 Copiar Discord</button>
                             <button onclick="eliminarFichajeAdmin('${t.keyFirebase}')" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
@@ -2061,25 +1861,12 @@
 
         function purgarHistorialFichajesAdmin() {
             if (confirm("⚠️ ¿Estás 100% seguro de que deseas purgar y eliminar TODO el historial de turnos y fichajes de los empleados?")) {
-                database.ref('fichajes_historial').remove().then(() => {
-                    alert("🧹 ¡Historial de turnos purgado correctamente!");
-                }).catch(err => {
-                    alert("❌ Error al purgar: " + err.message);
-                });
+                database.ref('fichajes_historial').remove().then(() => { alert("🧹 ¡Historial de turnos purgado correctamente!"); });
             }
         }
 
         function copiarFichajeIndividual(usr, inicio, fin, hrs, tickets, ventas) {
-            const textoDiscord = "```md\n" +
-                                 "⏱️ **CONTROL DE FICHAJE - THE CORNER**\n" +
-                                 "-----------------------------------\n" +
-                                 "👤 **Empleado:** " + usr + "\n" +
-                                 "⏰ **Inicio:** " + inicio + "\n" +
-                                 "🏁 **Fin:** " + fin + "\n" +
-                                 "⏳ **Horas Trabajadas:** " + hrs + "h\n" +
-                                 "🧾 **Tickets Emitidos:** " + tickets + "\n" +
-                                 "💰 **Beneficio Generado:** $" + numSeguro(ventas).toFixed(2) + "\n" +
-                                 "```";
+            const textoDiscord = "```md\n⏱️ **CONTROL DE FICHAJE - THE CORNER**\n-----------------------------------\n👤 **Empleado:** " + usr + "\n⏰ **Inicio:** " + inicio + "\n🏁 **Fin:** " + fin + "\n⏳ **Horas Trabajadas:** " + hrs + "h\n🧾 **Tickets Emitidos:** " + tickets + "\n💰 **Beneficio Generado:** $" + numSeguro(ventas).toFixed(2) + "\n```";
             copiarTextoPortapapeles(textoDiscord);
         }
 
@@ -2092,11 +1879,7 @@
         function filtrarTickets() { renderizarFacturas(); }
 
         function copiarTextoPortapapeles(texto) {
-            navigator.clipboard.writeText(texto).then(() => {
-                alert("📋 ¡Copiado al portapapeles con éxito! Ya puedes pegarlo en Discord.");
-            }).catch(() => {
-                prompt("Copia este texto manualmente:", texto);
-            });
+            navigator.clipboard.writeText(texto).then(() => { alert("📋 ¡Copiado al portapapeles con éxito! Ya puedes pegarlo en Discord."); }).catch(() => { prompt("Copia este texto manualmente:", texto); });
         }
 
         function generarFormatoDiscord(usuario, codigo, resumenItems, subtotal, descuentoMonto, pct, convenioNombre, totalConsumo, propina, esDeuda) {
@@ -2106,51 +1889,20 @@
             let infoPropina = propina > 0 ? `🪙 **Propina / Bote:** +$${propina.toFixed(2)}\n` : '';
             let totalRealCaja = esDeuda ? 0 : (totalConsumo + propina);
 
-            return "```md\n" +
-                   "🧾 **THE CORNER - SAINT DENIS**\n" +
-                   "👤 **Atendido por:** " + usuario + "\n" +
-                   "📅 **Ticket:** #" + codigo + "\n" +
-                   infoConvenio +
-                   "-----------------------------------\n" +
-                   "📦 **Detalle:**\n" +
-                   lineas + "\n" +
-                   "-----------------------------------\n" +
-                   (pct > 0 ? `💵 **Subtotal:** $${subtotal.toFixed(2)}\n` : '') +
-                   infoDescuento +
-                   (propina > 0 ? `🍽️ **Consumo:** $${totalConsumo.toFixed(2)}\n` + infoPropina : '') +
-                   (esDeuda ? `⚠️ **CARGADO A DEUDA:** $${totalConsumo.toFixed(2)}\n` : `💰 **TOTAL EN CAJA:** $${totalRealCaja.toFixed(2)}\n`) +
-                   "```";
+            return "```md\n🧾 **THE CORNER - SAINT DENIS**\n👤 **Atendido por:** " + usuario + "\n📅 **Ticket:** #" + codigo + "\n" + infoConvenio + "-----------------------------------\n📦 **Detalle:**\n" + lineas + "\n-----------------------------------\n" + (pct > 0 ? `💵 **Subtotal:** $${subtotal.toFixed(2)}\n` : '') + infoDescuento + (propina > 0 ? `🍽️ **Consumo:** $${totalConsumo.toFixed(2)}\n` + infoPropina : '') + (esDeuda ? `⚠️ **CARGADO A DEUDA:** $${totalConsumo.toFixed(2)}\n` : `💰 **TOTAL EN CAJA:** $${totalRealCaja.toFixed(2)}\n`) + "```";
         }
 
         function generarFormatoDiscordPedido(codigo, resumenItems, total) {
             const lineas = resumenItems.split(', ').map(i => "• " + i).join('\n');
-            return "```md\n" +
-                   "📦 **THE CORNER - PEDIDO DE MATERIA PRIMA**\n" +
-                   "📅 **Pedido:** #" + codigo + "\n" +
-                   "-----------------------------------\n" +
-                   "📋 **Detalle:**\n" +
-                   lineas + "\n" +
-                   "-----------------------------------\n" +
-                   "💰 **COSTE TOTAL:** $" + numSeguro(total).toFixed(2) + "\n" +
-                   "```";
+            return "```md\n📦 **THE CORNER - PEDIDO DE MATERIA PRIMA**\n📅 **Pedido:** #" + codigo + "\n-----------------------------------\n📋 **Detalle:**\n" + lineas + "\n-----------------------------------\n💰 **COSTE TOTAL:** $" + numSeguro(total).toFixed(2) + "\n```";
         }
 
         function copiarTicketDiscordTexto(usuario, codigo, resumen, total, propina) {
             const consumoReal = total - propina;
             let infoPropina = propina > 0 ? `🪙 **Propina / Bote:** +$${propina.toFixed(2)}\n` : '';
-            let texto = "```md\n" +
-                        "🧾 **THE CORNER - SAINT DENIS**\n" +
-                        "👤 **Atendido por:** " + usuario + "\n" +
-                        "📅 **Ticket:** #" + codigo + "\n" +
-                        "-----------------------------------\n" +
-                        "📦 **Detalle:**\n" +
-                        resumen.split(', ').map(i => "• " + i).join('\n') + "\n" +
-                        "-----------------------------------\n";
-            if (propina > 0) {
-                texto += `🍽️ **Consumo:** $${consumoReal.toFixed(2)}\n` + infoPropina;
-            }
-            texto += "💰 **TOTAL EN CAJA:** $" + total.toFixed(2) + "\n" +
-                     "```";
+            let texto = "```md\n🧾 **THE CORNER - SAINT DENIS**\n👤 **Atendido por:** " + usuario + "\n📅 **Ticket:** #" + codigo + "\n-----------------------------------\n📦 **Detalle:**\n" + resumen.split(', ').map(i => "• " + i).join('\n') + "\n-----------------------------------\n";
+            if (propina > 0) { texto += `🍽️ **Consumo:** $${consumoReal.toFixed(2)}\n` + infoPropina; }
+            texto += "💰 **TOTAL EN CAJA:** $" + total.toFixed(2) + "\n```";
             copiarTextoPortapapeles(texto);
         }
 
@@ -2166,42 +1918,22 @@
             let totalCoste = 0, resumenArray = [];
             Object.entries(productosEEUU || {}).forEach(([key, item]) => {
                 if (!item) return;
-                const itemId = item.id || key;
-                const est = pedidoEEUU[itemId];
-                if (est && est.cantidad > 0) {
-                    let p = est.tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm);
-                    totalCoste += est.cantidad * p;
-                    resumenArray.push(est.cantidad + "x " + item.nombre + " (EEUU)");
-                }
+                const itemId = item.id || key; const est = pedidoEEUU[itemId];
+                if (est && est.cantidad > 0) { let p = est.tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm); totalCoste += est.cantidad * p; resumenArray.push(est.cantidad + "x " + item.nombre + " (EEUU)"); }
             });
             Object.entries(productosMexico || {}).forEach(([key, item]) => {
                 if (!item) return;
-                const itemId = item.id || key;
-                const est = pedidoMex[itemId];
-                if (est && est.cantidad > 0) {
-                    let p = est.tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm);
-                    totalCoste += est.cantidad * p;
-                    resumenArray.push(est.cantidad + "x " + item.nombre + " (Mex)");
-                }
+                const itemId = item.id || key; const est = pedidoMex[itemId];
+                if (est && est.cantidad > 0) { let p = est.tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm); totalCoste += est.cantidad * p; resumenArray.push(est.cantidad + "x " + item.nombre + " (Mex)"); }
             });
 
-            if (totalCoste === 0) {
-                alert("No hay ningún producto en el pedido actual.");
-                return;
-            }
+            if (totalCoste === 0) { alert("No hay ningún producto en el pedido actual."); return; }
 
             const ahora = new Date();
             const codigoPedido = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0');
             const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
 
-            const pedidoData = {
-                id: Date.now(),
-                codigoPedido: codigoPedido,
-                total: totalCoste,
-                resumen: resumenArray.join(', '),
-                fecha: fechaStr
-            };
-
+            const pedidoData = { id: Date.now(), codigoPedido: codigoPedido, total: totalCoste, resumen: resumenArray.join(', '), fecha: fechaStr };
             database.ref('pedidos_historial').push(pedidoData);
             copiarTextoPortapapeles(generarFormatoDiscordPedido(codigoPedido, resumenArray.join(', '), totalCoste));
             alert("¡Pedido registrado en contabilidad, descontado de la caja y copiado para Discord!");
@@ -2209,584 +1941,116 @@
         }
 
         function generarBalanceSemanalAdmin() {
-            let totalVentas = 0;
-            listaFacturasGlobal.forEach(f => {
-                if (f && !f.esDeudaConvenio) {
-                    totalVentas += numSeguro(f.total);
-                }
-            });
-
-            let totalPedidos = 0;
+            let totalVentas = 0, totalPedidos = 0, totalHorasTrabajadas = 0, totalMermas = 0, totalEventos = 0;
+            listaFacturasGlobal.forEach(f => { if (f && !f.esDeudaConvenio) totalVentas += numSeguro(f.total); });
             listaPedidosGlobal.forEach(p => { if (p) totalPedidos += numSeguro(p.total); });
-
-            let totalHorasTrabajadas = 0;
             listaFichajesGlobal.forEach(t => { if (t) totalHorasTrabajadas += numSeguro(t.horas); });
+            listaMermasGlobal.forEach(m => { if (m) totalMermas += numSeguro(m.monto); });
+            listaEventosGlobal.forEach(ev => { if (ev) totalEventos += numSeguro(ev.monto); });
 
-            const dineroEnCaja = CAJA_INICIAL_BASE + totalVentas - totalPedidos;
+            const dineroEnCaja = CAJA_INICIAL_BASE + totalVentas - totalPedidos - totalMermas - totalEventos;
 
-            const textoDiscord = "```md\n" +
-                                 "📊 **BALANCE SEMANAL - THE CORNER**\n" +
-                                 "-----------------------------------\n" +
-                                 "🪙 **Caja Base:** $" + CAJA_INICIAL_BASE.toFixed(2) + "\n" +
-                                 "💰 **Total Entradas Caja (Ventas+Propinas):** $" + totalVentas.toFixed(2) + "\n" +
-                                 "📦 **Total Pedidos:** $" + totalPedidos.toFixed(2) + "\n" +
-                                 "⏳ **Horas Totales:** " + totalHorasTrabajadas.toFixed(2) + "h\n" +
-                                 "-----------------------------------\n" +
-                                 "💵 **DINERO EN CAJA:** $" + dineroEnCaja.toFixed(2) + "\n" +
-                                 "```";
-
+            const textoDiscord = "```md\n📊 **BALANCE SEMANAL - THE CORNER**\n-----------------------------------\n🪙 **Caja Base Inicial:** $" + CAJA_INICIAL_BASE.toFixed(2) + "\n💰 **Entradas (Ventas+Propinas):** +$" + totalVentas.toFixed(2) + "\n📦 **Salidas (Pedidos Materia Prima):** -$" + totalPedidos.toFixed(2) + "\n📉 **Salidas (Mermas y Accidentes):** -$" + totalMermas.toFixed(2) + "\n🎭 **Salidas (Gastos Eventos):** -$" + totalEventos.toFixed(2) + "\n⏳ **Horas Totales Trabajadas:** " + totalHorasTrabajadas.toFixed(2) + "h\n-----------------------------------\n💵 **DINERO REAL EN CAJA:** $" + dineroEnCaja.toFixed(2) + "\n```";
             copiarTextoPortapapeles(textoDiscord);
         }
 
-        function eliminarFacturaAdmin(keyFirebase) {
-            if (confirm("¿Estás seguro de eliminar este ticket?")) {
-                database.ref('facturas/' + keyFirebase).remove();
-            }
-        }
-
-        function eliminarLicenciaAdmin(keyFirebase) {
-            if (confirm("¿Estás seguro de eliminar esta licencia?")) {
-                database.ref('licencias/' + keyFirebase).remove();
-            }
-        }
-
-        function purgaHistorialAdmin() {
-            if (confirm("⚠️ ¿Estás 100% seguro de que deseas purgar y eliminar TODAS las facturas registradas?")) {
-                database.ref('facturas').remove();
-                alert("¡Purga completada! Historial limpio.");
-            }
-        }
-
-        function ordenarArrayPorNombre(obj) {
-            return Object.entries(obj || {}).filter(([, item]) => item && typeof item === 'object').map(([key, item]) => ({
-                ...item,
-                id: item.id || key,
-                nombre: item.nombre || 'Sin nombre'
-            })).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
-        }
+        function setPorcentajeVenta(pct) { document.getElementById('input-porcentaje-venta').value = pct; renderizarResumenVenta(); }
+        function eliminarFacturaAdmin(keyFirebase) { if (confirm("¿Estás seguro de eliminar este ticket?")) { database.ref('facturas/' + keyFirebase).remove(); } }
+        function eliminarLicenciaAdmin(keyFirebase) { if (confirm("¿Estás seguro de eliminar esta licencia?")) { database.ref('licencias/' + keyFirebase).remove(); } }
+        function purgaHistorialAdmin() { if (confirm("⚠️ ¿Estás 100% seguro de que deseas purgar y eliminar TODAS las facturas registradas?")) { database.ref('facturas').remove(); alert("¡Purga completada! Historial limpio."); } }
+        function ordenarArrayPorNombre(obj) { return Object.entries(obj || {}).filter(([, item]) => item && typeof item === 'object').map(([key, item]) => ({ ...item, id: item.id || key, nombre: item.nombre || 'Sin nombre' })).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })); }
 
         function renderizarTodo() {
             try {
-                renderTablaVenta('tabla-venta-comida', comida, ventaComida, 'comida');
-                renderTablaVenta('tabla-venta-bebida-normal', bebidaNormal, ventaBebidaNormal, 'bebida_normal');
-                renderTablaVenta('tabla-venta-bebida-alcohol', bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
-                renderTablaVenta('tabla-venta-menus', menus, ventaMenus, 'menu');
-                renderTablaVenta('tabla-venta-platos-npc', platosNPC, ventaPlatosNPC, 'platos_npc');
-                renderTablaVenta('tabla-venta-productos', productos, ventaProductos, 'productos');
-
-                renderTablaGestion('tabla-gestion-comida', comida, 'comida');
-                renderTablaGestionBebida('tabla-gestion-bebida-normal', bebidaNormal, 'bebida_normal');
-                renderTablaGestionBebida('tabla-gestion-bebida-alcohol', bebidaAlcohol, 'bebida_alcohol');
-                renderTablaGestionMenu('tabla-gestion-menus', menus);
-                renderTablaGestion('tabla-gestion-platos-npc', platosNPC, 'platos_npc');
-                renderTablaGestion('tabla-gestion-productos', productos, 'productos_varios');
-
-                renderTablaPedidos('tabla-pedidos-eeuu', productosEEUU, pedidoEEUU, 'eeuu');
-                renderTablaPedidos('tabla-pedidos-mexico', productosMexico, pedidoMex, 'mex');
-
-                renderizarResumenVenta();
-                renderizarResumenPedidos();
-
-                filtrarCartaVentas();
-                filtrarCatalogoPedidos();
-            } catch (err) {
-                console.error("Error al renderizar tablas:", err);
-            }
+                renderTablaVenta('tabla-venta-comida', comida, ventaComida, 'comida'); renderTablaVenta('tabla-venta-bebida-normal', bebidaNormal, ventaBebidaNormal, 'bebida_normal'); renderTablaVenta('tabla-venta-bebida-alcohol', bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol'); renderTablaVenta('tabla-venta-menus', menus, ventaMenus, 'menu'); renderTablaVenta('tabla-venta-platos-npc', platosNPC, ventaPlatosNPC, 'platos_npc'); renderTablaVenta('tabla-venta-productos', productos, ventaProductos, 'productos');
+                renderTablaGestion('tabla-gestion-comida', comida, 'comida'); renderTablaGestionBebida('tabla-gestion-bebida-normal', bebidaNormal, 'bebida_normal'); renderTablaGestionBebida('tabla-gestion-bebida-alcohol', bebidaAlcohol, 'bebida_alcohol'); renderTablaGestionMenu('tabla-gestion-menus', menus); renderTablaGestion('tabla-gestion-platos-npc', platosNPC, 'platos_npc'); renderTablaGestion('tabla-gestion-productos', productos, 'productos_varios');
+                renderTablaPedidos('tabla-pedidos-eeuu', productosEEUU, pedidoEEUU, 'eeuu'); renderTablaPedidos('tabla-pedidos-mexico', productosMexico, pedidoMex, 'mex');
+                renderizarResumenVenta(); renderizarResumenPedidos(); filtrarCartaVentas(); filtrarCatalogoPedidos();
+            } catch (err) { console.error("Error al renderizar tablas:", err); }
         }
 
         function renderTablaVenta(elementId, items, estadoObj, tipo) {
-            const tbody = document.getElementById(elementId);
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            const listaOrdenada = ordenarArrayPorNombre(items);
-
-            if (listaOrdenada.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-amber-200/40 italic">No hay productos registrados</td></tr>';
-                return;
-            }
-
+            const tbody = document.getElementById(elementId); if (!tbody) return; tbody.innerHTML = ''; const listaOrdenada = ordenarArrayPorNombre(items);
+            if (listaOrdenada.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-amber-200/40 italic">No hay productos registrados</td></tr>'; return; }
             listaOrdenada.forEach(item => {
-                const est = estadoObj[item.id] || { cantidad: 0, tarifa: 'norm' };
-                const pMin = numSeguro(item.pMin);
-                const pNorm = numSeguro(item.pNorm);
-                const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2);
-
-                let p = 0;
-                if (tipo === 'menu') {
-                    p = est.tarifa === 'min' ? pMin : pNorm;
-                } else {
-                    p = est.tarifa === 'min' ? pMin : (est.tarifa === 'med' ? pMed : pNorm);
-                }
+                const est = estadoObj[item.id] || { cantidad: 0, tarifa: 'norm' }; const pMin = numSeguro(item.pMin); const pNorm = numSeguro(item.pNorm); const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2);
+                let p = 0; if (tipo === 'menu') { p = est.tarifa === 'min' ? pMin : pNorm; } else { p = est.tarifa === 'min' ? pMin : (est.tarifa === 'med' ? pMed : pNorm); }
                 let sub = est.cantidad * p;
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-amber-900/20">
-                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
-                        <td class="p-2 text-center">
-                            <select onchange="cambiarTarifaVenta('${tipo}', '${item.id}', this.value)" class="rounded text-[11px] p-1">
-                                <option value="min" ${est.tarifa === 'min' ? 'selected' : ''}>Mín ($${pMin.toFixed(2)})</option>
-                                ${tipo !== 'menu' ? `<option value="med" ${est.tarifa === 'med' ? 'selected' : ''}>Med ($${pMed.toFixed(2)})</option>` : ''}
-                                <option value="norm" ${est.tarifa === 'norm' ? 'selected' : ''}>Máx ($${pNorm.toFixed(2)})</option>
-                            </select>
-                        </td>
-                        <td class="p-2 text-center">
-                            <input type="number" min="0" value="${est.cantidad}" onchange="cambiarCantVenta('${tipo}', '${item.id}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
-                        </td>
-                        <td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td>
-                    </tr>`;
+                tbody.innerHTML += `<tr class="hover:bg-amber-900/20"><td class="p-2 font-semibold text-amber-100">${item.nombre}</td><td class="p-2 text-center"><select onchange="cambiarTarifaVenta('${tipo}', '${item.id}', this.value)" class="rounded text-[11px] p-1"><option value="min" ${est.tarifa === 'min' ? 'selected' : ''}>Mín ($${pMin.toFixed(2)})</option>${tipo !== 'menu' ? `<option value="med" ${est.tarifa === 'med' ? 'selected' : ''}>Med ($${pMed.toFixed(2)})</option>` : ''}<option value="norm" ${est.tarifa === 'norm' ? 'selected' : ''}>Máx ($${pNorm.toFixed(2)})</option></select></td><td class="p-2 text-center"><input type="number" min="0" value="${est.cantidad}" onchange="cambiarCantVenta('${tipo}', '${item.id}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs"></td><td class="p-2 text-right font-mono font-bold text-amber-400">$${sub.toFixed(2)}</td></tr>`;
             });
         }
 
         function renderTablaGestion(elementId, items, dbPath) {
-            const tbody = document.getElementById(elementId);
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            const listaOrdenada = ordenarArrayPorNombre(items);
-
-            if (listaOrdenada.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay elementos guardados</td></tr>';
-                return;
-            }
-
+            const tbody = document.getElementById(elementId); if (!tbody) return; tbody.innerHTML = ''; const listaOrdenada = ordenarArrayPorNombre(items);
+            if (listaOrdenada.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay elementos guardados</td></tr>'; return; }
             listaOrdenada.forEach(item => {
-                const pMin = numSeguro(item.pMin);
-                const pNorm = numSeguro(item.pNorm);
-                const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2);
-                tbody.innerHTML += `
-                    <tr class="hover:bg-amber-900/20">
-                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
-                        <td class="p-2 text-center text-[10px] text-amber-200/70">$${pMin.toFixed(2)} / $${pMed.toFixed(2)} / $${pNorm.toFixed(2)}</td>
-                        <td class="p-2 text-center"><button onclick="eliminarItem('${dbPath}', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
-                    </tr>`;
+                const pMin = numSeguro(item.pMin); const pNorm = numSeguro(item.pNorm); const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2);
+                tbody.innerHTML += `<tr class="hover:bg-amber-900/20"><td class="p-2 font-semibold text-amber-100">${item.nombre}</td><td class="p-2 text-center text-[10px] text-amber-200/70">$${pMin.toFixed(2)} / $${pMed.toFixed(2)} / $${pNorm.toFixed(2)}</td><td class="p-2 text-center"><button onclick="eliminarItem('${dbPath}', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td></tr>`;
             });
         }
 
-        function renderTablaGestionBebida(elementId, items, dbPath) {
-            renderTablaGestion(elementId, items, dbPath);
-        }
-
+        function renderTablaGestionBebida(elementId, items, dbPath) { renderTablaGestion(elementId, items, dbPath); }
         function renderTablaGestionMenu(elementId, items) {
-            const tbody = document.getElementById(elementId);
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            const listaOrdenada = ordenarArrayPorNombre(items);
-
-            if (listaOrdenada.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay menús guardados</td></tr>';
-                return;
-            }
-
-            listaOrdenada.forEach(item => {
-                const pMin = numSeguro(item.pMin);
-                const pNorm = numSeguro(item.pNorm);
-                tbody.innerHTML += `
-                    <tr class="hover:bg-amber-900/20">
-                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
-                        <td class="p-2 text-center text-[10px] text-amber-200/70">$${pMin.toFixed(2)} / $${pNorm.toFixed(2)}</td>
-                        <td class="p-2 text-center"><button onclick="eliminarItem('menus', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td>
-                    </tr>`;
-            });
+            const tbody = document.getElementById(elementId); if (!tbody) return; tbody.innerHTML = ''; const listaOrdenada = ordenarArrayPorNombre(items);
+            if (listaOrdenada.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay menús guardados</td></tr>'; return; }
+            listaOrdenada.forEach(item => { const pMin = numSeguro(item.pMin); const pNorm = numSeguro(item.pNorm); tbody.innerHTML += `<tr class="hover:bg-amber-900/20"><td class="p-2 font-semibold text-amber-100">${item.nombre}</td><td class="p-2 text-center text-[10px] text-amber-200/70">$${pMin.toFixed(2)} / $${pNorm.toFixed(2)}</td><td class="p-2 text-center"><button onclick="eliminarItem('menus', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td></tr>`; });
         }
 
         function renderTablaPedidos(elementId, items, estadoObj, region) {
-            const tbody = document.getElementById(elementId);
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            const dbPath = region === 'eeuu' ? 'pedidos_eeuu' : 'pedidos_mexico';
-            const listaOrdenada = ordenarArrayPorNombre(items);
-
+            const tbody = document.getElementById(elementId); if (!tbody) return; tbody.innerHTML = ''; const dbPath = region === 'eeuu' ? 'pedidos_eeuu' : 'pedidos_mexico'; const listaOrdenada = ordenarArrayPorNombre(items);
             listaOrdenada.forEach(item => {
-                const itemId = item.id;
-                const est = estadoObj[itemId] || { cantidad: 0, tarifa: 'min' };
-                const pMin = numSeguro(item.pMin);
-                const pNorm = numSeguro(item.pNorm);
-                let p = est.tarifa === 'min' ? pMin : pNorm;
-                let sub = est.cantidad * p;
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-amber-900/20">
-                        <td class="p-2 font-semibold text-amber-100">${item.nombre}</td>
-                        <td class="p-2 text-center">
-                            <select onchange="cambiarTarifaPedido('${region}', '${itemId}', this.value)" class="rounded text-[11px] p-1">
-                                <option value="min" ${est.tarifa === 'min' ? 'selected' : ''}>Mín ($${pMin.toFixed(2)})</option>
-                                <option value="norm" ${est.tarifa === 'norm' ? 'selected' : ''}>Máx ($${pNorm.toFixed(2)})</option>
-                            </select>
-                        </td>
-                        <td class="p-2 text-center">
-                            <input type="number" min="0" value="${est.cantidad}" oninput="cambiarCantPedido('${region}', '${itemId}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs">
-                        </td>
-                        <td class="p-2 text-right font-mono font-bold text-amber-400" id="subtotal-${region}-${itemId}">$${sub.toFixed(2)}</td>
-                        <td class="p-2 text-center">
-                            <button onclick="eliminarItem('${dbPath}', '${itemId}')" title="Eliminar Producto" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
-                        </td>
-                    </tr>`;
+                const itemId = item.id; const est = estadoObj[itemId] || { cantidad: 0, tarifa: 'min' }; const pMin = numSeguro(item.pMin); const pNorm = numSeguro(item.pNorm);
+                let p = est.tarifa === 'min' ? pMin : pNorm; let sub = est.cantidad * p;
+                tbody.innerHTML += `<tr class="hover:bg-amber-900/20"><td class="p-2 font-semibold text-amber-100">${item.nombre}</td><td class="p-2 text-center"><select onchange="cambiarTarifaPedido('${region}', '${itemId}', this.value)" class="rounded text-[11px] p-1"><option value="min" ${est.tarifa === 'min' ? 'selected' : ''}>Mín ($${pMin.toFixed(2)})</option><option value="norm" ${est.tarifa === 'norm' ? 'selected' : ''}>Máx ($${pNorm.toFixed(2)})</option></select></td><td class="p-2 text-center"><input type="number" min="0" value="${est.cantidad}" oninput="cambiarCantPedido('${region}', '${itemId}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs"></td><td class="p-2 text-right font-mono font-bold text-amber-400" id="subtotal-${region}-${itemId}">$${sub.toFixed(2)}</td><td class="p-2 text-center"><button onclick="eliminarItem('${dbPath}', '${itemId}')" title="Eliminar Producto" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button></td></tr>`;
             });
-        }
-
-        function cambiarCantVenta(tipo, id, val) {
-            let obj;
-            if (tipo === 'comida') obj = ventaComida;
-            else if (tipo === 'bebida_normal') obj = ventaBebidaNormal;
-            else if (tipo === 'bebida_alcohol') obj = ventaBebidaAlcohol;
-            else if (tipo === 'menu') obj = ventaMenus;
-            else if (tipo === 'platos_npc') obj = ventaPlatosNPC;
-            else obj = ventaProductos;
-
-            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' };
-            obj[id].cantidad = Math.max(0, parseInt(val) || 0);
-            renderizarTodo();
-        }
-
-        function cambiarTarifaVenta(tipo, id, tarifa) {
-            let obj;
-            if (tipo === 'comida') obj = ventaComida;
-            else if (tipo === 'bebida_normal') obj = ventaBebidaNormal;
-            else if (tipo === 'bebida_alcohol') obj = ventaBebidaAlcohol;
-            else if (tipo === 'menu') obj = ventaMenus;
-            else if (tipo === 'platos_npc') obj = ventaPlatosNPC;
-            else obj = ventaProductos;
-
-            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' };
-            obj[id].tarifa = tarifa;
-            renderizarTodo();
-        }
-
-        function cambiarCantPedido(region, id, val) {
-            let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex;
-            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' };
-            const cant = Math.max(0, parseInt(val) || 0);
-            obj[id].cantidad = cant;
-
-            const items = region === 'eeuu' ? productosEEUU : productosMexico;
-            const item = items[id];
-            if (item) {
-                let p = obj[id].tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm);
-                let sub = cant * p;
-                const subEl = document.getElementById(`subtotal-${region}-${id}`);
-                if (subEl) subEl.textContent = `$${sub.toFixed(2)}`;
-            }
-
-            renderizarResumenPedidos();
-        }
-
-        function cambiarTarifaPedido(region, id, tarifa) {
-            let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex;
-            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' };
-            obj[id].tarifa = tarifa;
-
-            const items = region === 'eeuu' ? productosEEUU : productosMexico;
-            const item = items[id];
-            if (item) {
-                let p = tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm);
-                let sub = obj[id].cantidad * p;
-                const subEl = document.getElementById(`subtotal-${region}-${id}`);
-                if (subEl) subEl.textContent = `$${sub.toFixed(2)}`;
-            }
-
-            renderizarResumenPedidos();
-        }
-
-        function renderizarResumenVenta() {
-            const contenedor = document.getElementById('lista-resumen-venta');
-            if (!contenedor) return;
-            contenedor.innerHTML = '';
-            let subtotalBase = 0, hay = false;
-
-            const sumarAlResumen = (items, estadoObj, tipo) => {
-                ordenarArrayPorNombre(items).forEach(item => {
-                    const est = estadoObj[item.id];
-                    if (est && est.cantidad > 0) {
-                        hay = true;
-                        const pMin = numSeguro(item.pMin);
-                        const pNorm = numSeguro(item.pNorm);
-                        const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2);
-                        let p = tipo === 'menu' ? (est.tarifa === 'min' ? pMin : pNorm) : (est.tarifa === 'min' ? pMin : (est.tarifa === 'med' ? pMed : pNorm));
-                        let sub = est.cantidad * p;
-                        subtotalBase += sub;
-                        contenedor.innerHTML += `<div class="flex justify-between border-b border-amber-900/40 pb-1"><span>${item.nombre} (${est.cantidad})</span><span class="font-mono">$${sub.toFixed(2)}</span></div>`;
-                    }
-                });
-            };
-
-            sumarAlResumen(comida, ventaComida, 'comida');
-            sumarAlResumen(bebidaNormal, ventaBebidaNormal, 'bebida_normal');
-            sumarAlResumen(bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
-            sumarAlResumen(menus, ventaMenus, 'menu');
-            sumarAlResumen(platosNPC, ventaPlatosNPC, 'platos_npc');
-            sumarAlResumen(productos, ventaProductos, 'productos');
-
-            if (!hay) contenedor.innerHTML = '<p class="text-amber-200/40 italic text-center py-3">No hay productos seleccionados.</p>';
-
-            const pctInput = parseFloat(document.getElementById('input-porcentaje-venta').value);
-            const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
-            const descuentoMonto = subtotalBase * (pct / 100);
-            const totalVenta = Math.max(0, subtotalBase - descuentoMonto);
-
-            const efectivoInput = parseFloat(document.getElementById('input-efectivo-entregado').value);
-            const efectivoEntregado = isNaN(efectivoInput) ? 0 : efectivoInput;
-            const divPropina = document.getElementById('info-propina-calculada');
-            const spanPropina = document.getElementById('valor-propina-calc');
-
-            let propina = 0;
-            if (efectivoEntregado > totalVenta && totalVenta > 0) {
-                propina = efectivoEntregado - totalVenta;
-                if (divPropina && spanPropina) {
-                    spanPropina.textContent = `+$${propina.toFixed(2)}`;
-                    divPropina.classList.remove('hidden');
-                }
-            } else {
-                if (divPropina) divPropina.classList.add('hidden');
-            }
-
-            const totalIngresadoCaja = totalVenta + propina;
-
-            document.getElementById('subtotal-base-venta').textContent = `$${subtotalBase.toFixed(2)}`;
-            document.getElementById('descuento-monto-venta').textContent = `-$${descuentoMonto.toFixed(2)} (${pct}%)`;
-            
-            const elTotal = document.getElementById('total-precio-venta');
-            if (elTotal) {
-                if (propina > 0) {
-                    elTotal.textContent = `$${totalIngresadoCaja.toFixed(2)} (incl. $${propina.toFixed(2)} propina)`;
-                    elTotal.className = "text-base md:text-xl font-black text-emerald-400 font-rustic pt-1";
-                } else {
-                    elTotal.textContent = `$${totalIngresadoCaja.toFixed(2)}`;
-                    elTotal.className = "text-xl md:text-2xl font-black text-amber-400 font-rustic pt-1";
-                }
-            }
-        }
-
-        function renderizarResumenPedidos() {
-            let totalCoste = 0;
-            ordenarArrayPorNombre(productosEEUU).forEach(item => {
-                const est = pedidoEEUU[item.id];
-                if (est && est.cantidad > 0) {
-                    let p = est.tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm);
-                    totalCoste += est.cantidad * p;
-                }
-            });
-            ordenarArrayPorNombre(productosMexico).forEach(item => {
-                const est = pedidoMex[item.id];
-                if (est && est.cantidad > 0) {
-                    let p = est.tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm);
-                    totalCoste += est.cantidad * p;
-                }
-            });
-            const el = document.getElementById('total-coste-pedidos');
-            if (el) el.textContent = `$${totalCoste.toFixed(2)}`;
-        }
-
-        function limpiarPedidos() {
-            pedidoEEUU = {}; pedidoMex = {};
-            renderizarTodo();
         }
 
         document.getElementById('btn-registrar-venta').addEventListener('click', () => {
-            let subtotalBase = 0, resumenArray = [];
-            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
+            let subtotalBase = 0, resumenArray = []; const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
+            const recolectarVenta = (items, estadoObj, tipo) => { ordenarArrayPorNombre(items).forEach(item => { const est = estadoObj[item.id]; if (est && est.cantidad > 0) { const pMin = numSeguro(item.pMin); const pNorm = numSeguro(item.pNorm); const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2); let p = tipo === 'menu' ? (est.tarifa === 'min' ? pMin : pNorm) : (est.tarifa === 'min' ? pMin : (est.tarifa === 'med' ? pMed : pNorm)); subtotalBase += est.cantidad * p; resumenArray.push(est.cantidad + "x " + item.nombre); } }); };
+            recolectarVenta(comida, ventaComida, 'comida'); recolectarVenta(bebidaNormal, ventaBebidaNormal, 'bebida_normal'); recolectarVenta(bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol'); recolectarVenta(menus, ventaMenus, 'menu'); recolectarVenta(platosNPC, ventaPlatosNPC, 'platos_npc'); recolectarVenta(productos, ventaProductos, 'productos');
+            if (subtotalBase === 0) { alert("No hay ningún producto en la venta actual."); return; }
 
-            const recolectarVenta = (items, estadoObj, tipo) => {
-                ordenarArrayPorNombre(items).forEach(item => {
-                    const est = estadoObj[item.id];
-                    if (est && est.cantidad > 0) {
-                        const pMin = numSeguro(item.pMin);
-                        const pNorm = numSeguro(item.pNorm);
-                        const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2);
-                        let p = tipo === 'menu' ? (est.tarifa === 'min' ? pMin : pNorm) : (est.tarifa === 'min' ? pMin : (est.tarifa === 'med' ? pMed : pNorm));
-                        subtotalBase += est.cantidad * p;
-                        resumenArray.push(est.cantidad + "x " + item.nombre);
-                    }
-                });
-            };
+            const pctInput = parseFloat(document.getElementById('input-porcentaje-venta').value); const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
+            const descuentoMonto = subtotalBase * (pct / 100); const totalVenta = Math.max(0, subtotalBase - descuentoMonto);
+            const idConvenioSel = document.getElementById('select-convenio-venta').value; const esDeudaConvenio = Boolean(idConvenioSel);
+            const convenioObjeto = idConvenioSel ? conveniosGlobal[idConvenioSel] : null; const convenioNombre = convenioObjeto ? convenioObjeto.nombre : '';
 
-            recolectarVenta(comida, ventaComida, 'comida');
-            recolectarVenta(bebidaNormal, ventaBebidaNormal, 'bebida_normal');
-            recolectarVenta(bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
-            recolectarVenta(menus, ventaMenus, 'menu');
-            recolectarVenta(platosNPC, ventaPlatosNPC, 'platos_npc');
-            recolectarVenta(productos, ventaProductos, 'productos');
-
-            if (subtotalBase === 0) {
-                alert("No hay ningún producto en la venta actual.");
-                return;
-            }
-
-            const pctInput = parseFloat(document.getElementById('input-porcentaje-venta').value);
-            const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
-            const descuentoMonto = subtotalBase * (pct / 100);
-            const totalVenta = Math.max(0, subtotalBase - descuentoMonto);
-
-            const idConvenioSel = document.getElementById('select-convenio-venta').value;
-            const esDeudaConvenio = Boolean(idConvenioSel);
-            const convenioObjeto = idConvenioSel ? conveniosGlobal[idConvenioSel] : null;
-            const convenioNombre = convenioObjeto ? convenioObjeto.nombre : '';
-
-            const efectivoInput = parseFloat(document.getElementById('input-efectivo-entregado').value);
-            const efectivoEntregado = isNaN(efectivoInput) ? 0 : efectivoInput;
+            const efectivoInput = parseFloat(document.getElementById('input-efectivo-entregado').value); const efectivoEntregado = isNaN(efectivoInput) ? 0 : efectivoInput;
             const propina = (!esDeudaConvenio && efectivoEntregado > totalVenta) ? (efectivoEntregado - totalVenta) : 0;
             const totalIngresadoCaja = esDeudaConvenio ? 0 : (totalVenta + propina);
-
-            const ahora = new Date();
-            const codigoTicket = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0');
+            const ahora = new Date(); const codigoTicket = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0');
 
             let resumenFinalStr = resumenArray.join(', ');
             if (convenioNombre) resumenFinalStr += ` [Convenio: ${convenioNombre}${esDeudaConvenio ? ' (A Cuenta/Deuda)' : ''}]`;
             if (pct > 0) resumenFinalStr += ` [Desc: ${pct}%]`;
             if (propina > 0) resumenFinalStr += ` [Propina: +$${propina.toFixed(2)}]`;
 
-            const facturaData = {
-                id: Date.now(),
-                codigoTicket: codigoTicket,
-                usuario: usuarioNombre,
-                total: totalIngresadoCaja,
-                consumo: totalVenta,
-                propina: propina,
-                esDeudaConvenio: esDeudaConvenio,
-                convenioNombre: convenioNombre,
-                resumen: resumenFinalStr,
-                fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
-            };
-
+            const facturaData = { id: Date.now(), codigoTicket: codigoTicket, usuario: usuarioNombre, total: totalIngresadoCaja, consumo: totalVenta, propina: propina, esDeudaConvenio: esDeudaConvenio, convenioNombre: convenioNombre, resumen: resumenFinalStr, fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString() };
             database.ref('facturas').push(facturaData);
 
             if (esDeudaConvenio && idConvenioSel && convenioObjeto) {
-                const nuevaDeuda = numSeguro(convenioObjeto.saldoDeuda) + totalVenta;
-                const idConsumo = Date.now().toString();
-                const consumoItem = {
-                    id: idConsumo,
-                    descripcion: resumenArray.join(', '),
-                    monto: totalVenta,
-                    usuario: usuarioNombre,
-                    fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
-                };
-                database.ref(`convenios/${idConvenioSel}/saldoDeuda`).set(nuevaDeuda);
-                database.ref(`convenios/${idConvenioSel}/historialConsumos/${idConsumo}`).set(consumoItem);
+                const nuevaDeuda = numSeguro(convenioObjeto.saldoDeuda) + totalVenta; const idConsumo = Date.now().toString();
+                const consumoItem = { id: idConsumo, descripcion: resumenArray.join(', '), monto: totalVenta, usuario: usuarioNombre, fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString() };
+                database.ref(`convenios/${idConvenioSel}/saldoDeuda`).set(nuevaDeuda); database.ref(`convenios/${idConvenioSel}/historialConsumos/${idConsumo}`).set(consumoItem);
             }
-
             copiarTextoPortapapeles(generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), subtotalBase, descuentoMonto, pct, convenioNombre, totalVenta, propina, esDeudaConvenio));
-
             ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {};
-            document.getElementById('input-porcentaje-venta').value = '0';
-            document.getElementById('select-convenio-venta').value = '';
-            document.getElementById('input-efectivo-entregado').value = '';
-            renderizarTodo();
+            document.getElementById('input-porcentaje-venta').value = '0'; document.getElementById('select-convenio-venta').value = ''; document.getElementById('input-efectivo-entregado').value = ''; renderizarTodo();
         });
 
-        document.getElementById('btn-limpiar-venta').addEventListener('click', () => {
-            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {};
-            document.getElementById('input-porcentaje-venta').value = '0';
-            document.getElementById('select-convenio-venta').value = '';
-            document.getElementById('input-efectivo-entregado').value = '';
-            renderizarTodo();
-        });
+        document.getElementById('btn-limpiar-venta').addEventListener('click', () => { ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {}; document.getElementById('input-porcentaje-venta').value = '0'; document.getElementById('select-convenio-venta').value = ''; document.getElementById('input-efectivo-entregado').value = ''; renderizarTodo(); });
 
-        document.getElementById('form-nuevo-pedido-eeuu').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = 'e_' + Date.now().toString();
-            database.ref('pedidos_eeuu/' + id).set({
-                id, nombre: document.getElementById('p-eeuu-nombre').value.trim(),
-                pMin: parseFloat(document.getElementById('p-eeuu-min').value),
-                pNorm: parseFloat(document.getElementById('p-eeuu-norm').value)
-            });
-            this.reset();
-            alert("¡Producto añadido a EEUU!");
-        });
+        document.getElementById('form-nuevo-pedido-eeuu').addEventListener('submit', function(e) { e.preventDefault(); const id = 'e_' + Date.now().toString(); database.ref('pedidos_eeuu/' + id).set({ id, nombre: document.getElementById('p-eeuu-nombre').value.trim(), pMin: parseFloat(document.getElementById('p-eeuu-min').value), pNorm: parseFloat(document.getElementById('p-eeuu-norm').value) }); this.reset(); alert("¡Producto añadido a EEUU!"); });
+        document.getElementById('form-nuevo-pedido-mex').addEventListener('submit', function(e) { e.preventDefault(); const id = 'm_' + Date.now().toString(); database.ref('pedidos_mexico/' + id).set({ id, nombre: document.getElementById('p-mex-nombre').value.trim(), pMin: parseFloat(document.getElementById('p-mex-min').value), pNorm: parseFloat(document.getElementById('p-mex-norm').value) }); this.reset(); alert("¡Producto añadido a México!"); });
+        document.getElementById('form-nueva-licencia').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('licencias/' + id).set({ id, titular: document.getElementById('licencia-titular').value.trim(), tipo: document.getElementById('licencia-tipo').value, url: document.getElementById('licencia-url').value.trim() }); this.reset(); alert("¡Licencia archivada correctamente!"); });
+        document.getElementById('form-nueva-comida').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('comida/' + id).set({ id, nombre: document.getElementById('comida-nombre').value.trim(), pMin: parseFloat(document.getElementById('comida-min').value), pMed: parseFloat(document.getElementById('comida-med').value), pNorm: parseFloat(document.getElementById('comida-norm').value) }); this.reset(); alert("¡Plato añadido!"); });
+        document.getElementById('form-nueva-bebida').addEventListener('submit', function(e) { e.preventDefault(); const tipoBebida = document.getElementById('bebida-tipo').value; const dbRef = tipoBebida === 'normal' ? 'bebida_normal' : 'bebida_alcohol'; const id = Date.now().toString(); database.ref(dbRef + '/' + id).set({ id, nombre: document.getElementById('bebida-nombre').value.trim(), pMin: parseFloat(document.getElementById('bebida-min').value), pMed: parseFloat(document.getElementById('bebida-med').value), pNorm: parseFloat(document.getElementById('bebida-norm').value) }); this.reset(); alert("¡Bebida añadida!"); });
+        document.getElementById('form-nuevo-menu').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('menus/' + id).set({ id, nombre: document.getElementById('menu-nombre').value.trim(), pMin: parseFloat(document.getElementById('menu-min').value), pNorm: parseFloat(document.getElementById('menu-norm').value) }); this.reset(); alert("¡Menú añadido!"); });
+        document.getElementById('form-nuevo-plato-npc').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('platos_npc/' + id).set({ id, nombre: document.getElementById('plato-npc-nombre').value.trim(), pMin: parseFloat(document.getElementById('plato-npc-min').value), pMed: parseFloat(document.getElementById('plato-npc-med').value), pNorm: parseFloat(document.getElementById('plato-npc-norm').value) }); this.reset(); alert("¡Plato NPC añadido!"); });
+        document.getElementById('form-nuevo-producto').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('productos_varios/' + id).set({ id, nombre: document.getElementById('producto-nombre').value.trim(), pMin: parseFloat(document.getElementById('producto-min').value), pMed: parseFloat(document.getElementById('producto-med').value), pNorm: parseFloat(document.getElementById('producto-norm').value) }); this.reset(); alert("¡Producto añadido!"); });
 
-        document.getElementById('form-nuevo-pedido-mex').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = 'm_' + Date.now().toString();
-            database.ref('pedidos_mexico/' + id).set({
-                id, nombre: document.getElementById('p-mex-nombre').value.trim(),
-                pMin: parseFloat(document.getElementById('p-mex-min').value),
-                pNorm: parseFloat(document.getElementById('p-mex-norm').value)
-            });
-            this.reset();
-            alert("¡Producto añadido a México!");
-        });
-
-        document.getElementById('form-nueva-licencia').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = Date.now().toString();
-            database.ref('licencias/' + id).set({
-                id,
-                titular: document.getElementById('licencia-titular').value.trim(),
-                tipo: document.getElementById('licencia-tipo').value,
-                url: document.getElementById('licencia-url').value.trim()
-            });
-            this.reset();
-            alert("¡Licencia archivada correctamente!");
-        });
-
-        document.getElementById('form-nueva-comida').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = Date.now().toString();
-            database.ref('comida/' + id).set({
-                id, nombre: document.getElementById('comida-nombre').value.trim(),
-                pMin: parseFloat(document.getElementById('comida-min').value),
-                pMed: parseFloat(document.getElementById('comida-med').value),
-                pNorm: parseFloat(document.getElementById('comida-norm').value)
-            });
-            this.reset();
-            alert("¡Plato añadido!");
-        });
-
-        document.getElementById('form-nueva-bebida').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const tipoBebida = document.getElementById('bebida-tipo').value;
-            const dbRef = tipoBebida === 'normal' ? 'bebida_normal' : 'bebida_alcohol';
-            const id = Date.now().toString();
-            database.ref(dbRef + '/' + id).set({
-                id, nombre: document.getElementById('bebida-nombre').value.trim(),
-                pMin: parseFloat(document.getElementById('bebida-min').value),
-                pMed: parseFloat(document.getElementById('bebida-med').value),
-                pNorm: parseFloat(document.getElementById('bebida-norm').value)
-            });
-            this.reset();
-            alert("¡Bebida añadida!");
-        });
-
-        document.getElementById('form-nuevo-menu').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = Date.now().toString();
-            database.ref('menus/' + id).set({
-                id, nombre: document.getElementById('menu-nombre').value.trim(),
-                pMin: parseFloat(document.getElementById('menu-min').value),
-                pNorm: parseFloat(document.getElementById('menu-norm').value)
-            });
-            this.reset();
-            alert("¡Menú añadido!");
-        });
-
-        document.getElementById('form-nuevo-plato-npc').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = Date.now().toString();
-            database.ref('platos_npc/' + id).set({
-                id, nombre: document.getElementById('plato-npc-nombre').value.trim(),
-                pMin: parseFloat(document.getElementById('plato-npc-min').value),
-                pMed: parseFloat(document.getElementById('plato-npc-med').value),
-                pNorm: parseFloat(document.getElementById('plato-npc-norm').value)
-            });
-            this.reset();
-            alert("¡Plato NPC añadido!");
-        });
-
-        document.getElementById('form-nuevo-producto').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = Date.now().toString();
-            database.ref('productos_varios/' + id).set({
-                id, nombre: document.getElementById('producto-nombre').value.trim(),
-                pMin: parseFloat(document.getElementById('producto-min').value),
-                pMed: parseFloat(document.getElementById('producto-med').value),
-                pNorm: parseFloat(document.getElementById('producto-norm').value)
-            });
-            this.reset();
-            alert("¡Producto añadido!");
-        });
-
-        function eliminarItem(dbPath, id) {
-            if (confirm("¿Estás seguro de eliminar este elemento?")) {
-                database.ref(dbPath + '/' + id).remove();
-            }
-        }
+        function eliminarItem(dbPath, id) { if (confirm("¿Estás seguro de eliminar este elemento?")) { database.ref(dbPath + '/' + id).remove(); } }
     </script>
 </body>
 </html>
