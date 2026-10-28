@@ -161,7 +161,7 @@
             </div>
         </header>
 
-        <!-- NAVEGACIÓN PRINCIPAL ORDENADA -->
+        <!-- NAVEGACIÓN PRINCIPAL -->
         <div class="flex flex-wrap justify-center gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
             <button type="button" onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>💰</span> <span>Ventas</span>
@@ -212,7 +212,6 @@
 
         <!-- ================= PANTALLA 1: VENTAS ================= -->
         <div id="pantalla-ventas" class="space-y-4">
-            <!-- BUSCADOR RÁPIDO EN VENTAS -->
             <div class="western-panel rounded-xl p-3 flex items-center space-x-2">
                 <span class="text-base">🔍</span>
                 <input type="text" id="buscador-ventas" placeholder="Buscar en la carta (platos, bebidas, menús, platos NPC...)" class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarCartaVentas()">
@@ -457,12 +456,10 @@
                         <button type="button" id="btn-admin-purga" onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🧹 Purga (Admin)</button>
                     </div>
                 </div>
-
                 <div class="bg-stone-900/70 p-2 rounded-lg border border-amber-900/40 flex items-center space-x-2">
                     <span class="text-sm">🔍</span>
                     <input type="text" id="buscador-tickets" placeholder="Buscar por usuario, fecha, hora o producto..." class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarTickets()">
                 </div>
-
                 <div id="lista-historial-facturas" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-amber-200/80">
                     <p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay facturas registradas todavía.</p>
                 </div>
@@ -1046,7 +1043,13 @@
         // HELPERS
         function numSeguro(val) { return isNaN(parseFloat(val)) ? 0 : parseFloat(val); }
         function ordenarArrayPorNombre(obj) { return Object.entries(obj || {}).filter(([, item]) => item && typeof item === 'object').map(([key, item]) => ({ ...item, id: item.id || key, nombre: item.nombre || 'Sin nombre' })).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })); }
-        function copiarTextoPortapapeles(texto) { navigator.clipboard.writeText(texto).then(() => { alert("📋 ¡Copiado al portapapeles con éxito! Ya puedes pegarlo en Discord."); }).catch(() => { prompt("Copia este texto manualmente:", texto); }); }
+        function copiarTextoPortapapeles(texto) { 
+            navigator.clipboard.writeText(texto).then(() => { 
+                alert("📋 ¡Copiado al portapapeles con éxito! Ya puedes pegarlo en Discord."); 
+            }).catch(() => { 
+                prompt("Copia este texto manualmente:", texto); 
+            }); 
+        }
         
         function toggleSeccion(idSeccion) {
             const sec = document.getElementById(idSeccion);
@@ -1111,7 +1114,7 @@
                     else if (esSuperAdmin && (!usuarioData.aprobado || usuarioData.rol !== 'admin')) { usuarioData.aprobado = true; usuarioData.rol = 'admin'; database.ref('usuarios/' + user.uid).update({ aprobado: true, rol: 'admin' }); }
                     if (!usuarioData.aprobado && usuarioData.rol !== 'admin') { auth.signOut(); mostrarMensajeAuth("⏳ Tu cuenta aún no ha sido aprobada por un Administrador.", true); return; }
                     entrarEnAplicacion(user, usuarioData);
-                }).catch(err => { if (esSuperAdmin) { entrarEnAplicacion(user, { uid: user.uid, nombre: user.email.split('@')[0], email: user.email, aprobado: true, rol: 'admin', horasPendientes: 0 }); } else { mostrarMensajeAuth("❌ Error de permisos en base de datos: " + err.message, true); } });
+                }).catch(err => { if (esSuperAdmin) { entrarEnAplicacion(user, { uid: user.uid, nombre: user.email.split('@')[0], email: user.email, aprobado: true, rol: 'admin', horasPendientes: 0 }); } else { mostrarMensajeAuth("❌ Error de permisos en DB: " + err.message, true); } });
             } else { document.getElementById('seccion-app').classList.add('hidden'); document.getElementById('seccion-auth').classList.remove('hidden'); }
         });
 
@@ -1172,7 +1175,6 @@
         setInterval(() => {
             if (turnoActivo) actualizarEstadoFichajeUI();
             
-            // Solo redibuja la plantilla si la pestaña está visible (para no interferir con otras cosas)
             if (!document.getElementById('pantalla-plantilla').classList.contains('hidden')) {
                 renderizarPlantillaAdminUI();
             }
@@ -1258,7 +1260,7 @@
         function renderizarTodo() {
             try {
                 renderTablaVenta('tabla-venta-comida', comida, ventaComida, 'comida'); renderTablaVenta('tabla-venta-bebida-normal', bebidaNormal, ventaBebidaNormal, 'bebida_normal'); renderTablaVenta('tabla-venta-bebida-alcohol', bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol'); renderTablaVenta('tabla-venta-menus', menus, ventaMenus, 'menu'); renderTablaVenta('tabla-venta-platos-npc', platosNPC, ventaPlatosNPC, 'platos_npc'); renderTablaVenta('tabla-venta-productos', productos, ventaProductos, 'productos');
-                renderTablaGestion('tabla-gestion-comida', comida, 'comida'); renderTablaGestionBebida('tabla-gestion-bebida-normal', bebidaNormal, 'bebida_normal'); renderTablaGestionBebida('tabla-gestion-bebida-alcohol', bebidaAlcohol, 'bebida_alcohol'); renderTablaGestionMenu('tabla-gestion-menus', menus); renderTablaGestion('tabla-gestion-platos-npc', platosNPC, 'platos_npc'); renderTablaGestion('tabla-gestion-productos', productos, 'productos_varios');
+                renderTablaGestion('tabla-gestion-comida', comida, 'comida'); renderTablaGestion('tabla-gestion-bebida-normal', bebidaNormal, 'bebida_normal'); renderTablaGestion('tabla-gestion-bebida-alcohol', bebidaAlcohol, 'bebida_alcohol'); renderTablaGestion('tabla-gestion-menus', menus, 'menus'); renderTablaGestion('tabla-gestion-platos-npc', platosNPC, 'platos_npc'); renderTablaGestion('tabla-gestion-productos', productos, 'productos_varios');
                 renderTablaPedidos('tabla-pedidos-eeuu', productosEEUU, pedidoEEUU, 'eeuu'); renderTablaPedidos('tabla-pedidos-mexico', productosMexico, pedidoMex, 'mex');
                 renderizarResumenVenta(); renderizarResumenPedidos(); filtrarCartaVentas(); filtrarCatalogoPedidos();
             } catch (err) { console.error("Error al renderizar tablas:", err); }
@@ -1281,13 +1283,6 @@
                 const pMin = numSeguro(item.pMin); const pNorm = numSeguro(item.pNorm); const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2);
                 tbody.innerHTML += `<tr class="hover:bg-amber-900/20"><td class="p-2 font-semibold text-amber-100">${item.nombre}</td><td class="p-2 text-center text-[10px] text-amber-200/70">$${pMin.toFixed(2)} / ${pMed !== pMin ? '$'+pMed.toFixed(2)+' / ' : ''}$${pNorm.toFixed(2)}</td><td class="p-2 text-center"><button type="button" onclick="eliminarItem('${dbPath}', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td></tr>`;
             });
-        }
-
-        function renderTablaGestionBebida(elementId, items, dbPath) { renderTablaGestion(elementId, items, dbPath); }
-        function renderTablaGestionMenu(elementId, items) {
-            const tbody = document.getElementById(elementId); if (!tbody) return; tbody.innerHTML = ''; const listaOrdenada = ordenarArrayPorNombre(items);
-            if (listaOrdenada.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay menús guardados</td></tr>'; return; }
-            listaOrdenada.forEach(item => { const pMin = numSeguro(item.pMin); const pNorm = numSeguro(item.pNorm); tbody.innerHTML += `<tr class="hover:bg-amber-900/20"><td class="p-2 font-semibold text-amber-100">${item.nombre}</td><td class="p-2 text-center text-[10px] text-amber-200/70">$${pMin.toFixed(2)} / $${pNorm.toFixed(2)}</td><td class="p-2 text-center"><button type="button" onclick="eliminarItem('menus', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td></tr>`; });
         }
 
         function renderTablaPedidos(elementId, items, estadoObj, region) {
@@ -1378,59 +1373,7 @@
             const select = document.getElementById('select-convenio-venta'); if (!select) return; select.innerHTML = '<option value="">-- No cargar a convenio (Pago al contado) --</option>';
             Object.values(conveniosGlobal).filter(Boolean).sort((a,b) => (a.nombre || '').localeCompare(b.nombre || '')).forEach(c => { if (c && c.nombre) { select.innerHTML += `<option value="${c.id}">🏛️ ${c.nombre} (Deuda actual: $${numSeguro(c.saldoDeuda).toFixed(2)})</option>`; } });
         }
-        function agregarConsumoAConvenio(idConvenio) {
-            const descEl = document.getElementById(`desc-item-${idConvenio}`); const montoEl = document.getElementById(`monto-item-${idConvenio}`); if (!descEl || !montoEl) return;
-            const desc = descEl.value.trim(); const monto = parseFloat(montoEl.value);
-            if (!desc || isNaN(monto) || monto <= 0) { alert("Introduce una descripción válida y un importe positivo."); return; }
-            const convenio = conveniosGlobal[idConvenio]; if (!convenio) return;
-            const nuevaDeuda = numSeguro(convenio.saldoDeuda) + monto; const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado'; const idConsumo = Date.now().toString();
-            const consumoItem = { id: idConsumo, descripcion: desc, monto: monto, usuario: usuarioNombre, fecha: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date().toLocaleDateString() };
-            database.ref(`convenios/${idConvenio}/saldoDeuda`).set(nuevaDeuda); database.ref(`convenios/${idConvenio}/historialConsumos/${idConsumo}`).set(consumoItem).then(() => { descEl.value = ''; montoEl.value = ''; alert(`➕ Se han añadido $${monto.toFixed(2)} a la deuda de ${convenio.nombre || 'Convenio'}.`); });
-        }
-        function cobrarDeudaConvenio(idConvenio, nombreConvenio, deudaActual) {
-            if (deudaActual <= 0) { alert("Este convenio no tiene ninguna deuda pendiente."); return; }
-            if (confirm(`💵 ¿Confirmar el cobro de $${deudaActual.toFixed(2)} para la cuenta de "${nombreConvenio}"?\n\nEste dinero se ingresará a la Caja Total y la deuda quedará a $0.00.`)) {
-                const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado'; const ahora = new Date(); const codigoTicket = "PAGO-CONVENIO-" + String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0');
-                const facturaData = { id: Date.now(), codigoTicket: codigoTicket, usuario: usuarioNombre, total: deudaActual, consumo: deudaActual, propina: 0, resumen: `🏛️ LIQUIDACIÓN DE DEUDA CONVENIO: ${nombreConvenio}`, fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString() };
-                database.ref('facturas').push(facturaData); database.ref(`convenios/${idConvenio}/saldoDeuda`).set(0.00); database.ref(`convenios/${idConvenio}/historialConsumos`).remove().then(() => { alert(`✅ Deuda de ${nombreConvenio} liquidada con éxito. $${deudaActual.toFixed(2)} añadidos a la Caja Total.`); });
-            }
-        }
-        function eliminarConvenioAdmin(idConvenio, nombre) { if (confirm(`⚠️ ¿Estás seguro de eliminar el convenio "${nombre}"?`)) { database.ref('convenios/' + idConvenio).remove().then(() => { alert("🗑️ Convenio eliminado correctamente."); }).catch(err => { alert("❌ Error al eliminar: " + err.message); }); } }
-
-        function actualizarEstadoFichajeUI() {
-            const btnFichaje = document.getElementById('btn-fichaje'); const estadoFichajeText = document.getElementById('estado-fichaje-text'); if (!btnFichaje || !estadoFichajeText) return;
-            if (turnoActivo) {
-                btnFichaje.textContent = "🔴 Salir de Servicio"; btnFichaje.className = "w-full bg-red-800 hover:bg-red-700 text-red-100 font-bold py-2 rounded text-xs border border-red-600 transition font-rustic shadow";
-                const ahora = Date.now(); const diffMs = ahora - turnoActivo.inicio; const horas = Math.floor(diffMs / (1000 * 60 * 60)); const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60)); const segundos = Math.floor((diffMs % (1000 * 60)) / 1000);
-                estadoFichajeText.innerHTML = `🟢 En servicio (${turnoActivo.usuario}): <span class="font-mono text-emerald-400 font-bold">${String(horas).padStart(2,'0')}:${String(minutos).padStart(2,'0')}:${String(segundos).padStart(2,'0')}</span>`;
-            } else {
-                btnFichaje.textContent = "🟢 Entrar de Servicio"; btnFichaje.className = "w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 font-bold py-2 rounded text-xs border border-emerald-600 transition font-rustic shadow"; estadoFichajeText.innerHTML = `⚪ Fuera de servicio`;
-            }
-        }
-
-        function toggleFichaje() {
-            if (!auth.currentUser) return; const uid = auth.currentUser.uid; const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
-            if (!turnoActivo) {
-                const nuevoTurno = { usuario: usuarioNombre, inicio: Date.now(), fechaInicioStr: new Date().toLocaleString() };
-                database.ref('usuarios/' + uid + '/turnoActivo').set(nuevoTurno).then(() => { alert(`🟢 ¡Has entrado de servicio, ${usuarioNombre}! Buen turno.`); });
-            } else {
-                const fin = Date.now(); const diffMs = fin - turnoActivo.inicio; const totalHoras = (diffMs / (1000 * 60 * 60)).toFixed(2);
-                let ventasTurno = 0, cantidadTickets = 0;
-                listaFacturasGlobal.forEach(f => { if ((f.usuario || '').toLowerCase().includes((turnoActivo.usuario || '').toLowerCase()) && f.id >= turnoActivo.inicio) { ventasTurno += numSeguro(f.total); cantidadTickets++; } });
-                const turnoResumen = { id: Date.now(), usuario: turnoActivo.usuario, inicioStr: turnoActivo.fechaInicioStr, finStr: new Date().toLocaleString(), horas: totalHoras, ventas: ventasTurno, tickets: cantidadTickets };
-                
-                let horasPrevias = numSeguro(usuariosPlantillaGlobal[uid]?.horasPendientes);
-                let nuevasHoras = horasPrevias + parseFloat(totalHoras);
-                
-                database.ref('fichajes_historial').push(turnoResumen);
-                database.ref(`usuarios/${uid}/horasPendientes`).set(nuevasHoras);
-                database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => {
-                    const textoDiscord = "```md\n⏱️ **CONTROL DE FICHAJE - THE CORNER**\n-----------------------------------\n👤 **Empleado:** " + turnoResumen.usuario + "\n⏰ **Inicio:** " + turnoResumen.inicioStr + "\n🏁 **Fin:** " + turnoResumen.finStr + "\n⏳ **Horas Trabajadas:** " + turnoResumen.horas + "h\n🧾 **Tickets Emitidos:** " + turnoResumen.tickets + "\n💰 **Beneficio Generado:** $" + turnoResumen.ventas.toFixed(2) + "\n```";
-                    copiarTextoPortapapeles(textoDiscord); alert(`🔴 Turno finalizado para ${turnoResumen.usuario}.\nHoras: ${turnoResumen.horas}h | Ventas: $${turnoResumen.ventas.toFixed(2)}\n(Resumen copiado para Discord).`);
-                });
-            }
-        }
-
+        
         // DELETIONS
         function eliminarRegistroAdmin(ruta, keyFirebase) { if (confirm("¿Estás seguro de eliminar este registro? El dinero volverá a sumarse a la caja si corresponde.")) { database.ref(ruta + '/' + keyFirebase).remove(); } }
         function eliminarFacturaAdmin(keyFirebase) { if (confirm("¿Estás seguro de eliminar este ticket?")) { database.ref('facturas/' + keyFirebase).remove(); } }
@@ -1441,51 +1384,71 @@
         function eliminarPedidoAdmin(keyFirebase) { if (confirm("¿Estás seguro de eliminar este registro de pedido?")) { database.ref('pedidos_historial/' + keyFirebase).remove(); } }
         function eliminarFichajeAdmin(keyFirebase) { if (confirm("¿Deseas eliminar este registro de fichaje?")) { database.ref('fichajes_historial/' + keyFirebase).remove(); } }
 
-        // FORMATTERS
+        function verHistorialFichajesAdmin() { document.getElementById('panel-fichajes-admin').classList.remove('hidden'); }
+        function cerrarPanelFichajes() { document.getElementById('panel-fichajes-admin').classList.add('hidden'); }
         function filtrarCartaVentas() { const filtro = (document.getElementById('buscador-ventas')?.value || '').toLowerCase().trim(); const filtrarTabla = (tableId) => { const tbody = document.getElementById(tableId); if (!tbody) return; const filas = tbody.querySelectorAll('tr'); filas.forEach(fila => { const texto = fila.textContent.toLowerCase(); if (texto.includes(filtro)) { fila.style.display = ''; } else { fila.style.display = 'none'; } }); }; filtrarTabla('tabla-venta-comida'); filtrarTabla('tabla-venta-bebida-normal'); filtrarTabla('tabla-venta-bebida-alcohol'); filtrarTabla('tabla-venta-menus'); filtrarTabla('tabla-venta-platos-npc'); filtrarTabla('tabla-venta-productos'); }
         function filtrarCatalogoPedidos() { const filtro = (document.getElementById('buscador-catalogo-pedidos')?.value || '').toLowerCase().trim(); const filtrarTabla = (tableId) => { const tbody = document.getElementById(tableId); if (!tbody) return; const filas = tbody.querySelectorAll('tr'); filas.forEach(fila => { const texto = fila.textContent.toLowerCase(); if (texto.includes(filtro)) { fila.style.display = ''; } else { fila.style.display = 'none'; } }); }; filtrarTabla('tabla-pedidos-eeuu'); filtrarTabla('tabla-pedidos-mexico'); }
         function filtrarTickets() { renderizarFacturas(); }
         function filtrarPedidosHistorial() { renderizarPedidosHistorial(); }
 
-        // ================= FINAL EVENT LISTENERS (FORMS Y BOTONES) =================
+        // ================= EVENT LISTENERS PRINCIPALES (BOTONES Y FORMS) =================
         document.getElementById('btn-registrar-venta').addEventListener('click', () => {
             let subtotalBase = 0, resumenArray = []; const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
             const recolectarVenta = (items, estadoObj, tipo) => { ordenarArrayPorNombre(items).forEach(item => { const est = estadoObj[item.id]; if (est && est.cantidad > 0) { const pMin = numSeguro(item.pMin); const pNorm = numSeguro(item.pNorm); const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2); let p = tipo === 'menu' ? (est.tarifa === 'min' ? pMin : pNorm) : (est.tarifa === 'min' ? pMin : (est.tarifa === 'med' ? pMed : pNorm)); subtotalBase += est.cantidad * p; resumenArray.push(est.cantidad + "x " + item.nombre); } }); };
             recolectarVenta(comida, ventaComida, 'comida'); recolectarVenta(bebidaNormal, ventaBebidaNormal, 'bebida_normal'); recolectarVenta(bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol'); recolectarVenta(menus, ventaMenus, 'menu'); recolectarVenta(platosNPC, ventaPlatosNPC, 'platos_npc'); recolectarVenta(productos, ventaProductos, 'productos');
+            
             if (subtotalBase === 0) { alert("No hay ningún producto en la venta actual."); return; }
+
             const pctInput = parseFloat(document.getElementById('input-porcentaje-venta').value); const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput)); const descuentoMonto = subtotalBase * (pct / 100); const totalVenta = Math.max(0, subtotalBase - descuentoMonto);
             const idConvenioSel = document.getElementById('select-convenio-venta').value; const esDeudaConvenio = Boolean(idConvenioSel); const convenioObjeto = idConvenioSel ? conveniosGlobal[idConvenioSel] : null; const convenioNombre = convenioObjeto ? convenioObjeto.nombre : '';
             const efectivoInput = parseFloat(document.getElementById('input-efectivo-entregado').value); const efectivoEntregado = isNaN(efectivoInput) ? 0 : efectivoInput; const propina = (!esDeudaConvenio && efectivoEntregado > totalVenta) ? (efectivoEntregado - totalVenta) : 0; const totalIngresadoCaja = esDeudaConvenio ? 0 : (totalVenta + propina);
             const ahora = new Date(); const codigoTicket = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0');
             let resumenFinalStr = resumenArray.join(', '); if (convenioNombre) resumenFinalStr += ` [Convenio: ${convenioNombre}${esDeudaConvenio ? ' (A Cuenta/Deuda)' : ''}]`; if (pct > 0) resumenFinalStr += ` [Desc: ${pct}%]`; if (propina > 0) resumenFinalStr += ` [Propina: +$${propina.toFixed(2)}]`;
+            
             const facturaData = { id: Date.now(), codigoTicket: codigoTicket, usuario: usuarioNombre, total: totalIngresadoCaja, consumo: totalVenta, propina: propina, esDeudaConvenio: esDeudaConvenio, convenioNombre: convenioNombre, resumen: resumenFinalStr, fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString() };
-            database.ref('facturas').push(facturaData);
-            if (esDeudaConvenio && idConvenioSel && convenioObjeto) { const nuevaDeuda = numSeguro(convenioObjeto.saldoDeuda) + totalVenta; const idConsumo = Date.now().toString(); const consumoItem = { id: idConsumo, descripcion: resumenArray.join(', '), monto: totalVenta, usuario: usuarioNombre, fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString() }; database.ref(`convenios/${idConvenioSel}/saldoDeuda`).set(nuevaDeuda); database.ref(`convenios/${idConvenioSel}/historialConsumos/${idConsumo}`).set(consumoItem); }
-            copiarTextoPortapapeles(generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), subtotalBase, descuentoMonto, pct, convenioNombre, totalVenta, propina, esDeudaConvenio));
-            document.getElementById('btn-limpiar-venta').click();
+            
+            database.ref('facturas').push(facturaData).then(() => {
+                if (esDeudaConvenio && idConvenioSel && convenioObjeto) { const nuevaDeuda = numSeguro(convenioObjeto.saldoDeuda) + totalVenta; const idConsumo = Date.now().toString(); const consumoItem = { id: idConsumo, descripcion: resumenArray.join(', '), monto: totalVenta, usuario: usuarioNombre, fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString() }; database.ref(`convenios/${idConvenioSel}/saldoDeuda`).set(nuevaDeuda); database.ref(`convenios/${idConvenioSel}/historialConsumos/${idConsumo}`).set(consumoItem); }
+                copiarTextoPortapapeles(generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), subtotalBase, descuentoMonto, pct, convenioNombre, totalVenta, propina, esDeudaConvenio));
+                document.getElementById('btn-limpiar-venta').click();
+                alert("✅ ¡Venta registrada con éxito y ticket copiado!");
+            }).catch(err => { alert("Error al registrar venta: " + err.message); });
         });
 
-        document.getElementById('btn-limpiar-venta').addEventListener('click', () => { ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {}; document.getElementById('input-porcentaje-venta').value = '0'; document.getElementById('select-convenio-venta').value = ''; document.getElementById('input-efectivo-entregado').value = ''; renderizarTodo(); });
+        document.getElementById('btn-limpiar-venta').addEventListener('click', () => { 
+            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {}; 
+            document.getElementById('input-porcentaje-venta').value = '0'; 
+            document.getElementById('select-convenio-venta').value = ''; 
+            document.getElementById('input-efectivo-entregado').value = ''; 
+            renderizarTodo(); 
+        });
+
+        function registrarPedidoContabilidad() {
+            let totalCoste = 0, resumenArray = [];
+            Object.entries(productosEEUU || {}).forEach(([key, item]) => { if (!item) return; const itemId = item.id || key; const est = pedidoEEUU[itemId]; if (est && est.cantidad > 0) { let p = est.tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm); totalCoste += est.cantidad * p; resumenArray.push(est.cantidad + "x " + item.nombre + " (EEUU)"); } });
+            Object.entries(productosMexico || {}).forEach(([key, item]) => { if (!item) return; const itemId = item.id || key; const est = pedidoMex[itemId]; if (est && est.cantidad > 0) { let p = est.tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm); totalCoste += est.cantidad * p; resumenArray.push(est.cantidad + "x " + item.nombre + " (Mex)"); } });
+            if (totalCoste === 0) { alert("No hay ningún producto en el pedido actual."); return; }
+            const ahora = new Date(); const codigoPedido = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0'); const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
+            const pedidoData = { id: Date.now(), codigoPedido: codigoPedido, total: totalCoste, resumen: resumenArray.join(', '), fecha: fechaStr };
+            
+            database.ref('pedidos_historial').push(pedidoData).then(() => {
+                copiarTextoPortapapeles(generarFormatoDiscordPedido(codigoPedido, resumenArray.join(', '), totalCoste));
+                alert("✅ ¡Pedido registrado en contabilidad, descontado de la caja y copiado para Discord!"); 
+                limpiarPedidos();
+            });
+        }
         
-        document.getElementById('form-nuevo-pedido-eeuu').addEventListener('submit', function(e) { e.preventDefault(); const id = 'e_' + Date.now().toString(); database.ref('pedidos_eeuu/' + id).set({ id, nombre: document.getElementById('p-eeuu-nombre').value.trim(), pMin: parseFloat(document.getElementById('p-eeuu-min').value), pNorm: parseFloat(document.getElementById('p-eeuu-norm').value) }); this.reset(); alert("¡Producto añadido a EEUU!"); });
-        
-        document.getElementById('form-nuevo-pedido-mex').addEventListener('submit', function(e) { e.preventDefault(); const id = 'm_' + Date.now().toString(); database.ref('pedidos_mexico/' + id).set({ id, nombre: document.getElementById('p-mex-nombre').value.trim(), pMin: parseFloat(document.getElementById('p-mex-min').value), pNorm: parseFloat(document.getElementById('p-mex-norm').value) }); this.reset(); alert("¡Producto añadido a México!"); });
-        
+        document.getElementById('form-nuevo-pedido-eeuu').addEventListener('submit', function(e) { e.preventDefault(); const id = 'e_' + Date.now().toString(); database.ref('pedidos_eeuu/' + id).set({ id, nombre: document.getElementById('p-eeuu-nombre').value.trim(), pMin: parseFloat(document.getElementById('p-eeuu-min').value), pNorm: parseFloat(document.getElementById('p-eeuu-norm').value) }).then(() => { this.reset(); alert("¡Producto añadido a EEUU!"); }); });
+        document.getElementById('form-nuevo-pedido-mex').addEventListener('submit', function(e) { e.preventDefault(); const id = 'm_' + Date.now().toString(); database.ref('pedidos_mexico/' + id).set({ id, nombre: document.getElementById('p-mex-nombre').value.trim(), pMin: parseFloat(document.getElementById('p-mex-min').value), pNorm: parseFloat(document.getElementById('p-mex-norm').value) }).then(() => { this.reset(); alert("¡Producto añadido a México!"); }); });
         document.getElementById('form-nueva-merma').addEventListener('submit', function(e) { e.preventDefault(); const desc = document.getElementById('merma-desc').value.trim(); const monto = parseFloat(document.getElementById('merma-monto').value); if (!desc || isNaN(monto) || monto <= 0) { alert("Introduce un motivo y un importe válido mayor a 0."); return; } const ahora = new Date(); const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString(); const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Admin'; database.ref('mermas_historial').push({ descripcion: desc, monto: monto, usuario: usuarioNombre, fecha: fechaStr }).then(() => { this.reset(); const txtDiscord = "```md\n📉 **MERMA / ACCIDENTE - THE CORNER**\n-----------------------------------\n👤 **Registrado por:** " + usuarioNombre + "\n📝 **Motivo:** " + desc + "\n💰 **Pérdida (Restado de Caja):** -$" + monto.toFixed(2) + "\n```"; copiarTextoPortapapeles(txtDiscord); alert("📉 Merma registrada. Dinero restado de la caja correctamente."); }).catch(err => { alert("Error al guardar: " + err.message); }); });
-        
         document.getElementById('form-nuevo-evento').addEventListener('submit', function(e) { e.preventDefault(); const desc = document.getElementById('evento-desc').value.trim(); const monto = parseFloat(document.getElementById('evento-monto').value); if (!desc || isNaN(monto) || monto <= 0) { alert("Introduce un concepto y un gasto válido mayor a 0."); return; } const ahora = new Date(); const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString(); const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Admin'; database.ref('eventos_historial').push({ descripcion: desc, monto: monto, usuario: usuarioNombre, fecha: fechaStr }).then(() => { this.reset(); const txtDiscord = "```md\n🎭 **GASTO DE EVENTO - THE CORNER**\n-----------------------------------\n👤 **Registrado por:** " + usuarioNombre + "\n🎉 **Concepto/Evento:** " + desc + "\n💰 **Retiro de Caja:** -$" + monto.toFixed(2) + "\n```"; copiarTextoPortapapeles(txtDiscord); alert("🎭 Gasto de evento registrado. Dinero descontado de la caja."); }).catch(err => { alert("Error al guardar: " + err.message); }); });
-        
-        document.getElementById('form-nueva-licencia').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('licencias/' + id).set({ id, titular: document.getElementById('licencia-titular').value.trim(), tipo: document.getElementById('licencia-tipo').value, url: document.getElementById('licencia-url').value.trim() }); this.reset(); alert("¡Licencia archivada correctamente!"); });
-        
-        document.getElementById('form-nueva-comida').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('comida/' + id).set({ id, nombre: document.getElementById('comida-nombre').value.trim(), pMin: parseFloat(document.getElementById('comida-min').value), pMed: parseFloat(document.getElementById('comida-med').value), pNorm: parseFloat(document.getElementById('comida-norm').value) }); this.reset(); alert("¡Plato añadido!"); });
-        
-        document.getElementById('form-nueva-bebida').addEventListener('submit', function(e) { e.preventDefault(); const tipoBebida = document.getElementById('bebida-tipo').value; const dbRef = tipoBebida === 'normal' ? 'bebida_normal' : 'bebida_alcohol'; const id = Date.now().toString(); database.ref(dbRef + '/' + id).set({ id, nombre: document.getElementById('bebida-nombre').value.trim(), pMin: parseFloat(document.getElementById('bebida-min').value), pMed: parseFloat(document.getElementById('bebida-med').value), pNorm: parseFloat(document.getElementById('bebida-norm').value) }); this.reset(); alert("¡Bebida añadida!"); });
-        
-        document.getElementById('form-nuevo-menu').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('menus/' + id).set({ id, nombre: document.getElementById('menu-nombre').value.trim(), pMin: parseFloat(document.getElementById('menu-min').value), pNorm: parseFloat(document.getElementById('menu-norm').value) }); this.reset(); alert("¡Menú añadido!"); });
-        
-        document.getElementById('form-nuevo-plato-npc').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('platos_npc/' + id).set({ id, nombre: document.getElementById('plato-npc-nombre').value.trim(), pMin: parseFloat(document.getElementById('plato-npc-min').value), pMed: parseFloat(document.getElementById('plato-npc-med').value), pNorm: parseFloat(document.getElementById('plato-npc-norm').value) }); this.reset(); alert("¡Plato NPC añadido!"); });
-        
-        document.getElementById('form-nuevo-producto').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('productos_varios/' + id).set({ id, nombre: document.getElementById('producto-nombre').value.trim(), pMin: parseFloat(document.getElementById('producto-min').value), pMed: parseFloat(document.getElementById('producto-med').value), pNorm: parseFloat(document.getElementById('producto-norm').value) }); this.reset(); alert("¡Producto añadido!"); });
+        document.getElementById('form-nueva-licencia').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('licencias/' + id).set({ id, titular: document.getElementById('licencia-titular').value.trim(), tipo: document.getElementById('licencia-tipo').value, url: document.getElementById('licencia-url').value.trim() }).then(() => { this.reset(); alert("¡Licencia archivada correctamente!"); }); });
+        document.getElementById('form-nueva-comida').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('comida/' + id).set({ id, nombre: document.getElementById('comida-nombre').value.trim(), pMin: parseFloat(document.getElementById('comida-min').value), pMed: parseFloat(document.getElementById('comida-med').value), pNorm: parseFloat(document.getElementById('comida-norm').value) }).then(() => { this.reset(); alert("¡Plato añadido!"); }); });
+        document.getElementById('form-nueva-bebida').addEventListener('submit', function(e) { e.preventDefault(); const tipoBebida = document.getElementById('bebida-tipo').value; const dbRef = tipoBebida === 'normal' ? 'bebida_normal' : 'bebida_alcohol'; const id = Date.now().toString(); database.ref(dbRef + '/' + id).set({ id, nombre: document.getElementById('bebida-nombre').value.trim(), pMin: parseFloat(document.getElementById('bebida-min').value), pMed: parseFloat(document.getElementById('bebida-med').value), pNorm: parseFloat(document.getElementById('bebida-norm').value) }).then(() => { this.reset(); alert("¡Bebida añadida!"); }); });
+        document.getElementById('form-nuevo-menu').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('menus/' + id).set({ id, nombre: document.getElementById('menu-nombre').value.trim(), pMin: parseFloat(document.getElementById('menu-min').value), pNorm: parseFloat(document.getElementById('menu-norm').value) }).then(() => { this.reset(); alert("¡Menú añadido!"); }); });
+        document.getElementById('form-nuevo-plato-npc').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('platos_npc/' + id).set({ id, nombre: document.getElementById('plato-npc-nombre').value.trim(), pMin: parseFloat(document.getElementById('plato-npc-min').value), pMed: parseFloat(document.getElementById('plato-npc-med').value), pNorm: parseFloat(document.getElementById('plato-npc-norm').value) }).then(() => { this.reset(); alert("¡Plato NPC añadido!"); }); });
+        document.getElementById('form-nuevo-producto').addEventListener('submit', function(e) { e.preventDefault(); const id = Date.now().toString(); database.ref('productos_varios/' + id).set({ id, nombre: document.getElementById('producto-nombre').value.trim(), pMin: parseFloat(document.getElementById('producto-min').value), pMed: parseFloat(document.getElementById('producto-med').value), pNorm: parseFloat(document.getElementById('producto-norm').value) }).then(() => { this.reset(); alert("¡Producto añadido!"); }); });
+
     </script>
 </body>
 </html>
