@@ -1417,8 +1417,42 @@
             let obj; if (tipo === 'comida') obj = ventaComida; else if (tipo === 'bebida_normal') obj = ventaBebidaNormal; else if (tipo === 'bebida_alcohol') obj = ventaBebidaAlcohol; else if (tipo === 'menu') obj = ventaMenus; else if (tipo === 'platos_npc') obj = ventaPlatosNPC; else obj = ventaProductos;
             if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'norm' }; obj[id].tarifa = tarifa; renderizarTodo();
         }
-        function cambiarCantPedido(region, id, val) { let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex; if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' }; const cant = Math.max(0, parseInt(val) || 0); obj[id].cantidad = cant; renderizarResumenPedidos(); }
-        function cambiarTarifaPedido(region, id, tarifa) { let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex; if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' }; obj[id].tarifa = tarifa; renderizarResumenPedidos(); }
+
+        // ================= CORRECCIÓN SUBTOTOALES INDIVIDUALES PEDIDOS =================
+        function cambiarCantPedido(region, id, val) { 
+            let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex; 
+            let prodList = region === 'eeuu' ? productosEEUU : productosMexico;
+            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' }; 
+            const cant = Math.max(0, parseInt(val) || 0); 
+            obj[id].cantidad = cant; 
+            
+            const item = prodList[id];
+            if (item) {
+                let p = obj[id].tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm);
+                let sub = cant * p;
+                const subtotalEl = document.getElementById(`subtotal-${region}-${id}`);
+                if (subtotalEl) subtotalEl.textContent = `$${sub.toFixed(2)}`;
+            }
+            renderizarResumenPedidos(); 
+        }
+
+        function cambiarTarifaPedido(region, id, tarifa) { 
+            let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex; 
+            let prodList = region === 'eeuu' ? productosEEUU : productosMexico;
+            if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' }; 
+            obj[id].tarifa = tarifa; 
+            
+            const item = prodList[id];
+            if (item) {
+                let p = tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm);
+                let sub = obj[id].cantidad * p;
+                const subtotalEl = document.getElementById(`subtotal-${region}-${id}`);
+                if (subtotalEl) subtotalEl.textContent = `$${sub.toFixed(2)}`;
+            }
+            renderizarResumenPedidos(); 
+        }
+        // ==============================================================================
+
         function setPorcentajeVenta(pct) { document.getElementById('input-porcentaje-venta').value = pct; renderizarResumenVenta(); }
         function filtrarCartaVentas() { const filtro = (document.getElementById('buscador-ventas')?.value || '').toLowerCase().trim(); const filtrarTabla = (tableId) => { const tbody = document.getElementById(tableId); if (!tbody) return; const filas = tbody.querySelectorAll('tr'); filas.forEach(fila => { const texto = fila.textContent.toLowerCase(); if (texto.includes(filtro)) { fila.style.display = ''; } else { fila.style.display = 'none'; } }); }; filtrarTabla('tabla-venta-comida'); filtrarTabla('tabla-venta-bebida-normal'); filtrarTabla('tabla-venta-bebida-alcohol'); filtrarTabla('tabla-venta-menus'); filtrarTabla('tabla-venta-platos-npc'); filtrarTabla('tabla-venta-productos'); }
         function filtrarCatalogoPedidos() { const filtro = (document.getElementById('buscador-catalogo-pedidos')?.value || '').toLowerCase().trim(); const filtrarTabla = (tableId) => { const tbody = document.getElementById(tableId); if (!tbody) return; const filas = tbody.querySelectorAll('tr'); filas.forEach(fila => { const texto = fila.textContent.toLowerCase(); if (texto.includes(filtro)) { fila.style.display = ''; } else { fila.style.display = 'none'; } }); }; filtrarTabla('tabla-pedidos-eeuu'); filtrarTabla('tabla-pedidos-mexico'); }
@@ -1484,7 +1518,6 @@
                 });
                 const turnoResumen = { id: Date.now(), usuario: turnoActivo.usuario, inicioStr: turnoActivo.fechaInicioStr, finStr: new Date().toLocaleString(), horas: totalHoras, ventas: ventasTurno, tickets: cantidadTickets };
                 
-                // CORRECCIÓN: Leemos las horas reales de la Base de Datos antes de sumar
                 database.ref('usuarios/' + uid + '/horasPendientes').once('value').then(snapshot => {
                     let horasPrevias = numSeguro(snapshot.val());
                     let nuevasHoras = horasPrevias + parseFloat(totalHoras);
