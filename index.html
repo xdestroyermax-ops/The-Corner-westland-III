@@ -161,7 +161,7 @@
             </div>
         </header>
 
-        <!-- NAVEGACIÓN PRINCIPAL -->
+        <!-- NAVEGACIÓN PRINCIPAL ORDENADA -->
         <div class="flex flex-wrap justify-center gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
             <button onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>💰</span> <span>Ventas</span>
@@ -543,6 +543,7 @@
                             </table>
                         </div>
                     </div>
+
                     <div>
                         <h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🇲🇽 Agricultura México</h3>
                         <div class="overflow-x-auto">
@@ -1067,9 +1068,7 @@
             }
         }
 
-        // ==============================================================================
         // ================= JS: RENDERIZADO MERMAS, EVENTOS Y NÓMINAS =================
-        // ==============================================================================
         function renderizarMermas() {
             const galeria = document.getElementById('lista-mermas');
             if (!galeria) return;
@@ -1155,8 +1154,6 @@
                 database.ref(ruta + '/' + keyFirebase).remove();
             }
         }
-        // ==============================================================================
-
 
         function switchAuthTab(tab) {
             const fLogin = document.getElementById('form-login');
@@ -1573,7 +1570,6 @@
                 actualizarCajaTotalDisplay();
             });
 
-            // NUEVO: NÓMINAS
             database.ref('nominas_historial').on('value', (s) => {
                 const data = s.val();
                 listaNominasGlobal = [];
@@ -1637,7 +1633,7 @@
             actualizarEstadoFichajeUI();
         }
 
-        // ================= JS: GESTIÓN DE SUELDOS (NUEVO) ==============================
+        // ================= JS: GESTIÓN DE SUELDOS =================
         function renderizarSueldosAdmin() {
             const galeria = document.getElementById('galeria-sueldos-admin');
             if (!galeria) return;
@@ -1701,8 +1697,8 @@
                     </div>`;
             });
 
-            const activeTag = document.activeElement.tagName;
-            if(activeTag !== 'INPUT') {
+            const activeTag = document.activeElement ? document.activeElement.tagName : '';
+            if (activeTag !== 'INPUT') {
                 galeria.innerHTML = htmlCompleto;
                 listaUsuarios.forEach(usr => recalcularTotalUI(usr.uid));
             }
@@ -1717,7 +1713,7 @@
 
         function recalcularTotalUI(uid) {
             const usr = usuariosPlantillaGlobal[uid];
-            if (!usr) return;
+            if (!usr) return 0;
 
             let horas = numSeguro(usr.horasPendientes);
             let base = numSeguro(document.getElementById(`base-${uid}`)?.value);
@@ -1790,8 +1786,69 @@
             }
         }
 
-        // ================= JS: EVENT LISTENERS (VENTAS, PEDIDOS, MERMAS, ETC) =================
-        
+        // ================= JS: CÁLCULO DE MÁS VENDIDOS =================
+        function calcularMasVendidos() {
+            const contenedor = document.getElementById('lista-mas-vendidos');
+            if (!contenedor) return;
+            contenedor.innerHTML = '';
+
+            let conteoProductos = {};
+            let totalUnidadesVendidas = 0;
+
+            listaFacturasGlobal.forEach(f => {
+                if (!f || !f.resumen) return;
+                const partes = f.resumen.split(',');
+                partes.forEach(parte => {
+                    const limpia = parte.trim();
+                    const regex = /^(\d+)x\s+(.+)$/;
+                    const match = limpia.match(regex);
+                    if (match) {
+                        const cantidad = parseInt(match[1]) || 0;
+                        let nombreProd = match[2].trim();
+                        nombreProd = nombreProd.replace(/\[.*?\]/g, '').trim();
+
+                        if (cantidad > 0 && nombreProd) {
+                            conteoProductos[nombreProd] = (conteoProductos[nombreProd] || 0) + cantidad;
+                            totalUnidadesVendidas += cantidad;
+                        }
+                    }
+                });
+            });
+
+            const ranking = Object.entries(conteoProductos).sort((a, b) => b[1] - a[1]);
+
+            if (ranking.length === 0) {
+                contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">Aún no hay suficientes ventas registradas para generar estadísticas.</p>';
+                return;
+            }
+
+            ranking.forEach(([producto, cantidad], index) => {
+                const porcentaje = totalUnidadesVendidas > 0 ? ((cantidad / totalUnidadesVendidas) * 100).toFixed(1) : 0;
+                let medalla = '🔹';
+                if (index === 0) medalla = '🥇';
+                else if (index === 1) medalla = '🥈';
+                else if (index === 2) medalla = '🥉';
+
+                contenedor.innerHTML += `
+                    <div class="bg-stone-900/90 border border-amber-900/60 p-3 rounded-xl shadow space-y-2 flex flex-col justify-between">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-amber-300 font-rustic text-xs">${medalla} ${producto}</span>
+                            <span class="bg-amber-950 text-amber-400 font-mono font-bold text-[10px] px-2 py-0.5 rounded border border-amber-800">${cantidad} uds.</span>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-[10px] text-amber-200/70">
+                                <span>Porcentaje de ventas:</span>
+                                <span class="font-bold text-emerald-400">${porcentaje}%</span>
+                            </div>
+                            <div class="w-full bg-stone-950 rounded-full h-1.5 border border-amber-900/40 overflow-hidden">
+                                <div class="bg-amber-500 h-full rounded-full" style="width: ${porcentaje}%"></div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // ================= JS: BOTONES DE FORMULARIOS =================
         document.getElementById('btn-registrar-venta').addEventListener('click', () => {
             let subtotalBase = 0, resumenArray = [];
             const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
@@ -1919,84 +1976,54 @@
             e.preventDefault();
             const desc = document.getElementById('merma-desc').value.trim();
             const monto = parseFloat(document.getElementById('merma-monto').value);
-            
             if (!desc || isNaN(monto) || monto <= 0) {
                 alert("Introduce un motivo y un importe válido mayor a 0.");
                 return;
             }
-
             const ahora = new Date();
             const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
             const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Admin';
 
-            database.ref('mermas_historial').push({
-                descripcion: desc,
-                monto: monto,
-                usuario: usuarioNombre,
-                fecha: fechaStr
-            }).then(() => {
+            database.ref('mermas_historial').push({ descripcion: desc, monto: monto, usuario: usuarioNombre, fecha: fechaStr }).then(() => {
                 this.reset();
                 const txtDiscord = "```md\n📉 **MERMA / ACCIDENTE - THE CORNER**\n-----------------------------------\n👤 **Registrado por:** " + usuarioNombre + "\n📝 **Motivo:** " + desc + "\n💰 **Pérdida (Restado de Caja):** -$" + monto.toFixed(2) + "\n```";
                 copiarTextoPortapapeles(txtDiscord);
                 alert("📉 Merma registrada. Dinero restado de la caja correctamente.");
-            }).catch(err => {
-                alert("Error al guardar: " + err.message);
-            });
+            }).catch(err => { alert("Error al guardar: " + err.message); });
         });
 
         document.getElementById('form-nuevo-evento').addEventListener('submit', function(e) {
             e.preventDefault();
             const desc = document.getElementById('evento-desc').value.trim();
             const monto = parseFloat(document.getElementById('evento-monto').value);
-            
             if (!desc || isNaN(monto) || monto <= 0) {
                 alert("Introduce un concepto y un gasto válido mayor a 0.");
                 return;
             }
-
             const ahora = new Date();
             const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
             const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Admin';
 
-            database.ref('eventos_historial').push({
-                descripcion: desc,
-                monto: monto,
-                usuario: usuarioNombre,
-                fecha: fechaStr
-            }).then(() => {
+            database.ref('eventos_historial').push({ descripcion: desc, monto: monto, usuario: usuarioNombre, fecha: fechaStr }).then(() => {
                 this.reset();
                 const txtDiscord = "```md\n🎭 **GASTO DE EVENTO - THE CORNER**\n-----------------------------------\n👤 **Registrado por:** " + usuarioNombre + "\n🎉 **Concepto/Evento:** " + desc + "\n💰 **Retiro de Caja:** -$" + monto.toFixed(2) + "\n```";
                 copiarTextoPortapapeles(txtDiscord);
                 alert("🎭 Gasto de evento registrado. Dinero descontado de la caja.");
-            }).catch(err => {
-                alert("Error al guardar: " + err.message);
-            });
+            }).catch(err => { alert("Error al guardar: " + err.message); });
         });
 
         document.getElementById('form-nueva-licencia').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = Date.now().toString();
-            database.ref('licencias/' + id).set({
-                id,
-                titular: document.getElementById('licencia-titular').value.trim(),
-                tipo: document.getElementById('licencia-tipo').value,
-                url: document.getElementById('licencia-url').value.trim()
-            });
-            this.reset();
-            alert("¡Licencia archivada correctamente!");
+            database.ref('licencias/' + id).set({ id, titular: document.getElementById('licencia-titular').value.trim(), tipo: document.getElementById('licencia-tipo').value, url: document.getElementById('licencia-url').value.trim() });
+            this.reset(); alert("¡Licencia archivada correctamente!");
         });
 
         document.getElementById('form-nueva-comida').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = Date.now().toString();
-            database.ref('comida/' + id).set({
-                id, nombre: document.getElementById('comida-nombre').value.trim(),
-                pMin: parseFloat(document.getElementById('comida-min').value),
-                pMed: parseFloat(document.getElementById('comida-med').value),
-                pNorm: parseFloat(document.getElementById('comida-norm').value)
-            });
-            this.reset();
-            alert("¡Plato añadido!");
+            database.ref('comida/' + id).set({ id, nombre: document.getElementById('comida-nombre').value.trim(), pMin: parseFloat(document.getElementById('comida-min').value), pMed: parseFloat(document.getElementById('comida-med').value), pNorm: parseFloat(document.getElementById('comida-norm').value) });
+            this.reset(); alert("¡Plato añadido!");
         });
 
         document.getElementById('form-nueva-bebida').addEventListener('submit', function(e) {
@@ -2004,52 +2031,29 @@
             const tipoBebida = document.getElementById('bebida-tipo').value;
             const dbRef = tipoBebida === 'normal' ? 'bebida_normal' : 'bebida_alcohol';
             const id = Date.now().toString();
-            database.ref(dbRef + '/' + id).set({
-                id, nombre: document.getElementById('bebida-nombre').value.trim(),
-                pMin: parseFloat(document.getElementById('bebida-min').value),
-                pMed: parseFloat(document.getElementById('bebida-med').value),
-                pNorm: parseFloat(document.getElementById('bebida-norm').value)
-            });
-            this.reset();
-            alert("¡Bebida añadida!");
+            database.ref(dbRef + '/' + id).set({ id, nombre: document.getElementById('bebida-nombre').value.trim(), pMin: parseFloat(document.getElementById('bebida-min').value), pMed: parseFloat(document.getElementById('bebida-med').value), pNorm: parseFloat(document.getElementById('bebida-norm').value) });
+            this.reset(); alert("¡Bebida añadida!");
         });
 
         document.getElementById('form-nuevo-menu').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = Date.now().toString();
-            database.ref('menus/' + id).set({
-                id, nombre: document.getElementById('menu-nombre').value.trim(),
-                pMin: parseFloat(document.getElementById('menu-min').value),
-                pNorm: parseFloat(document.getElementById('menu-norm').value)
-            });
-            this.reset();
-            alert("¡Menú añadido!");
+            database.ref('menus/' + id).set({ id, nombre: document.getElementById('menu-nombre').value.trim(), pMin: parseFloat(document.getElementById('menu-min').value), pNorm: parseFloat(document.getElementById('menu-norm').value) });
+            this.reset(); alert("¡Menú añadido!");
         });
 
         document.getElementById('form-nuevo-plato-npc').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = Date.now().toString();
-            database.ref('platos_npc/' + id).set({
-                id, nombre: document.getElementById('plato-npc-nombre').value.trim(),
-                pMin: parseFloat(document.getElementById('plato-npc-min').value),
-                pMed: parseFloat(document.getElementById('plato-npc-med').value),
-                pNorm: parseFloat(document.getElementById('plato-npc-norm').value)
-            });
-            this.reset();
-            alert("¡Plato NPC añadido!");
+            database.ref('platos_npc/' + id).set({ id, nombre: document.getElementById('plato-npc-nombre').value.trim(), pMin: parseFloat(document.getElementById('plato-npc-min').value), pMed: parseFloat(document.getElementById('plato-npc-med').value), pNorm: parseFloat(document.getElementById('plato-npc-norm').value) });
+            this.reset(); alert("¡Plato NPC añadido!");
         });
 
         document.getElementById('form-nuevo-producto').addEventListener('submit', function(e) {
             e.preventDefault();
             const id = Date.now().toString();
-            database.ref('productos_varios/' + id).set({
-                id, nombre: document.getElementById('producto-nombre').value.trim(),
-                pMin: parseFloat(document.getElementById('producto-min').value),
-                pMed: parseFloat(document.getElementById('producto-med').value),
-                pNorm: parseFloat(document.getElementById('producto-norm').value)
-            });
-            this.reset();
-            alert("¡Producto añadido!");
+            database.ref('productos_varios/' + id).set({ id, nombre: document.getElementById('producto-nombre').value.trim(), pMin: parseFloat(document.getElementById('producto-min').value), pMed: parseFloat(document.getElementById('producto-med').value), pNorm: parseFloat(document.getElementById('producto-norm').value) });
+            this.reset(); alert("¡Producto añadido!");
         });
 
         function eliminarItem(dbPath, id) {
