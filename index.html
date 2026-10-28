@@ -482,7 +482,7 @@
                 <form id="form-nuevo-convenio" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
                     <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Crear Nueva Cuenta de Convenio</h3>
                     <div class="flex flex-col md:flex-row gap-2">
-                        <input type="text" id="convenio-nombre" placeholder="Nombre de la Organización / Colectivo (Ej: Sheriffs, Médicos...)" required class="w-full p-2 rounded text-xs">
+                        <input type="text" id="convenio-nombre" placeholder="Nombre de la Organización / Colectivo" required class="w-full p-2 rounded text-xs">
                         <button type="submit" class="bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold px-4 py-2 rounded text-xs border border-amber-600 font-rustic whitespace-nowrap">Crear Convenio</button>
                     </div>
                 </form>
@@ -1040,14 +1040,8 @@
         let ventaComida = {}, ventaBebidaNormal = {}, ventaBebidaAlcohol = {}, ventaMenus = {}, ventaPlatosNPC = {}, ventaProductos = {};
         let pedidoEEUU = {}, pedidoMex = {};
         
-        let listaFacturasGlobal = [];
-        let listaPedidosGlobal = [];
-        let listaFichajesGlobal = [];
-        let listaMermasGlobal = [];
-        let listaEventosGlobal = [];
-        let listaNominasGlobal = [];
-        let turnoActivo = null;
-        let usuariosPlantillaGlobal = {};
+        let listaFacturasGlobal = [], listaPedidosGlobal = [], listaFichajesGlobal = [], listaMermasGlobal = [], listaEventosGlobal = [], listaNominasGlobal = [];
+        let turnoActivo = null, usuariosPlantillaGlobal = {};
 
         // HELPERS
         function numSeguro(val) { return isNaN(parseFloat(val)) ? 0 : parseFloat(val); }
@@ -1117,7 +1111,7 @@
                     else if (esSuperAdmin && (!usuarioData.aprobado || usuarioData.rol !== 'admin')) { usuarioData.aprobado = true; usuarioData.rol = 'admin'; database.ref('usuarios/' + user.uid).update({ aprobado: true, rol: 'admin' }); }
                     if (!usuarioData.aprobado && usuarioData.rol !== 'admin') { auth.signOut(); mostrarMensajeAuth("⏳ Tu cuenta aún no ha sido aprobada por un Administrador.", true); return; }
                     entrarEnAplicacion(user, usuarioData);
-                }).catch(err => { if (esSuperAdmin) { entrarEnAplicacion(user, { uid: user.uid, nombre: user.email.split('@')[0], email: user.email, aprobado: true, rol: 'admin', horasPendientes: 0 }); } else { mostrarMensajeAuth("❌ Error de permisos en DB: " + err.message, true); } });
+                }).catch(err => { if (esSuperAdmin) { entrarEnAplicacion(user, { uid: user.uid, nombre: user.email.split('@')[0], email: user.email, aprobado: true, rol: 'admin', horasPendientes: 0 }); } else { mostrarMensajeAuth("❌ Error de permisos en base de datos: " + err.message, true); } });
             } else { document.getElementById('seccion-app').classList.add('hidden'); document.getElementById('seccion-auth').classList.remove('hidden'); }
         });
 
@@ -1145,7 +1139,7 @@
                 Object.values(data).forEach(u => {
                     if (u && !u.aprobado && u.rol !== 'admin') {
                         hay = true;
-                        contenedor.innerHTML += `<div class="bg-stone-900 border border-amber-900/60 p-3 rounded-lg flex justify-between items-center"><div><div class="font-bold text-amber-300 font-rustic">${u.nombre || 'Sin nombre'}</div><div class="text-[10px] text-amber-500">${u.email || ''}</div></div><div class="flex gap-1"><button onclick="aprobarUsuario('${u.uid}')" class="bg-emerald-800 hover:bg-emerald-700 text-emerald-100 px-2.5 py-1 rounded font-bold text-[10px]">🟢 Aprobar</button><button onclick="rechazarUsuario('${u.uid}')" class="bg-red-950 hover:bg-red-900 text-red-200 px-2 py-1 rounded text-[10px]">🔴 Rechazar</button></div></div>`;
+                        contenedor.innerHTML += `<div class="bg-stone-900 border border-amber-900/60 p-3 rounded-lg flex justify-between items-center"><div><div class="font-bold text-amber-300 font-rustic">${u.nombre || 'Sin nombre'}</div><div class="text-[10px] text-amber-500">${u.email || ''}</div></div><div class="flex gap-1"><button type="button" onclick="aprobarUsuario('${u.uid}')" class="bg-emerald-800 hover:bg-emerald-700 text-emerald-100 px-2.5 py-1 rounded font-bold text-[10px]">🟢 Aprobar</button><button type="button" onclick="rechazarUsuario('${u.uid}')" class="bg-red-950 hover:bg-red-900 text-red-200 px-2 py-1 rounded text-[10px]">🔴 Rechazar</button></div></div>`;
                     }
                 });
                 if (!hay) contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay usuarios pendientes de aprobación.</p>';
@@ -1155,22 +1149,35 @@
         function rechazarUsuario(uid) { if (confirm("¿Rechazar y eliminar la solicitud de este usuario?")) { database.ref('usuarios/' + uid).remove(); } }
 
         function escucharPlantillaAdmin() { database.ref('usuarios').on('value', snapshot => { usuariosPlantillaGlobal = snapshot.val() || {}; renderizarPlantillaAdminUI(); if (!document.getElementById('pantalla-sueldos').classList.contains('hidden')) { renderizarSueldosAdmin(); } }); }
+        
         function renderizarPlantillaAdminUI() {
             const galeria = document.getElementById('galeria-plantilla-admin'); if (!galeria) return;
             let enServicioCount = 0, fueraServicioCount = 0, htmlEnServicio = '', htmlFueraServicio = '';
             const listaUsuarios = Object.values(usuariosPlantillaGlobal).filter(u => u && (u.aprobado || u.rol === 'admin'));
             if (listaUsuarios.length === 0) { galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay empleados registrados en la plantilla.</p>'; document.getElementById('cant-en-servicio').textContent = '0'; document.getElementById('cant-fuera-servicio').textContent = '0'; return; }
+            
             listaUsuarios.forEach(usr => {
-                const esAdminActual = usuarioActualData && usuarioActualData.rol === 'admin'; const nombreSeguro = (usr.nombre || '').replace(/'/g, "\\'"); const botonEliminarHTML = esAdminActual ? `<button onclick="eliminarEmpleadoAdmin('${usr.uid}', '${nombreSeguro}')" class="w-full bg-red-950/80 hover:bg-red-900 text-red-200 text-[10px] py-1 rounded border border-red-800 font-rustic font-bold transition">🗑️ Eliminar Empleado</button>` : '';
+                const esAdminActual = usuarioActualData && usuarioActualData.rol === 'admin'; const nombreSeguro = (usr.nombre || '').replace(/'/g, "\\'"); const botonEliminarHTML = esAdminActual ? `<button type="button" onclick="eliminarEmpleadoAdmin('${usr.uid}', '${nombreSeguro}')" class="w-full bg-red-950/80 hover:bg-red-900 text-red-200 text-[10px] py-1 rounded border border-red-800 font-rustic font-bold transition">🗑️ Eliminar Empleado</button>` : '';
                 if (usr.turnoActivo) {
                     enServicioCount++; const ahora = Date.now(); const diffMs = ahora - usr.turnoActivo.inicio; const horas = Math.floor(diffMs / (1000 * 60 * 60)); const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60)); const segundos = Math.floor((diffMs % (1000 * 60)) / 1000); const tiempoStr = `${String(horas).padStart(2,'0')}:${String(minutos).padStart(2,'0')}:${String(segundos).padStart(2,'0')}`;
-                    htmlEnServicio += `<div class="bg-stone-950/90 border-2 border-emerald-600 p-3 rounded-xl shadow-lg space-y-2"><div class="flex justify-between items-center border-b border-amber-900/30 pb-1"><div><span class="font-black text-amber-300 font-rustic text-sm block">${usr.nombre || ''}</span><span class="text-[9px] text-amber-500">${usr.email || ''}</span></div><span class="bg-emerald-950 text-emerald-400 font-mono text-[9px] px-2 py-0.5 rounded-full border border-emerald-700 font-bold">🟢 EN SERVICIO</span></div><div class="text-[10px] text-amber-200/80 space-y-1 bg-stone-900/60 p-2 rounded border border-amber-900/30"><div>⏰ Fichado desde: <span class="text-amber-300 font-bold">${usr.turnoActivo.fechaInicioStr || ''}</span></div><div>⏳ Tiempo Transcurrido: <span class="font-mono text-emerald-400 font-bold text-xs">${tiempoStr}</span></div></div><div class="flex flex-col gap-1"><button onclick="forzarSalidaAdmin('${usr.uid}', '${nombreSeguro}')" class="w-full bg-amber-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-rustic font-bold transition">🛑 Forzar Salida / Desfichar</button>${botonEliminarHTML}</div></div>`;
+                    htmlEnServicio += `<div class="bg-stone-950/90 border-2 border-emerald-600 p-3 rounded-xl shadow-lg space-y-2"><div class="flex justify-between items-center border-b border-amber-900/30 pb-1"><div><span class="font-black text-amber-300 font-rustic text-sm block">${usr.nombre || ''}</span><span class="text-[9px] text-amber-500">${usr.email || ''}</span></div><span class="bg-emerald-950 text-emerald-400 font-mono text-[9px] px-2 py-0.5 rounded-full border border-emerald-700 font-bold">🟢 EN SERVICIO</span></div><div class="text-[10px] text-amber-200/80 space-y-1 bg-stone-900/60 p-2 rounded border border-amber-900/30"><div>⏰ Fichado desde: <span class="text-amber-300 font-bold">${usr.turnoActivo.fechaInicioStr || ''}</span></div><div>⏳ Tiempo Transcurrido: <span class="font-mono text-emerald-400 font-bold text-xs">${tiempoStr}</span></div></div><div class="flex flex-col gap-1"><button type="button" onclick="forzarSalidaAdmin('${usr.uid}', '${nombreSeguro}')" class="w-full bg-amber-950 hover:bg-amber-900 text-amber-200 text-[10px] py-1 rounded border border-amber-800 font-rustic font-bold transition">🛑 Forzar Salida / Desfichar</button>${botonEliminarHTML}</div></div>`;
                 } else {
                     fueraServicioCount++; htmlFueraServicio += `<div class="bg-stone-900/60 border border-amber-900/40 p-3 rounded-xl space-y-2 opacity-90"><div class="flex justify-between items-center border-b border-amber-900/30 pb-1"><div><span class="font-bold text-amber-200/90 font-rustic text-xs block">${usr.nombre || ''}</span><span class="text-[9px] text-amber-500/70">${usr.email || ''}</span></div><span class="bg-stone-950 text-amber-200/40 font-mono text-[9px] px-2 py-0.5 rounded-full border border-amber-900/50">⚪ FUERA</span></div><div class="text-[10px] text-amber-200/40 italic">Empleado fuera de servicio actualmente.</div>${botonEliminarHTML}</div>`;
                 }
             });
             document.getElementById('cant-en-servicio').textContent = enServicioCount; document.getElementById('cant-fuera-servicio').textContent = fueraServicioCount; galeria.innerHTML = htmlEnServicio + htmlFueraServicio;
         }
+
+        // ====== EL RELOJ INTERNO ======
+        setInterval(() => {
+            if (turnoActivo) actualizarEstadoFichajeUI();
+            
+            // Solo redibuja la plantilla si la pestaña está visible (para no interferir con otras cosas)
+            if (!document.getElementById('pantalla-plantilla').classList.contains('hidden')) {
+                renderizarPlantillaAdminUI();
+            }
+        }, 1000);
+
         function forzarSalidaAdmin(uid, nombre) { if (confirm(`¿Estás seguro de forzar la salida de turno para ${nombre}?`)) { database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => { alert(`🔴 Se ha sacado de servicio a ${nombre}.`); }).catch(err => { alert("❌ Error: " + err.message); }); } }
         function eliminarEmpleadoAdmin(uid, nombre) { if (confirm(`⚠️ ¿Estás seguro de eliminar permanentemente al empleado "${nombre}" de la plantilla?`)) { database.ref('usuarios/' + uid).remove().then(() => { alert(`🗑️ Se ha eliminado a ${nombre} de la plantilla.`); }).catch(err => { alert("❌ Error: " + err.message); }); } }
 
@@ -1196,7 +1203,7 @@
             database.ref('licencias').on('value', (s) => {
                 const data = s.val(); const galeria = document.getElementById('galeria-licencias'); if (!galeria) return; galeria.innerHTML = '';
                 if (!data) { galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay licencias archivadas todavía.</p>'; return; }
-                Object.keys(data).reverse().forEach(key => { const lic = data[key]; if (!lic) return; galeria.innerHTML += `<div class="bg-stone-900/85 border border-amber-900/60 rounded-xl overflow-hidden shadow-lg flex flex-col justify-between"><div class="p-3 bg-stone-950/80 border-b border-amber-900/40 flex justify-between items-center"><div><h4 class="font-bold text-amber-300 text-sm font-rustic">${lic.titular || ''}</h4><span class="text-[10px] text-amber-500 font-semibold uppercase">${lic.tipo || ''}</span></div><button onclick="eliminarLicenciaAdmin('${key}')" title="Borrar Licencia" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button></div><div class="p-2 bg-stone-900 flex justify-center items-center"><a href="${lic.url}" target="_blank"><img src="${lic.url}" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x180?text=Error+al+cargar+imagen';" class="max-h-48 w-full object-contain rounded border border-amber-900/40 hover:opacity-90 transition"></a></div><div class="p-2 bg-stone-950/40 text-center border-t border-amber-900/30"><a href="${lic.url}" target="_blank" class="text-[10px] text-amber-400 hover:underline font-rustic">🔗 Ver Imagen Completa</a></div></div>`; });
+                Object.keys(data).reverse().forEach(key => { const lic = data[key]; if (!lic) return; galeria.innerHTML += `<div class="bg-stone-900/85 border border-amber-900/60 rounded-xl overflow-hidden shadow-lg flex flex-col justify-between"><div class="p-3 bg-stone-950/80 border-b border-amber-900/40 flex justify-between items-center"><div><h4 class="font-bold text-amber-300 text-sm font-rustic">${lic.titular || ''}</h4><span class="text-[10px] text-amber-500 font-semibold uppercase">${lic.tipo || ''}</span></div><button type="button" onclick="eliminarLicenciaAdmin('${key}')" title="Borrar Licencia" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button></div><div class="p-2 bg-stone-900 flex justify-center items-center"><a href="${lic.url}" target="_blank"><img src="${lic.url}" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x180?text=Error+al+cargar+imagen';" class="max-h-48 w-full object-contain rounded border border-amber-900/40 hover:opacity-90 transition"></a></div><div class="p-2 bg-stone-950/40 text-center border-t border-amber-900/30"><a href="${lic.url}" target="_blank" class="text-[10px] text-amber-400 hover:underline font-rustic">🔗 Ver Imagen Completa</a></div></div>`; });
             });
             actualizarEstadoFichajeUI();
         }
@@ -1272,7 +1279,7 @@
             if (listaOrdenada.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-amber-200/40 italic">No hay elementos guardados</td></tr>'; return; }
             listaOrdenada.forEach(item => {
                 const pMin = numSeguro(item.pMin); const pNorm = numSeguro(item.pNorm); const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2);
-                tbody.innerHTML += `<tr class="hover:bg-amber-900/20"><td class="p-2 font-semibold text-amber-100">${item.nombre}</td><td class="p-2 text-center text-[10px] text-amber-200/70">$${pMin.toFixed(2)} / $${pMed.toFixed(2)} / $${pNorm.toFixed(2)}</td><td class="p-2 text-center"><button type="button" onclick="eliminarItem('${dbPath}', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td></tr>`;
+                tbody.innerHTML += `<tr class="hover:bg-amber-900/20"><td class="p-2 font-semibold text-amber-100">${item.nombre}</td><td class="p-2 text-center text-[10px] text-amber-200/70">$${pMin.toFixed(2)} / ${pMed !== pMin ? '$'+pMed.toFixed(2)+' / ' : ''}$${pNorm.toFixed(2)}</td><td class="p-2 text-center"><button type="button" onclick="eliminarItem('${dbPath}', '${item.id}')" class="bg-red-950 text-red-200 px-2 py-1 rounded text-[10px]">Eliminar</button></td></tr>`;
             });
         }
 
@@ -1286,7 +1293,8 @@
         function renderTablaPedidos(elementId, items, estadoObj, region) {
             const tbody = document.getElementById(elementId); if (!tbody) return; tbody.innerHTML = ''; const dbPath = region === 'eeuu' ? 'pedidos_eeuu' : 'pedidos_mexico'; const listaOrdenada = ordenarArrayPorNombre(items);
             listaOrdenada.forEach(item => {
-                const itemId = item.id; const est = estadoObj[itemId] || { cantidad: 0, tarifa: 'min' }; const pMin = numSeguro(item.pMin); const pNorm = numSeguro(item.pNorm); let p = est.tarifa === 'min' ? pMin : pNorm; let sub = est.cantidad * p;
+                const itemId = item.id; const est = estadoObj[itemId] || { cantidad: 0, tarifa: 'min' }; const pMin = numSeguro(item.pMin); const pNorm = numSeguro(item.pNorm);
+                let p = est.tarifa === 'min' ? pMin : pNorm; let sub = est.cantidad * p;
                 tbody.innerHTML += `<tr class="hover:bg-amber-900/20"><td class="p-2 font-semibold text-amber-100">${item.nombre}</td><td class="p-2 text-center"><select onchange="cambiarTarifaPedido('${region}', '${itemId}', this.value)" class="rounded text-[11px] p-1"><option value="min" ${est.tarifa === 'min' ? 'selected' : ''}>Mín ($${pMin.toFixed(2)})</option><option value="norm" ${est.tarifa === 'norm' ? 'selected' : ''}>Máx ($${pNorm.toFixed(2)})</option></select></td><td class="p-2 text-center"><input type="number" min="0" value="${est.cantidad}" oninput="cambiarCantPedido('${region}', '${itemId}', this.value)" class="w-14 p-1 text-center rounded font-bold text-xs"></td><td class="p-2 text-right font-mono font-bold text-amber-400" id="subtotal-${region}-${itemId}">$${sub.toFixed(2)}</td><td class="p-2 text-center"><button type="button" onclick="eliminarItem('${dbPath}', '${itemId}')" title="Eliminar Producto" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button></td></tr>`;
             });
         }
@@ -1351,52 +1359,6 @@
             });
         }
 
-        function renderizarMermas() {
-            const galeria = document.getElementById('lista-mermas'); if (!galeria) return; galeria.innerHTML = '';
-            if (listaMermasGlobal.length === 0) { galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay mermas registradas.</p>'; return; }
-            listaMermasGlobal.forEach(m => {
-                galeria.innerHTML += `<div class="bg-stone-900/80 border border-red-900/50 p-3 rounded-lg shadow space-y-1 relative"><div class="flex justify-between items-center border-b border-red-900/30 pb-1"><span class="font-bold text-red-400 font-rustic text-sm">📉 Merma</span><span class="font-mono text-red-400 font-bold">-$${numSeguro(m.monto).toFixed(2)}</span></div><div class="text-xs text-amber-100 font-semibold pt-1">${m.descripcion}</div><div class="flex justify-between items-end pt-1"><div class="text-[9px] text-amber-500/70">👤 ${m.usuario} <br> 🕒 ${m.fecha}</div><button type="button" onclick="eliminarRegistroAdmin('mermas_historial', '${m.keyFirebase}')" title="Borrar Merma" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button></div></div>`;
-            });
-        }
-
-        function renderizarEventos() {
-            const galeria = document.getElementById('lista-eventos'); if (!galeria) return; galeria.innerHTML = '';
-            if (listaEventosGlobal.length === 0) { galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay gastos de eventos registrados.</p>'; return; }
-            listaEventosGlobal.forEach(ev => {
-                galeria.innerHTML += `<div class="bg-stone-900/80 border border-indigo-900/50 p-3 rounded-lg shadow space-y-1 relative"><div class="flex justify-between items-center border-b border-indigo-900/30 pb-1"><span class="font-bold text-indigo-400 font-rustic text-sm">🎭 Gasto de Evento</span><span class="font-mono text-indigo-400 font-bold">-$${numSeguro(ev.monto).toFixed(2)}</span></div><div class="text-xs text-amber-100 font-semibold pt-1">${ev.descripcion}</div><div class="flex justify-between items-end pt-1"><div class="text-[9px] text-amber-500/70">👤 ${ev.usuario} <br> 🕒 ${ev.fecha}</div><button type="button" onclick="eliminarRegistroAdmin('eventos_historial', '${ev.keyFirebase}')" title="Borrar Evento" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button></div></div>`;
-            });
-        }
-
-        function renderizarNominasHistorial() {
-            const galeria = document.getElementById('galeria-nominas-historial'); if (!galeria) return; galeria.innerHTML = '';
-            if (listaNominasGlobal.length === 0) { galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No se han emitido pagos de nóminas todavía.</p>'; return; }
-            listaNominasGlobal.forEach(nom => {
-                galeria.innerHTML += `<div class="bg-stone-900/80 border border-emerald-900/50 p-3 rounded-lg shadow space-y-1 relative"><div class="flex justify-between items-center border-b border-emerald-900/30 pb-1"><span class="font-bold text-emerald-400 font-rustic text-sm">💸 Nómina Pagada</span><span class="font-mono text-emerald-400 font-bold">-$${numSeguro(nom.montoTotal).toFixed(2)}</span></div><div class="text-xs text-amber-100 font-semibold pt-1">Empleado: ${nom.empleadoNombre}</div><div class="text-[10px] text-amber-200/70">Horas pagadas: <span class="font-bold">${nom.horasPagadas}h</span></div><div class="text-[10px] text-amber-200/70">Bonus aplicado: <span class="font-bold">$${numSeguro(nom.bonusAplicado).toFixed(2)}</span></div><div class="flex justify-between items-end pt-1 border-t border-emerald-900/30 mt-1"><div class="text-[9px] text-amber-500/70">🕒 ${nom.fecha}</div><button type="button" onclick="eliminarRegistroAdmin('nominas_historial', '${nom.keyFirebase}')" title="Anular Nómina (Devuelve el dinero)" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button></div></div>`;
-            });
-        }
-
-        function renderizarFichajesAdmin() {
-            const galeria = document.getElementById('galeria-fichajes-admin'); if (!galeria) return; galeria.innerHTML = '';
-            const filtro = (document.getElementById('buscador-fichajes-admin')?.value || '').toLowerCase().trim();
-            const fichajesFiltrados = listaFichajesGlobal.filter(t => { if (!t) return false; const usr = (t.usuario || '').toLowerCase(); const inicio = (t.inicioStr || '').toLowerCase(); const fin = (t.finStr || '').toLowerCase(); return usr.includes(filtro) || inicio.includes(filtro) || fin.includes(filtro); });
-            if (fichajesFiltrados.length === 0) { galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-3">No hay turnos finalizados que coincidan.</p>'; return; }
-            fichajesFiltrados.forEach(t => {
-                galeria.innerHTML += `<div class="bg-stone-950/80 border border-amber-900/50 p-3 rounded-lg shadow space-y-1"><div class="flex justify-between items-center border-b border-amber-900/30 pb-1"><span class="font-bold text-amber-300 font-rustic">👤 ${t.usuario || ''}</span><span class="font-mono text-emerald-400 font-bold">${t.horas || 0}h</span></div><div class="text-[10px] text-amber-200/70 space-y-0.5 pt-1"><div>⏰ Inicio: ${t.inicioStr || ''}</div><div>🏁 Fin: ${t.finStr || ''}</div><div>🧾 Tickets: <span class="text-amber-300 font-bold">${t.tickets || 0}</span></div><div>💰 Recaudación: <span class="text-amber-400 font-bold">$${numSeguro(t.ventas).toFixed(2)}</span></div></div><div class="flex justify-end gap-1 pt-1"><button type="button" onclick="copiarFichajeIndividual('${t.usuario}', '${t.inicioStr}', '${t.finStr}', '${t.horas}', '${t.tickets||0}', '${t.ventas||0}')" class="bg-indigo-950 hover:bg-indigo-900 text-indigo-200 text-[10px] px-2 py-0.5 rounded border border-indigo-700">📋 Copiar Discord</button><button type="button" onclick="eliminarFichajeAdmin('${t.keyFirebase}')" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button></div></div>`;
-            });
-        }
-
-        function renderizarConvenios() {
-            const galeria = document.getElementById('galeria-convenios'); if (!galeria) return; galeria.innerHTML = '';
-            const listaConvenios = Object.values(conveniosGlobal).filter(Boolean);
-            if (listaConvenios.length === 0) { galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay cuentas de convenios creadas aún.</p>'; return; }
-            listaConvenios.forEach(c => {
-                if (!c || !c.id) return; const nombreConvenio = c.nombre || 'Convenio sin nombre'; const deuda = numSeguro(c.saldoDeuda); const consumos = c.historialConsumos ? Object.values(c.historialConsumos).filter(Boolean).reverse() : []; let htmlConsumos = '';
-                if (consumos.length === 0) { htmlConsumos = '<p class="text-[10px] text-amber-200/40 italic text-center py-2">Sin consumos fiados acumulados.</p>'; } else { consumos.slice(0, 5).forEach(item => { htmlConsumos += `<div class="flex justify-between items-center text-[10px] border-b border-amber-900/30 pb-1"><div><span class="text-amber-200 font-semibold block">${item.descripcion || ''}</span><span class="text-[8px] text-amber-500">${item.fecha || ''} (${item.usuario || ''})</span></div><span class="font-mono font-bold text-amber-400">+$${numSeguro(item.monto).toFixed(2)}</span></div>`; }); }
-                const nombreEscapado = nombreConvenio.replace(/'/g, "\\'");
-                galeria.innerHTML += `<div class="western-panel rounded-xl p-3.5 flex flex-col justify-between space-y-3 border-amber-700"><div class="space-y-2"><div class="flex justify-between items-center border-b border-amber-900/60 pb-1.5"><h3 class="font-bold text-amber-300 font-rustic text-sm">🏛️ ${nombreConvenio}</h3><button type="button" onclick="eliminarConvenioAdmin('${c.id}', '${nombreEscapado}')" title="Eliminar Convenio" class="text-red-400 hover:text-red-200 text-xs px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button></div><div class="bg-stone-950/90 p-2.5 rounded-lg border border-amber-900/60 text-center"><span class="text-[9px] uppercase font-bold text-amber-400/80 font-rustic block">💰 Deuda Total Pendiente:</span><span class="text-lg font-black ${deuda > 0 ? 'text-red-400' : 'text-emerald-400'} font-mono">$${deuda.toFixed(2)}</span></div><div class="bg-stone-900/80 p-2 rounded-lg border border-amber-900/40 space-y-1.5"><span class="text-[10px] font-bold text-amber-300 block">➕ Añadir Consumo Directo:</span><div class="flex gap-1"><input type="text" id="desc-item-${c.id}" placeholder="Ej: 2x Menú Medio Muerto" class="w-2/3 p-1 rounded text-[10px]"><input type="number" step="0.01" id="monto-item-${c.id}" placeholder="$" class="w-1/3 p-1 rounded text-[10px] text-center"></div><button type="button" onclick="agregarConsumoAConvenio('${c.id}')" class="w-full bg-amber-800 hover:bg-amber-700 text-amber-100 text-[10px] py-1 rounded font-rustic font-bold border border-amber-600">➕ Sumar a la Deuda</button></div><div class="space-y-1 max-h-32 overflow-y-auto pr-1"><span class="text-[9px] uppercase font-bold text-amber-400/70 font-rustic block">📋 Últimos Consumos:</span>${htmlConsumos}</div></div><div class="pt-2 border-t border-amber-900/60"><button type="button" onclick="cobrarDeudaConvenio('${c.id}', '${nombreEscapado}', ${deuda})" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 text-xs py-2 rounded font-rustic font-bold border border-emerald-600 shadow transition">💵 Liquidar Deuda (Cobrar e Ingresar a Caja)</button></div></div>`;
-            });
-        }
-
         // INTERACTIONS
         function cambiarCantVenta(tipo, id, val) {
             let obj; if (tipo === 'comida') obj = ventaComida; else if (tipo === 'bebida_normal') obj = ventaBebidaNormal; else if (tipo === 'bebida_alcohol') obj = ventaBebidaAlcohol; else if (tipo === 'menu') obj = ventaMenus; else if (tipo === 'platos_npc') obj = ventaPlatosNPC; else obj = ventaProductos;
@@ -1408,11 +1370,8 @@
         }
         function cambiarCantPedido(region, id, val) { let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex; if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' }; const cant = Math.max(0, parseInt(val) || 0); obj[id].cantidad = cant; renderizarResumenPedidos(); }
         function cambiarTarifaPedido(region, id, tarifa) { let obj = region === 'eeuu' ? pedidoEEUU : pedidoMex; if (!obj[id]) obj[id] = { cantidad: 0, tarifa: 'min' }; obj[id].tarifa = tarifa; renderizarResumenPedidos(); }
+        
         function setPorcentajeVenta(pct) { document.getElementById('input-porcentaje-venta').value = pct; renderizarResumenVenta(); }
-        function filtrarCartaVentas() { const filtro = (document.getElementById('buscador-ventas')?.value || '').toLowerCase().trim(); const filtrarTabla = (tableId) => { const tbody = document.getElementById(tableId); if (!tbody) return; const filas = tbody.querySelectorAll('tr'); filas.forEach(fila => { const texto = fila.textContent.toLowerCase(); if (texto.includes(filtro)) { fila.style.display = ''; } else { fila.style.display = 'none'; } }); }; filtrarTabla('tabla-venta-comida'); filtrarTabla('tabla-venta-bebida-normal'); filtrarTabla('tabla-venta-bebida-alcohol'); filtrarTabla('tabla-venta-menus'); filtrarTabla('tabla-venta-platos-npc'); filtrarTabla('tabla-venta-productos'); }
-        function filtrarCatalogoPedidos() { const filtro = (document.getElementById('buscador-catalogo-pedidos')?.value || '').toLowerCase().trim(); const filtrarTabla = (tableId) => { const tbody = document.getElementById(tableId); if (!tbody) return; const filas = tbody.querySelectorAll('tr'); filas.forEach(fila => { const texto = fila.textContent.toLowerCase(); if (texto.includes(filtro)) { fila.style.display = ''; } else { fila.style.display = 'none'; } }); }; filtrarTabla('tabla-pedidos-eeuu'); filtrarTabla('tabla-pedidos-mexico'); }
-        function filtrarTickets() { renderizarFacturas(); }
-        function filtrarPedidosHistorial() { renderizarPedidosHistorial(); }
         function limpiarPedidos() { pedidoEEUU = {}; pedidoMex = {}; renderizarTodo(); }
 
         function actualizarSelectConveniosVenta() {
@@ -1472,11 +1431,6 @@
             }
         }
 
-        function copiarFichajeIndividual(usr, inicio, fin, hrs, tickets, ventas) {
-            const textoDiscord = "```md\n⏱️ **CONTROL DE FICHAJE - THE CORNER**\n-----------------------------------\n👤 **Empleado:** " + usr + "\n⏰ **Inicio:** " + inicio + "\n🏁 **Fin:** " + fin + "\n⏳ **Horas Trabajadas:** " + hrs + "h\n🧾 **Tickets Emitidos:** " + tickets + "\n💰 **Beneficio Generado:** $" + numSeguro(ventas).toFixed(2) + "\n```";
-            copiarTextoPortapapeles(textoDiscord);
-        }
-
         // DELETIONS
         function eliminarRegistroAdmin(ruta, keyFirebase) { if (confirm("¿Estás seguro de eliminar este registro? El dinero volverá a sumarse a la caja si corresponde.")) { database.ref(ruta + '/' + keyFirebase).remove(); } }
         function eliminarFacturaAdmin(keyFirebase) { if (confirm("¿Estás seguro de eliminar este ticket?")) { database.ref('facturas/' + keyFirebase).remove(); } }
@@ -1487,61 +1441,11 @@
         function eliminarPedidoAdmin(keyFirebase) { if (confirm("¿Estás seguro de eliminar este registro de pedido?")) { database.ref('pedidos_historial/' + keyFirebase).remove(); } }
         function eliminarFichajeAdmin(keyFirebase) { if (confirm("¿Deseas eliminar este registro de fichaje?")) { database.ref('fichajes_historial/' + keyFirebase).remove(); } }
 
-        // SUELDOS Y NOMINAS
-        function renderizarSueldosAdmin() {
-            const galeria = document.getElementById('galeria-sueldos-admin'); if (!galeria) return;
-            const listaUsuarios = Object.values(usuariosPlantillaGlobal).filter(u => u && (u.aprobado || u.rol === 'admin'));
-            if (listaUsuarios.length === 0) { galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay empleados registrados en la plantilla para gestionar sueldos.</p>'; return; }
-            let htmlCompleto = '';
-            listaUsuarios.forEach(usr => {
-                const nombreSeguro = (usr.nombre || '').replace(/'/g, "\\'"); const horasP = numSeguro(usr.horasPendientes).toFixed(2); const sBase = numSeguro(usr.sueldoBase).toFixed(2); const hMin = numSeguro(usr.horasMinimas).toFixed(2); const extraRate = numSeguro(usr.incentivoExtra).toFixed(2);
-                htmlCompleto += `<div class="bg-stone-900/90 border border-amber-900/50 rounded-xl p-3 shadow-lg flex flex-col justify-between" id="card-sueldo-${usr.uid}"><div class="space-y-2"><div class="flex justify-between items-center border-b border-amber-900/40 pb-2"><h3 class="font-bold text-amber-300 font-rustic text-sm">👤 ${usr.nombre || ''}</h3><span class="bg-stone-950 text-amber-400 font-mono text-[10px] px-2 py-0.5 rounded border border-amber-800">Pendiente: <span class="font-black text-emerald-400">${horasP}h</span></span></div><div class="grid grid-cols-3 gap-2"><div><label class="block text-[9px] text-amber-200/70 mb-1">Sueldo Base ($)</label><input type="number" id="base-${usr.uid}" step="0.01" value="${sBase}" onchange="guardarConfigSueldo('${usr.uid}', 'sueldoBase', this.value)" class="w-full p-1.5 rounded text-[10px] text-center font-bold"></div><div><label class="block text-[9px] text-amber-200/70 mb-1">Horas Mínimas</label><input type="number" id="min-${usr.uid}" step="0.01" value="${hMin}" onchange="guardarConfigSueldo('${usr.uid}', 'horasMinimas', this.value)" class="w-full p-1.5 rounded text-[10px] text-center font-bold"></div><div><label class="block text-[9px] text-amber-200/70 mb-1">Incentivo Extra/h</label><input type="number" id="extra-${usr.uid}" step="0.01" value="${extraRate}" onchange="guardarConfigSueldo('${usr.uid}', 'incentivoExtra', this.value)" class="w-full p-1.5 rounded text-[10px] text-center font-bold"></div></div><div class="bg-stone-950/60 p-2 rounded border border-amber-900/30 flex justify-between items-center"><label class="text-[10px] font-bold text-amber-300">➕ Bonus / Ajuste Manual ($):</label><input type="number" id="bonus-${usr.uid}" step="0.01" value="0.00" oninput="recalcularTotalUI('${usr.uid}')" class="w-20 p-1 rounded text-xs text-center font-bold bg-stone-900 border-amber-700 text-amber-200"></div></div><div class="pt-3 border-t border-amber-900/60 mt-3 space-y-2"><div class="flex justify-between items-center bg-stone-950 p-2 rounded border border-emerald-900/50"><span class="text-[11px] font-bold text-amber-400 font-rustic uppercase">Total a Pagar:</span><span id="display-total-${usr.uid}" class="text-base font-black text-emerald-400 font-mono">$0.00</span></div><button type="button" onclick="procesarPagoSueldo('${usr.uid}', '${nombreSeguro}')" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 text-[11px] py-2 rounded font-rustic font-bold border border-emerald-600 shadow transition">💸 Pagar, Descontar Caja y Resetear Horas</button></div></div>`;
-            });
-            const activeTag = document.activeElement ? document.activeElement.tagName : '';
-            if (activeTag !== 'INPUT') { galeria.innerHTML = htmlCompleto; listaUsuarios.forEach(usr => recalcularTotalUI(usr.uid)); }
-        }
-
-        function guardarConfigSueldo(uid, campo, valor) { let numVal = numSeguro(valor); database.ref(`usuarios/${uid}/${campo}`).set(numVal).then(() => { recalcularTotalUI(uid); }); }
-        
-        function recalcularTotalUI(uid) {
-            const usr = usuariosPlantillaGlobal[uid]; if (!usr) return 0;
-            let horas = numSeguro(usr.horasPendientes); let base = numSeguro(document.getElementById(`base-${uid}`)?.value); let min = numSeguro(document.getElementById(`min-${uid}`)?.value); let extraRate = numSeguro(document.getElementById(`extra-${uid}`)?.value); let bonus = numSeguro(document.getElementById(`bonus-${uid}`)?.value);
-            let total = 0; if (min > 0) { if (horas <= min) { total = (horas / min) * base; } else { total = base + ((horas - min) * extraRate); } } else { total = base + (horas * extraRate); } total += bonus;
-            const display = document.getElementById(`display-total-${uid}`); if (display) { display.textContent = `$${Math.max(0, total).toFixed(2)}`; } return Math.max(0, total);
-        }
-
-        function procesarPagoSueldo(uid, nombre) {
-            const usr = usuariosPlantillaGlobal[uid]; if (!usr) return; let horas = numSeguro(usr.horasPendientes);
-            if (horas <= 0) { alert("Este empleado no tiene horas pendientes de cobro."); return; }
-            const totalFinal = recalcularTotalUI(uid); const bonusAplicado = numSeguro(document.getElementById(`bonus-${uid}`)?.value);
-            if (confirm(`💸 ¿Confirmas el PAGO de $${totalFinal.toFixed(2)} a ${nombre}?\n\nEsto restará el dinero de la caja y pondrá sus horas a 0.`)) {
-                const ahora = new Date(); const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
-                const nominaData = { id: Date.now(), empleadoUid: uid, empleadoNombre: nombre, horasPagadas: horas, montoTotal: totalFinal, bonusAplicado: bonusAplicado, pagador: usuarioActualData.nombre, fecha: fechaStr };
-                database.ref('nominas_historial').push(nominaData);
-                database.ref(`usuarios/${uid}/horasPendientes`).set(0).then(() => {
-                    const txtDiscord = "```md\n💸 **PAGO DE NÓMINA - THE CORNER**\n-----------------------------------\n👤 **Empleado Pagado:** " + nombre + "\n⏰ **Horas Totales:** " + horas.toFixed(2) + "h\n🎁 **Ajuste/Bonus:** $" + bonusAplicado.toFixed(2) + "\n💰 **TOTAL PAGADO:** $" + totalFinal.toFixed(2) + "\n```";
-                    copiarTextoPortapapeles(txtDiscord); alert(`✅ Se han pagado $${totalFinal.toFixed(2)} a ${nombre}. Dinero restado de la caja.`); document.getElementById(`bonus-${uid}`).value = '0.00';
-                });
-            }
-        }
-
-        // FORMATTERS & MISC
-        function generarFormatoDiscord(usuario, codigo, resumenItems, subtotal, descuentoMonto, pct, convenioNombre, totalConsumo, propina, esDeuda) {
-            const lineas = resumenItems.split(', ').map(i => "• " + i).join('\n'); let infoConvenio = convenioNombre ? `🏛️ **Convenio:** ${convenioNombre} ${esDeuda ? '(Fiado a cuenta)' : ''}\n` : ''; let infoDescuento = pct > 0 ? `🏷️ **Descuento Aplicado:** ${pct}% (-$${descuentoMonto.toFixed(2)})\n` : ''; let infoPropina = propina > 0 ? `🪙 **Propina / Bote:** +$${propina.toFixed(2)}\n` : ''; let totalRealCaja = esDeuda ? 0 : (totalConsumo + propina);
-            return "```md\n🧾 **THE CORNER - SAINT DENIS**\n👤 **Atendido por:** " + usuario + "\n📅 **Ticket:** #" + codigo + "\n" + infoConvenio + "-----------------------------------\n📦 **Detalle:**\n" + lineas + "\n-----------------------------------\n" + (pct > 0 ? `💵 **Subtotal:** $${subtotal.toFixed(2)}\n` : '') + infoDescuento + (propina > 0 ? `🍽️ **Consumo:** $${totalConsumo.toFixed(2)}\n` + infoPropina : '') + (esDeuda ? `⚠️ **CARGADO A DEUDA:** $${totalConsumo.toFixed(2)}\n` : `💰 **TOTAL EN CAJA:** $${totalRealCaja.toFixed(2)}\n`) + "```";
-        }
-        function generarFormatoDiscordPedido(codigo, resumenItems, total) { const lineas = resumenItems.split(', ').map(i => "• " + i).join('\n'); return "```md\n📦 **THE CORNER - PEDIDO DE MATERIA PRIMA**\n📅 **Pedido:** #" + codigo + "\n-----------------------------------\n📋 **Detalle:**\n" + lineas + "\n-----------------------------------\n💰 **COSTE TOTAL:** $" + numSeguro(total).toFixed(2) + "\n```"; }
-        function copiarTicketDiscordTexto(usuario, codigo, resumen, total, propina) { const consumoReal = total - propina; let infoPropina = propina > 0 ? `🪙 **Propina / Bote:** +$${propina.toFixed(2)}\n` : ''; let texto = "```md\n🧾 **THE CORNER - SAINT DENIS**\n👤 **Atendido por:** " + usuario + "\n📅 **Ticket:** #" + codigo + "\n-----------------------------------\n📦 **Detalle:**\n" + resumen.split(', ').map(i => "• " + i).join('\n') + "\n-----------------------------------\n"; if (propina > 0) { texto += `🍽️ **Consumo:** $${consumoReal.toFixed(2)}\n` + infoPropina; } texto += "💰 **TOTAL EN CAJA:** $" + total.toFixed(2) + "\n```"; copiarTextoPortapapeles(texto); }
-
-        function registrarPedidoContabilidad() {
-            let totalCoste = 0, resumenArray = [];
-            Object.entries(productosEEUU || {}).forEach(([key, item]) => { if (!item) return; const itemId = item.id || key; const est = pedidoEEUU[itemId]; if (est && est.cantidad > 0) { let p = est.tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm); totalCoste += est.cantidad * p; resumenArray.push(est.cantidad + "x " + item.nombre + " (EEUU)"); } });
-            Object.entries(productosMexico || {}).forEach(([key, item]) => { if (!item) return; const itemId = item.id || key; const est = pedidoMex[itemId]; if (est && est.cantidad > 0) { let p = est.tarifa === 'min' ? numSeguro(item.pMin) : numSeguro(item.pNorm); totalCoste += est.cantidad * p; resumenArray.push(est.cantidad + "x " + item.nombre + " (Mex)"); } });
-            if (totalCoste === 0) { alert("No hay ningún producto en el pedido actual."); return; }
-            const ahora = new Date(); const codigoPedido = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0'); const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
-            const pedidoData = { id: Date.now(), codigoPedido: codigoPedido, total: totalCoste, resumen: resumenArray.join(', '), fecha: fechaStr };
-            database.ref('pedidos_historial').push(pedidoData); copiarTextoPortapapeles(generarFormatoDiscordPedido(codigoPedido, resumenArray.join(', '), totalCoste)); alert("¡Pedido registrado en contabilidad, descontado de la caja y copiado para Discord!"); limpiarPedidos();
-        }
+        // FORMATTERS
+        function filtrarCartaVentas() { const filtro = (document.getElementById('buscador-ventas')?.value || '').toLowerCase().trim(); const filtrarTabla = (tableId) => { const tbody = document.getElementById(tableId); if (!tbody) return; const filas = tbody.querySelectorAll('tr'); filas.forEach(fila => { const texto = fila.textContent.toLowerCase(); if (texto.includes(filtro)) { fila.style.display = ''; } else { fila.style.display = 'none'; } }); }; filtrarTabla('tabla-venta-comida'); filtrarTabla('tabla-venta-bebida-normal'); filtrarTabla('tabla-venta-bebida-alcohol'); filtrarTabla('tabla-venta-menus'); filtrarTabla('tabla-venta-platos-npc'); filtrarTabla('tabla-venta-productos'); }
+        function filtrarCatalogoPedidos() { const filtro = (document.getElementById('buscador-catalogo-pedidos')?.value || '').toLowerCase().trim(); const filtrarTabla = (tableId) => { const tbody = document.getElementById(tableId); if (!tbody) return; const filas = tbody.querySelectorAll('tr'); filas.forEach(fila => { const texto = fila.textContent.toLowerCase(); if (texto.includes(filtro)) { fila.style.display = ''; } else { fila.style.display = 'none'; } }); }; filtrarTabla('tabla-pedidos-eeuu'); filtrarTabla('tabla-pedidos-mexico'); }
+        function filtrarTickets() { renderizarFacturas(); }
+        function filtrarPedidosHistorial() { renderizarPedidosHistorial(); }
 
         // ================= FINAL EVENT LISTENERS (FORMS Y BOTONES) =================
         document.getElementById('btn-registrar-venta').addEventListener('click', () => {
@@ -1562,8 +1466,6 @@
         });
 
         document.getElementById('btn-limpiar-venta').addEventListener('click', () => { ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {}; document.getElementById('input-porcentaje-venta').value = '0'; document.getElementById('select-convenio-venta').value = ''; document.getElementById('input-efectivo-entregado').value = ''; renderizarTodo(); });
-
-        document.getElementById('form-nuevo-convenio').addEventListener('submit', (e) => { e.preventDefault(); const nombre = document.getElementById('convenio-nombre').value.trim(); if (!nombre) return; const id = 'conv_' + Date.now().toString(); database.ref('convenios/' + id).set({ id: id, nombre: nombre, saldoDeuda: 0.00, historialConsumos: {} }).then(() => { document.getElementById('convenio-nombre').value = ''; alert(`🏛️ Convenio "${nombre}" creado con éxito.`); }); });
         
         document.getElementById('form-nuevo-pedido-eeuu').addEventListener('submit', function(e) { e.preventDefault(); const id = 'e_' + Date.now().toString(); database.ref('pedidos_eeuu/' + id).set({ id, nombre: document.getElementById('p-eeuu-nombre').value.trim(), pMin: parseFloat(document.getElementById('p-eeuu-min').value), pNorm: parseFloat(document.getElementById('p-eeuu-norm').value) }); this.reset(); alert("¡Producto añadido a EEUU!"); });
         
