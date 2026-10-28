@@ -161,7 +161,7 @@
             </div>
         </header>
 
-        <!-- NAVEGACIÓN PRINCIPAL ORDENADA -->
+        <!-- NAVEGACIÓN PRINCIPAL -->
         <div class="flex flex-wrap justify-center gap-1 bg-stone-950/90 p-1.5 rounded-xl border border-amber-900/50 text-center text-[10px] md:text-xs">
             <button onclick="cambiarPantalla('ventas')" id="btn-tab-ventas" class="tab-btn active py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>💰</span> <span>Ventas</span>
@@ -543,7 +543,6 @@
                             </table>
                         </div>
                     </div>
-
                     <div>
                         <h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🇲🇽 Agricultura México</h3>
                         <div class="overflow-x-auto">
@@ -1068,6 +1067,9 @@
             }
         }
 
+        // ==============================================================================
+        // ================= JS: RENDERIZADO MERMAS, EVENTOS Y NÓMINAS =================
+        // ==============================================================================
         function renderizarMermas() {
             const galeria = document.getElementById('lista-mermas');
             if (!galeria) return;
@@ -1153,6 +1155,8 @@
                 database.ref(ruta + '/' + keyFirebase).remove();
             }
         }
+        // ==============================================================================
+
 
         function switchAuthTab(tab) {
             const fLogin = document.getElementById('form-login');
@@ -1569,6 +1573,7 @@
                 actualizarCajaTotalDisplay();
             });
 
+            // NUEVO: NÓMINAS
             database.ref('nominas_historial').on('value', (s) => {
                 const data = s.val();
                 listaNominasGlobal = [];
@@ -1785,68 +1790,7 @@
             }
         }
 
-        function calcularMasVendidos() {
-            const contenedor = document.getElementById('lista-mas-vendidos');
-            if (!contenedor) return;
-            contenedor.innerHTML = '';
-
-            let conteoProductos = {};
-            let totalUnidadesVendidas = 0;
-
-            listaFacturasGlobal.forEach(f => {
-                if (!f || !f.resumen) return;
-                const partes = f.resumen.split(',');
-                partes.forEach(parte => {
-                    const limpia = parte.trim();
-                    const regex = /^(\d+)x\s+(.+)$/;
-                    const match = limpia.match(regex);
-                    if (match) {
-                        const cantidad = parseInt(match[1]) || 0;
-                        let nombreProd = match[2].trim();
-                        nombreProd = nombreProd.replace(/\[.*?\]/g, '').trim();
-
-                        if (cantidad > 0 && nombreProd) {
-                            conteoProductos[nombreProd] = (conteoProductos[nombreProd] || 0) + cantidad;
-                            totalUnidadesVendidas += cantidad;
-                        }
-                    }
-                });
-            });
-
-            const ranking = Object.entries(conteoProductos).sort((a, b) => b[1] - a[1]);
-
-            if (ranking.length === 0) {
-                contenedor.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">Aún no hay suficientes ventas registradas para generar estadísticas.</p>';
-                return;
-            }
-
-            ranking.forEach(([producto, cantidad], index) => {
-                const porcentaje = totalUnidadesVendidas > 0 ? ((cantidad / totalUnidadesVendidas) * 100).toFixed(1) : 0;
-                let medalla = '🔹';
-                if (index === 0) medalla = '🥇';
-                else if (index === 1) medalla = '🥈';
-                else if (index === 2) medalla = '🥉';
-
-                contenedor.innerHTML += `
-                    <div class="bg-stone-900/90 border border-amber-900/60 p-3 rounded-xl shadow space-y-2 flex flex-col justify-between">
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold text-amber-300 font-rustic text-xs">${medalla} ${producto}</span>
-                            <span class="bg-amber-950 text-amber-400 font-mono font-bold text-[10px] px-2 py-0.5 rounded border border-amber-800">${cantidad} uds.</span>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-[10px] text-amber-200/70">
-                                <span>Porcentaje de ventas:</span>
-                                <span class="font-bold text-emerald-400">${porcentaje}%</span>
-                            </div>
-                            <div class="w-full bg-stone-950 rounded-full h-1.5 border border-amber-900/40 overflow-hidden">
-                                <div class="bg-amber-500 h-full rounded-full" style="width: ${porcentaje}%"></div>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        // ================= JS: BOTONES Y EVENT LISTENERS (VENTAS, PEDIDOS, MERMAS, ETC) =================
+        // ================= JS: EVENT LISTENERS (VENTAS, PEDIDOS, MERMAS, ETC) =================
         
         document.getElementById('btn-registrar-venta').addEventListener('click', () => {
             let subtotalBase = 0, resumenArray = [];
