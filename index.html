@@ -193,6 +193,10 @@
             <button id="btn-tab-plantilla" onclick="cambiarPantalla('plantilla')" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
                 <span>📋</span> <span>Plantilla</span>
             </button>
+            <!-- NUEVO BOTÓN DE SUELDOS (SOLO ADMIN) -->
+            <button id="btn-tab-sueldos" onclick="cambiarPantalla('sueldos')" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center hidden">
+                <span>💸</span> <span>Sueldos</span>
+            </button>
             <button onclick="cambiarPantalla('mas-vendidos')" id="btn-tab-mas-vendidos" class="tab-btn py-2 px-2 rounded-lg font-bold text-amber-200/70 border border-transparent transition font-rustic flex flex-col items-center justify-center">
                 <span>🏆</span> <span>Más Vendidos</span>
             </button>
@@ -454,17 +458,19 @@
                         <button id="btn-admin-purga" onclick="purgaHistorialAdmin()" class="bg-red-950 hover:bg-red-900 text-red-200 border border-red-700 text-[11px] px-3 py-1.5 rounded font-rustic font-bold transition hidden">🧹 Purga (Admin)</button>
                     </div>
                 </div>
+
                 <div class="bg-stone-900/70 p-2 rounded-lg border border-amber-900/40 flex items-center space-x-2">
                     <span class="text-sm">🔍</span>
                     <input type="text" id="buscador-tickets" placeholder="Buscar por usuario, fecha, hora o producto..." class="w-full p-2 rounded text-xs bg-stone-950 text-amber-100 border-amber-800 focus:outline-none" oninput="filtrarTickets()">
                 </div>
+
                 <div id="lista-historial-facturas" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-amber-200/80">
                     <p class="italic text-amber-200/40 col-span-2 text-center py-4">No hay facturas registradas todavía.</p>
                 </div>
             </div>
         </div>
 
-        <!-- ================= PANTALLA: CONVENIOS ================= -->
+        <!-- ================= PANTALLA DE CONVENIOS ================= -->
         <div id="pantalla-convenios" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-amber-900/60 pb-2 gap-2">
@@ -477,7 +483,7 @@
                 <form id="form-nuevo-convenio" class="bg-stone-900/60 p-3 rounded-xl border border-amber-900/40 space-y-3">
                     <h3 class="text-xs font-bold text-amber-300 font-rustic">➕ Crear Nueva Cuenta de Convenio</h3>
                     <div class="flex flex-col md:flex-row gap-2">
-                        <input type="text" id="convenio-nombre" placeholder="Nombre de la Organización / Colectivo" required class="w-full p-2 rounded text-xs">
+                        <input type="text" id="convenio-nombre" placeholder="Nombre de la Organización / Colectivo (Ej: Sheriffs, Médicos...)" required class="w-full p-2 rounded text-xs">
                         <button type="submit" class="bg-amber-800 hover:bg-amber-700 text-amber-100 font-bold px-4 py-2 rounded text-xs border border-amber-600 font-rustic whitespace-nowrap">Crear Convenio</button>
                     </div>
                 </form>
@@ -488,7 +494,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLA: PEDIDOS ================= -->
+        <!-- ================= PANTALLA 2: PEDIDOS ================= -->
         <div id="pantalla-pedidos" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-3 flex items-center space-x-2">
                 <span class="text-base">🔍</span>
@@ -538,6 +544,7 @@
                             </table>
                         </div>
                     </div>
+
                     <div>
                         <h3 class="text-sm font-bold text-amber-300 mb-2 font-rustic">🇲🇽 Agricultura México</h3>
                         <div class="overflow-x-auto">
@@ -582,7 +589,7 @@
             </div>
         </div>
 
-        <!-- ================= PANTALLAS DE GESTIÓN CARTA ================= -->
+        <!-- ================= PANTALLAS DE GESTIÓN (COMIDA, BEBIDA, MENÚS, NPC, PRODUCTOS, LICENCIAS) ================= -->
         <div id="pantalla-comida" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <h2 class="text-lg font-extrabold text-amber-400 border-b border-amber-900/60 pb-2 font-rustic">🥩 Gestión de Comida (3 Tarifas)</h2>
@@ -841,6 +848,29 @@
             </div>
         </div>
 
+        <!-- ================= NUEVA PANTALLA: SUELDOS (ADMIN) ================= -->
+        <div id="pantalla-sueldos" class="space-y-4 hidden">
+            <div class="western-panel rounded-xl p-4 space-y-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-amber-900/60 pb-2 gap-2">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-amber-400 font-rustic">💸 Gestión de Sueldos y Nóminas</h2>
+                        <p class="text-xs text-amber-200/60">Configura el pago de cada empleado. Las horas se suman solas al desfichar.</p>
+                    </div>
+                </div>
+                
+                <div id="galeria-sueldos-admin" class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs">
+                    <p class="italic text-amber-200/40 col-span-full text-center py-4">Cargando datos de sueldos...</p>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-amber-900/60">
+                    <h3 class="text-sm font-extrabold text-amber-400 font-rustic mb-3">📜 Historial de Nóminas Pagadas</h3>
+                    <div id="galeria-nominas-historial" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                        <p class="italic text-amber-200/40 col-span-full text-center py-4">No se han emitido pagos de nóminas todavía.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="pantalla-mas-vendidos" class="space-y-4 hidden">
             <div class="western-panel rounded-xl p-4 space-y-4">
                 <div class="flex justify-between items-center border-b border-amber-900/60 pb-2">
@@ -1018,6 +1048,7 @@
         let listaFichajesGlobal = [];
         let listaMermasGlobal = [];
         let listaEventosGlobal = [];
+        let listaNominasGlobal = []; // NUEVO PARA SUELDOS
         let turnoActivo = null;
 
         function numSeguro(val) {
@@ -1037,6 +1068,97 @@
                 btn.textContent = '➕ Desplegar';
             }
         }
+
+        // ==============================================================================
+        // ================= JS: RENDERIZADO MERMAS, EVENTOS Y NÓMINAS =================
+        // ==============================================================================
+        function renderizarMermas() {
+            const galeria = document.getElementById('lista-mermas');
+            if (!galeria) return;
+            galeria.innerHTML = '';
+            
+            if (listaMermasGlobal.length === 0) {
+                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay mermas registradas.</p>';
+                return;
+            }
+
+            listaMermasGlobal.forEach(m => {
+                galeria.innerHTML += `
+                    <div class="bg-stone-900/80 border border-red-900/50 p-3 rounded-lg shadow space-y-1 relative">
+                        <div class="flex justify-between items-center border-b border-red-900/30 pb-1">
+                            <span class="font-bold text-red-400 font-rustic text-sm">📉 Merma</span>
+                            <span class="font-mono text-red-400 font-bold">-$${numSeguro(m.monto).toFixed(2)}</span>
+                        </div>
+                        <div class="text-xs text-amber-100 font-semibold pt-1">${m.descripcion}</div>
+                        <div class="flex justify-between items-end pt-1">
+                            <div class="text-[9px] text-amber-500/70">👤 ${m.usuario} <br> 🕒 ${m.fecha}</div>
+                            <button onclick="eliminarRegistroAdmin('mermas_historial', '${m.keyFirebase}')" title="Borrar Merma" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function renderizarEventos() {
+            const galeria = document.getElementById('lista-eventos');
+            if (!galeria) return;
+            galeria.innerHTML = '';
+            
+            if (listaEventosGlobal.length === 0) {
+                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay gastos de eventos registrados.</p>';
+                return;
+            }
+
+            listaEventosGlobal.forEach(ev => {
+                galeria.innerHTML += `
+                    <div class="bg-stone-900/80 border border-indigo-900/50 p-3 rounded-lg shadow space-y-1 relative">
+                        <div class="flex justify-between items-center border-b border-indigo-900/30 pb-1">
+                            <span class="font-bold text-indigo-400 font-rustic text-sm">🎭 Gasto de Evento</span>
+                            <span class="font-mono text-indigo-400 font-bold">-$${numSeguro(ev.monto).toFixed(2)}</span>
+                        </div>
+                        <div class="text-xs text-amber-100 font-semibold pt-1">${ev.descripcion}</div>
+                        <div class="flex justify-between items-end pt-1">
+                            <div class="text-[9px] text-amber-500/70">👤 ${ev.usuario} <br> 🕒 ${ev.fecha}</div>
+                            <button onclick="eliminarRegistroAdmin('eventos_historial', '${ev.keyFirebase}')" title="Borrar Evento" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function renderizarNominasHistorial() {
+            const galeria = document.getElementById('galeria-nominas-historial');
+            if (!galeria) return;
+            galeria.innerHTML = '';
+
+            if (listaNominasGlobal.length === 0) {
+                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No se han emitido pagos de nóminas todavía.</p>';
+                return;
+            }
+
+            listaNominasGlobal.forEach(nom => {
+                galeria.innerHTML += `
+                    <div class="bg-stone-900/80 border border-emerald-900/50 p-3 rounded-lg shadow space-y-1 relative">
+                        <div class="flex justify-between items-center border-b border-emerald-900/30 pb-1">
+                            <span class="font-bold text-emerald-400 font-rustic text-sm">💸 Nómina Pagada</span>
+                            <span class="font-mono text-emerald-400 font-bold">-$${numSeguro(nom.montoTotal).toFixed(2)}</span>
+                        </div>
+                        <div class="text-xs text-amber-100 font-semibold pt-1">Empleado: ${nom.empleadoNombre}</div>
+                        <div class="text-[10px] text-amber-200/70">Horas pagadas: <span class="font-bold">${nom.horasPagadas}h</span></div>
+                        <div class="text-[10px] text-amber-200/70">Bonus aplicado: <span class="font-bold">$${numSeguro(nom.bonusAplicado).toFixed(2)}</span></div>
+                        <div class="flex justify-between items-end pt-1 border-t border-emerald-900/30 mt-1">
+                            <div class="text-[9px] text-amber-500/70">🕒 ${nom.fecha}</div>
+                            <button onclick="eliminarRegistroAdmin('nominas_historial', '${nom.keyFirebase}')" title="Anular Nómina (Devuelve el dinero)" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function eliminarRegistroAdmin(ruta, keyFirebase) {
+            if (confirm("¿Estás seguro de eliminar este registro? El dinero volverá a sumarse a la caja si corresponde.")) {
+                database.ref(ruta + '/' + keyFirebase).remove();
+            }
+        }
+        // ==============================================================================
+
 
         function switchAuthTab(tab) {
             const fLogin = document.getElementById('form-login');
@@ -1104,7 +1226,8 @@
                     nombre: nombre,
                     email: email,
                     aprobado: esAdmin ? true : false,
-                    rol: esAdmin ? 'admin' : 'empleado'
+                    rol: esAdmin ? 'admin' : 'empleado',
+                    horasPendientes: 0
                 };
 
                 database.ref('usuarios/' + uid).set(nuevoUsuario).then(() => {
@@ -1138,6 +1261,7 @@
                 document.getElementById('btn-admin-balance').classList.remove('hidden');
                 document.getElementById('btn-admin-purga').classList.remove('hidden');
                 
+                document.getElementById('btn-tab-sueldos').classList.remove('hidden');
                 document.getElementById('btn-tab-mermas').classList.remove('hidden');
                 document.getElementById('btn-tab-eventos').classList.remove('hidden');
 
@@ -1167,7 +1291,8 @@
                             nombre: user.email ? user.email.split('@')[0] : 'Admin',
                             email: user.email || '',
                             aprobado: esSuperAdmin ? true : false,
-                            rol: esSuperAdmin ? 'admin' : 'empleado'
+                            rol: esSuperAdmin ? 'admin' : 'empleado',
+                            horasPendientes: 0
                         };
                         database.ref('usuarios/' + user.uid).set(usuarioData);
                     } else if (esSuperAdmin && (!usuarioData.aprobado || usuarioData.rol !== 'admin')) {
@@ -1190,7 +1315,8 @@
                             nombre: user.email.split('@')[0],
                             email: user.email,
                             aprobado: true,
-                            rol: 'admin'
+                            rol: 'admin',
+                            horasPendientes: 0
                         });
                     } else {
                         mostrarMensajeAuth("❌ Error de permisos en base de datos: " + err.message, true);
@@ -1247,7 +1373,7 @@
         }
 
         function cambiarPantalla(pantalla) {
-            const pantallas = ['ventas', 'convenios', 'pedidos', 'comida', 'bebida', 'menus', 'platos-npc', 'productos', 'licencias', 'plantilla', 'mas-vendidos', 'mermas', 'eventos', 'aprobaciones'];
+            const pantallas = ['ventas', 'convenios', 'pedidos', 'comida', 'bebida', 'menus', 'platos-npc', 'productos', 'licencias', 'plantilla', 'sueldos', 'mas-vendidos', 'mermas', 'eventos', 'aprobaciones'];
             
             pantallas.forEach(p => {
                 const el = document.getElementById('pantalla-' + p);
@@ -1264,6 +1390,9 @@
             if (pantalla === 'mas-vendidos') {
                 calcularMasVendidos();
             }
+            if (pantalla === 'sueldos') {
+                renderizarSueldosAdmin();
+            }
         }
 
         function modalAjustarCajaBase() {
@@ -1274,20 +1403,21 @@
                 return;
             }
 
-            let totalVentas = 0, totalPedidos = 0, totalMermas = 0, totalEventos = 0;
+            let totalVentas = 0, totalPedidos = 0, totalMermas = 0, totalEventos = 0, totalNominas = 0;
             listaFacturasGlobal.forEach(f => { if (!f.esDeudaConvenio) totalVentas += numSeguro(f.total); });
             listaPedidosGlobal.forEach(p => { totalPedidos += numSeguro(p.total); });
             listaMermasGlobal.forEach(m => { totalMermas += numSeguro(m.monto); });
             listaEventosGlobal.forEach(ev => { totalEventos += numSeguro(ev.monto); });
+            listaNominasGlobal.forEach(nom => { totalNominas += numSeguro(nom.montoTotal); });
 
-            const dineroActualCalculado = CAJA_INICIAL_BASE + totalVentas - totalPedidos - totalMermas - totalEventos;
+            const dineroActualCalculado = CAJA_INICIAL_BASE + totalVentas - totalPedidos - totalMermas - totalEventos - totalNominas;
 
             const entrada = prompt("🪙 Contraseña correcta. Introduce el dinero REAL total que hay en la caja (IC):", dineroActualCalculado.toFixed(2));
             if (entrada !== null && entrada.trim() !== "") {
                 const entradaLimpia = entrada.replace(',', '.').trim();
                 const nuevoMontoTotal = parseFloat(entradaLimpia);
                 if (!isNaN(nuevoMontoTotal)) {
-                    const baseCalculada = nuevoMontoTotal - totalVentas + totalPedidos + totalMermas + totalEventos;
+                    const baseCalculada = nuevoMontoTotal - totalVentas + totalPedidos + totalMermas + totalEventos + totalNominas;
                     CAJA_INICIAL_BASE = baseCalculada;
 
                     database.ref('configuracion/caja_base').set(baseCalculada).then(() => {
@@ -1304,13 +1434,14 @@
         }
 
         function actualizarCajaTotalDisplay() {
-            let totalVentas = 0, totalPedidos = 0, totalMermas = 0, totalEventos = 0;
+            let totalVentas = 0, totalPedidos = 0, totalMermas = 0, totalEventos = 0, totalNominas = 0;
             listaFacturasGlobal.forEach(f => { if (!f.esDeudaConvenio) totalVentas += numSeguro(f.total); });
             listaPedidosGlobal.forEach(p => { totalPedidos += numSeguro(p.total); });
             listaMermasGlobal.forEach(m => { totalMermas += numSeguro(m.monto); });
             listaEventosGlobal.forEach(ev => { totalEventos += numSeguro(ev.monto); });
+            listaNominasGlobal.forEach(nom => { totalNominas += numSeguro(nom.montoTotal); });
 
-            const dineroActual = CAJA_INICIAL_BASE + totalVentas - totalPedidos - totalMermas - totalEventos;
+            const dineroActual = CAJA_INICIAL_BASE + totalVentas - totalPedidos - totalMermas - totalEventos - totalNominas;
             
             const el = document.getElementById('caja-total-display');
             if (el) {
@@ -1335,53 +1466,14 @@
                 actualizarCajaTotalDisplay();
             });
 
-            database.ref('comida').on('value', (s) => {
-                comida = s.val() || comidaInicial;
-                if (!s.val()) database.ref('comida').set(comidaInicial);
-                renderizarTodo();
-            });
-
-            database.ref('bebida_normal').on('value', (s) => {
-                bebidaNormal = s.val() || bebidaNormalInicial;
-                if (!s.val()) database.ref('bebida_normal').set(bebidaNormalInicial);
-                renderizarTodo();
-            });
-
-            database.ref('bebida_alcohol').on('value', (s) => {
-                bebidaAlcohol = s.val() || bebidaAlcoholInicial;
-                if (!s.val()) database.ref('bebida_alcohol').set(bebidaAlcoholInicial);
-                renderizarTodo();
-            });
-
-            database.ref('menus').on('value', (s) => {
-                menus = s.val() || menusIniciales;
-                if (!s.val()) database.ref('menus').set(menusIniciales);
-                renderizarTodo();
-            });
-
-            database.ref('platos_npc').on('value', (s) => {
-                platosNPC = s.val() || platosNPCIniciales;
-                if (!s.val()) database.ref('platos_npc').set(platosNPCIniciales);
-                renderizarTodo();
-            });
-
-            database.ref('productos_varios').on('value', (s) => {
-                productos = s.val() || productosIniciales;
-                if (!s.val()) database.ref('productos_varios').set(productosIniciales);
-                renderizarTodo();
-            });
-
-            database.ref('pedidos_eeuu').on('value', (s) => {
-                productosEEUU = s.val() || productosEEUUInicial;
-                if (!s.val()) database.ref('pedidos_eeuu').set(productosEEUUInicial);
-                renderizarTodo();
-            });
-
-            database.ref('pedidos_mexico').on('value', (s) => {
-                productosMexico = s.val() || productosMexicoInicial;
-                if (!s.val()) database.ref('pedidos_mexico').set(productosMexicoInicial);
-                renderizarTodo();
-            });
+            database.ref('comida').on('value', (s) => { comida = s.val() || comidaInicial; if (!s.val()) database.ref('comida').set(comidaInicial); renderizarTodo(); });
+            database.ref('bebida_normal').on('value', (s) => { bebidaNormal = s.val() || bebidaNormalInicial; if (!s.val()) database.ref('bebida_normal').set(bebidaNormalInicial); renderizarTodo(); });
+            database.ref('bebida_alcohol').on('value', (s) => { bebidaAlcohol = s.val() || bebidaAlcoholInicial; if (!s.val()) database.ref('bebida_alcohol').set(bebidaAlcoholInicial); renderizarTodo(); });
+            database.ref('menus').on('value', (s) => { menus = s.val() || menusIniciales; if (!s.val()) database.ref('menus').set(menusIniciales); renderizarTodo(); });
+            database.ref('platos_npc').on('value', (s) => { platosNPC = s.val() || platosNPCIniciales; if (!s.val()) database.ref('platos_npc').set(platosNPCIniciales); renderizarTodo(); });
+            database.ref('productos_varios').on('value', (s) => { productos = s.val() || productosIniciales; if (!s.val()) database.ref('productos_varios').set(productosIniciales); renderizarTodo(); });
+            database.ref('pedidos_eeuu').on('value', (s) => { productosEEUU = s.val() || productosEEUUInicial; if (!s.val()) database.ref('pedidos_eeuu').set(productosEEUUInicial); renderizarTodo(); });
+            database.ref('pedidos_mexico').on('value', (s) => { productosMexico = s.val() || productosMexicoInicial; if (!s.val()) database.ref('pedidos_mexico').set(productosMexicoInicial); renderizarTodo(); });
 
             database.ref('convenios').on('value', (s) => {
                 conveniosGlobal = s.val() || {};
@@ -1444,6 +1536,20 @@
                 actualizarCajaTotalDisplay();
             });
 
+            // NUEVO: NÓMINAS
+            database.ref('nominas_historial').on('value', (s) => {
+                const data = s.val();
+                listaNominasGlobal = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        listaNominasGlobal.push({ ...data[key], keyFirebase: key });
+                    });
+                    listaNominasGlobal.reverse();
+                }
+                renderizarNominasHistorial();
+                actualizarCajaTotalDisplay();
+            });
+
             database.ref('fichajes_historial').on('value', (s) => {
                 const data = s.val();
                 listaFichajesGlobal = [];
@@ -1494,126 +1600,6 @@
             actualizarEstadoFichajeUI();
         }
 
-        // ================= JS: MERMAS Y EVENTOS =================
-        document.getElementById('form-nueva-merma').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const desc = document.getElementById('merma-desc').value.trim();
-            const monto = parseFloat(document.getElementById('merma-monto').value);
-            
-            if (!desc || isNaN(monto) || monto <= 0) {
-                alert("Introduce un motivo y un importe válido mayor a 0.");
-                return;
-            }
-
-            const ahora = new Date();
-            const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
-            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Admin';
-
-            database.ref('mermas_historial').push({
-                descripcion: desc,
-                monto: monto,
-                usuario: usuarioNombre,
-                fecha: fechaStr
-            }).then(() => {
-                this.reset();
-                const txtDiscord = "```md\n📉 **MERMA / ACCIDENTE - THE CORNER**\n-----------------------------------\n👤 **Registrado por:** " + usuarioNombre + "\n📝 **Motivo:** " + desc + "\n💰 **Pérdida (Restado de Caja):** -$" + monto.toFixed(2) + "\n```";
-                copiarTextoPortapapeles(txtDiscord);
-                alert("📉 Merma registrada. Dinero restado de la caja correctamente.");
-            }).catch(err => {
-                alert("Error al guardar: " + err.message);
-            });
-        });
-
-        document.getElementById('form-nuevo-evento').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const desc = document.getElementById('evento-desc').value.trim();
-            const monto = parseFloat(document.getElementById('evento-monto').value);
-            
-            if (!desc || isNaN(monto) || monto <= 0) {
-                alert("Introduce un concepto y un gasto válido mayor a 0.");
-                return;
-            }
-
-            const ahora = new Date();
-            const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
-            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Admin';
-
-            database.ref('eventos_historial').push({
-                descripcion: desc,
-                monto: monto,
-                usuario: usuarioNombre,
-                fecha: fechaStr
-            }).then(() => {
-                this.reset();
-                const txtDiscord = "```md\n🎭 **GASTO DE EVENTO - THE CORNER**\n-----------------------------------\n👤 **Registrado por:** " + usuarioNombre + "\n🎉 **Concepto/Evento:** " + desc + "\n💰 **Retiro de Caja:** -$" + monto.toFixed(2) + "\n```";
-                copiarTextoPortapapeles(txtDiscord);
-                alert("🎭 Gasto de evento registrado. Dinero descontado de la caja.");
-            }).catch(err => {
-                alert("Error al guardar: " + err.message);
-            });
-        });
-
-        function renderizarMermas() {
-            const galeria = document.getElementById('lista-mermas');
-            if (!galeria) return;
-            galeria.innerHTML = '';
-            
-            if (listaMermasGlobal.length === 0) {
-                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay mermas registradas.</p>';
-                return;
-            }
-
-            listaMermasGlobal.forEach(m => {
-                galeria.innerHTML += `
-                    <div class="bg-stone-900/80 border border-red-900/50 p-3 rounded-lg shadow space-y-1 relative">
-                        <div class="flex justify-between items-center border-b border-red-900/30 pb-1">
-                            <span class="font-bold text-red-400 font-rustic text-sm">📉 Merma</span>
-                            <span class="font-mono text-red-400 font-bold">-$${numSeguro(m.monto).toFixed(2)}</span>
-                        </div>
-                        <div class="text-xs text-amber-100 font-semibold pt-1">${m.descripcion}</div>
-                        <div class="flex justify-between items-end pt-1">
-                            <div class="text-[9px] text-amber-500/70">
-                                👤 ${m.usuario} <br> 🕒 ${m.fecha}
-                            </div>
-                            <button onclick="eliminarRegistroAdmin('mermas_historial', '${m.keyFirebase}')" title="Borrar Merma" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        function renderizarEventos() {
-            const galeria = document.getElementById('lista-eventos');
-            if (!galeria) return;
-            galeria.innerHTML = '';
-            
-            if (listaEventosGlobal.length === 0) {
-                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay gastos de eventos registrados.</p>';
-                return;
-            }
-
-            listaEventosGlobal.forEach(ev => {
-                galeria.innerHTML += `
-                    <div class="bg-stone-900/80 border border-indigo-900/50 p-3 rounded-lg shadow space-y-1 relative">
-                        <div class="flex justify-between items-center border-b border-indigo-900/30 pb-1">
-                            <span class="font-bold text-indigo-400 font-rustic text-sm">🎭 Gasto de Evento</span>
-                            <span class="font-mono text-indigo-400 font-bold">-$${numSeguro(ev.monto).toFixed(2)}</span>
-                        </div>
-                        <div class="text-xs text-amber-100 font-semibold pt-1">${ev.descripcion}</div>
-                        <div class="flex justify-between items-end pt-1">
-                            <div class="text-[9px] text-amber-500/70">
-                                👤 ${ev.usuario} <br> 🕒 ${ev.fecha}
-                            </div>
-                            <button onclick="eliminarRegistroAdmin('eventos_historial', '${ev.keyFirebase}')" title="Borrar Evento" class="text-red-400 hover:text-red-200 text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 border border-red-800">🗑️</button>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        function eliminarRegistroAdmin(ruta, keyFirebase) {
-            if (confirm("¿Estás seguro de eliminar este registro? El dinero volverá a sumarse a la caja.")) {
-                database.ref(ruta + '/' + keyFirebase).remove();
-            }
-        }
 
         // ================= JS: CÁLCULO DE MÁS VENDIDOS =================
         function calcularMasVendidos() {
@@ -1914,7 +1900,12 @@
                     tickets: cantidadTickets
                 };
 
+                // NUEVO: Sumar horas acumuladas al empleado para sueldos
+                let horasPrevias = numSeguro(usuariosPlantillaGlobal[uid]?.horasPendientes);
+                let nuevasHoras = horasPrevias + parseFloat(totalHoras);
+
                 database.ref('fichajes_historial').push(turnoResumen);
+                database.ref('usuarios/' + uid + '/horasPendientes').set(nuevasHoras); // Guarda horas pendientes
                 database.ref('usuarios/' + uid + '/turnoActivo').remove().then(() => {
                     const textoDiscord = "```md\n" +
                                          "⏱️ **CONTROL DE FICHAJE - THE CORNER**\n" +
@@ -1935,12 +1926,18 @@
         setInterval(() => {
             if (turnoActivo) actualizarEstadoFichajeUI();
             renderizarPlantillaAdminUI();
+            if (!document.getElementById('pantalla-sueldos').classList.contains('hidden')) {
+                // Para que los contadores en la pestaña de sueldos no parpadeen si hay inputs activos, no lo refrescaremos constantemente.
+            }
         }, 1000);
 
         function escucharPlantillaAdmin() {
             database.ref('usuarios').on('value', snapshot => {
                 usuariosPlantillaGlobal = snapshot.val() || {};
                 renderizarPlantillaAdminUI();
+                if (!document.getElementById('pantalla-sueldos').classList.contains('hidden')) {
+                    renderizarSueldosAdmin();
+                }
             });
         }
 
@@ -2013,6 +2010,167 @@
             document.getElementById('cant-fuera-servicio').textContent = fueraServicioCount;
             galeria.innerHTML = htmlEnServicio + htmlFueraServicio;
         }
+
+        // ==============================================================================
+        // ================= JS: GESTIÓN DE SUELDOS (NUEVO) ==============================
+        // ==============================================================================
+        function renderizarSueldosAdmin() {
+            const galeria = document.getElementById('galeria-sueldos-admin');
+            if (!galeria) return;
+            
+            const listaUsuarios = Object.values(usuariosPlantillaGlobal).filter(u => u && (u.aprobado || u.rol === 'admin'));
+
+            if (listaUsuarios.length === 0) {
+                galeria.innerHTML = '<p class="italic text-amber-200/40 col-span-full text-center py-4">No hay empleados registrados en la plantilla para gestionar sueldos.</p>';
+                return;
+            }
+
+            // Para no sobreescribir inputs activos del admin, construimos un string solo si difiere en algo que no sean los inputs
+            let htmlCompleto = '';
+
+            listaUsuarios.forEach(usr => {
+                const nombreSeguro = (usr.nombre || '').replace(/'/g, "\\'");
+                const horasP = numSeguro(usr.horasPendientes).toFixed(2);
+                const sBase = numSeguro(usr.sueldoBase).toFixed(2);
+                const hMin = numSeguro(usr.horasMinimas).toFixed(2);
+                const extraRate = numSeguro(usr.incentivoExtra).toFixed(2);
+
+                htmlCompleto += `
+                    <div class="bg-stone-900/90 border border-amber-900/50 rounded-xl p-3 shadow-lg flex flex-col justify-between" id="card-sueldo-${usr.uid}">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center border-b border-amber-900/40 pb-2">
+                                <h3 class="font-bold text-amber-300 font-rustic text-sm">👤 ${usr.nombre || ''}</h3>
+                                <span class="bg-stone-950 text-amber-400 font-mono text-[10px] px-2 py-0.5 rounded border border-amber-800">
+                                    Pendiente: <span class="font-black text-emerald-400">${horasP}h</span>
+                                </span>
+                            </div>
+                            
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="block text-[9px] text-amber-200/70 mb-1">Sueldo Base ($)</label>
+                                    <input type="number" id="base-${usr.uid}" step="0.01" value="${sBase}" onchange="guardarConfigSueldo('${usr.uid}', 'sueldoBase', this.value)" class="w-full p-1.5 rounded text-[10px] text-center font-bold">
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] text-amber-200/70 mb-1">Horas Mínimas</label>
+                                    <input type="number" id="min-${usr.uid}" step="0.01" value="${hMin}" onchange="guardarConfigSueldo('${usr.uid}', 'horasMinimas', this.value)" class="w-full p-1.5 rounded text-[10px] text-center font-bold">
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] text-amber-200/70 mb-1">Incentivo Extra/h</label>
+                                    <input type="number" id="extra-${usr.uid}" step="0.01" value="${extraRate}" onchange="guardarConfigSueldo('${usr.uid}', 'incentivoExtra', this.value)" class="w-full p-1.5 rounded text-[10px] text-center font-bold">
+                                </div>
+                            </div>
+                            
+                            <div class="bg-stone-950/60 p-2 rounded border border-amber-900/30 flex justify-between items-center">
+                                <label class="text-[10px] font-bold text-amber-300">➕ Bonus / Ajuste Manual ($):</label>
+                                <input type="number" id="bonus-${usr.uid}" step="0.01" value="0.00" oninput="recalcularTotalUI('${usr.uid}')" class="w-20 p-1 rounded text-xs text-center font-bold bg-stone-900 border-amber-700 text-amber-200">
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-amber-900/60 mt-3 space-y-2">
+                            <div class="flex justify-between items-center bg-stone-950 p-2 rounded border border-emerald-900/50">
+                                <span class="text-[11px] font-bold text-amber-400 font-rustic uppercase">Total a Pagar:</span>
+                                <span id="display-total-${usr.uid}" class="text-base font-black text-emerald-400 font-mono">$0.00</span>
+                            </div>
+                            <button onclick="procesarPagoSueldo('${usr.uid}', '${nombreSeguro}')" class="w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-100 text-[11px] py-2 rounded font-rustic font-bold border border-emerald-600 shadow transition">
+                                💸 Pagar, Descontar Caja y Resetear Horas
+                            </button>
+                        </div>
+                    </div>`;
+            });
+
+            // Solo inyectamos si no hay campos en foco para evitar perder lo escrito. En React esto se hace con estados, aquí haremos un check básico o simplemente lo seteamos y llamamos a recalcular
+            const activeTag = document.activeElement.tagName;
+            if(activeTag !== 'INPUT') {
+                galeria.innerHTML = htmlCompleto;
+                listaUsuarios.forEach(usr => recalcularTotalUI(usr.uid));
+            }
+        }
+
+        function guardarConfigSueldo(uid, campo, valor) {
+            let numVal = numSeguro(valor);
+            database.ref(`usuarios/${uid}/${campo}`).set(numVal).then(() => {
+                recalcularTotalUI(uid);
+            });
+        }
+
+        function recalcularTotalUI(uid) {
+            const usr = usuariosPlantillaGlobal[uid];
+            if (!usr) return;
+
+            let horas = numSeguro(usr.horasPendientes);
+            let base = numSeguro(document.getElementById(`base-${uid}`)?.value);
+            let min = numSeguro(document.getElementById(`min-${uid}`)?.value);
+            let extraRate = numSeguro(document.getElementById(`extra-${uid}`)?.value);
+            let bonus = numSeguro(document.getElementById(`bonus-${uid}`)?.value);
+
+            let total = 0;
+            if (min > 0) {
+                if (horas <= min) {
+                    total = (horas / min) * base;
+                } else {
+                    total = base + ((horas - min) * extraRate);
+                }
+            } else {
+                total = base + (horas * extraRate); // Si no hay mínimo, base + todas las horas como extras
+            }
+
+            total += bonus;
+            
+            const display = document.getElementById(`display-total-${uid}`);
+            if (display) {
+                display.textContent = `$${Math.max(0, total).toFixed(2)}`;
+            }
+            return Math.max(0, total); // Retorna para usar al pagar
+        }
+
+        function procesarPagoSueldo(uid, nombre) {
+            const usr = usuariosPlantillaGlobal[uid];
+            if (!usr) return;
+
+            let horas = numSeguro(usr.horasPendientes);
+            if (horas <= 0) {
+                alert("Este empleado no tiene horas pendientes de cobro.");
+                return;
+            }
+
+            const totalFinal = recalcularTotalUI(uid);
+            const bonusAplicado = numSeguro(document.getElementById(`bonus-${uid}`)?.value);
+
+            if (confirm(`💸 ¿Confirmas el PAGO de $${totalFinal.toFixed(2)} a ${nombre}?\n\nEsto restará el dinero de la caja y pondrá sus horas a 0.`)) {
+                const ahora = new Date();
+                const fechaStr = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString();
+
+                const nominaData = {
+                    id: Date.now(),
+                    empleadoUid: uid,
+                    empleadoNombre: nombre,
+                    horasPagadas: horas,
+                    montoTotal: totalFinal,
+                    bonusAplicado: bonusAplicado,
+                    pagador: usuarioActualData.nombre,
+                    fecha: fechaStr
+                };
+
+                // Guardar historial de nómina
+                database.ref('nominas_historial').push(nominaData);
+                // Resetear horas del empleado a 0
+                database.ref(`usuarios/${uid}/horasPendientes`).set(0).then(() => {
+                    const txtDiscord = "```md\n" +
+                                       "💸 **PAGO DE NÓMINA - THE CORNER**\n" +
+                                       "-----------------------------------\n" +
+                                       "👤 **Empleado Pagado:** " + nombre + "\n" +
+                                       "⏰ **Horas Totales:** " + horas.toFixed(2) + "h\n" +
+                                       "🎁 **Ajuste/Bonus:** $" + bonusAplicado.toFixed(2) + "\n" +
+                                       "💰 **TOTAL PAGADO:** $" + totalFinal.toFixed(2) + "\n" +
+                                       "```";
+                    copiarTextoPortapapeles(txtDiscord);
+                    alert(`✅ Se han pagado $${totalFinal.toFixed(2)} a ${nombre}. Dinero restado de la caja.`);
+                    document.getElementById(`bonus-${uid}`).value = '0.00'; // reset UI bonus
+                });
+            }
+        }
+        // ==============================================================================
+
 
         function forzarSalidaAdmin(uid, nombre) {
             if (confirm(`¿Estás seguro de forzar la salida de turno para ${nombre}?`)) {
@@ -2390,7 +2548,10 @@
             let totalEventos = 0;
             listaEventosGlobal.forEach(ev => { if (ev) totalEventos += numSeguro(ev.monto); });
 
-            const dineroEnCaja = CAJA_INICIAL_BASE + totalVentas - totalPedidos - totalMermas - totalEventos;
+            let totalNominas = 0;
+            listaNominasGlobal.forEach(nom => { if (nom) totalNominas += numSeguro(nom.montoTotal); });
+
+            const dineroEnCaja = CAJA_INICIAL_BASE + totalVentas - totalPedidos - totalMermas - totalEventos - totalNominas;
 
             const textoDiscord = "```md\n" +
                                  "📊 **BALANCE SEMANAL - THE CORNER**\n" +
@@ -2400,6 +2561,7 @@
                                  "📦 **Salidas (Pedidos Materia Prima):** -$" + totalPedidos.toFixed(2) + "\n" +
                                  "📉 **Salidas (Mermas y Accidentes):** -$" + totalMermas.toFixed(2) + "\n" +
                                  "🎭 **Salidas (Gastos Eventos):** -$" + totalEventos.toFixed(2) + "\n" +
+                                 "💸 **Salidas (Nóminas Pagadas):** -$" + totalNominas.toFixed(2) + "\n" +
                                  "⏳ **Horas Totales Trabajadas:** " + totalHorasTrabajadas.toFixed(2) + "h\n" +
                                  "-----------------------------------\n" +
                                  "💵 **DINERO REAL EN CAJA:** $" + dineroEnCaja.toFixed(2) + "\n" +
@@ -2749,105 +2911,6 @@
             pedidoEEUU = {}; pedidoMex = {};
             renderizarTodo();
         }
-
-        document.getElementById('btn-registrar-venta').addEventListener('click', () => {
-            let subtotalBase = 0, resumenArray = [];
-            const usuarioNombre = usuarioActualData ? usuarioActualData.nombre : 'Empleado';
-
-            const recolectarVenta = (items, estadoObj, tipo) => {
-                ordenarArrayPorNombre(items).forEach(item => {
-                    const est = estadoObj[item.id];
-                    if (est && est.cantidad > 0) {
-                        const pMin = numSeguro(item.pMin);
-                        const pNorm = numSeguro(item.pNorm);
-                        const pMed = item.pMed !== undefined ? numSeguro(item.pMed) : ((pMin + pNorm) / 2);
-                        let p = tipo === 'menu' ? (est.tarifa === 'min' ? pMin : pNorm) : (est.tarifa === 'min' ? pMin : (est.tarifa === 'med' ? pMed : pNorm));
-                        subtotalBase += est.cantidad * p;
-                        resumenArray.push(est.cantidad + "x " + item.nombre);
-                    }
-                });
-            };
-
-            recolectarVenta(comida, ventaComida, 'comida');
-            recolectarVenta(bebidaNormal, ventaBebidaNormal, 'bebida_normal');
-            recolectarVenta(bebidaAlcohol, ventaBebidaAlcohol, 'bebida_alcohol');
-            recolectarVenta(menus, ventaMenus, 'menu');
-            recolectarVenta(platosNPC, ventaPlatosNPC, 'platos_npc');
-            recolectarVenta(productos, ventaProductos, 'productos');
-
-            if (subtotalBase === 0) {
-                alert("No hay ningún producto en la venta actual.");
-                return;
-            }
-
-            const pctInput = parseFloat(document.getElementById('input-porcentaje-venta').value);
-            const pct = isNaN(pctInput) ? 0 : Math.max(0, Math.min(100, pctInput));
-            const descuentoMonto = subtotalBase * (pct / 100);
-            const totalVenta = Math.max(0, subtotalBase - descuentoMonto);
-
-            const idConvenioSel = document.getElementById('select-convenio-venta').value;
-            const esDeudaConvenio = Boolean(idConvenioSel);
-            const convenioObjeto = idConvenioSel ? conveniosGlobal[idConvenioSel] : null;
-            const convenioNombre = convenioObjeto ? convenioObjeto.nombre : '';
-
-            const efectivoInput = parseFloat(document.getElementById('input-efectivo-entregado').value);
-            const efectivoEntregado = isNaN(efectivoInput) ? 0 : efectivoInput;
-            const propina = (!esDeudaConvenio && efectivoEntregado > totalVenta) ? (efectivoEntregado - totalVenta) : 0;
-            const totalIngresadoCaja = esDeudaConvenio ? 0 : (totalVenta + propina);
-
-            const ahora = new Date();
-            const codigoTicket = String(ahora.getDate()).padStart(2, '0') + "/" + String(ahora.getMonth() + 1).padStart(2, '0') + "/" + ahora.getFullYear() + "-" + String(ahora.getHours()).padStart(2, '0') + ":" + String(ahora.getMinutes()).padStart(2, '0');
-
-            let resumenFinalStr = resumenArray.join(', ');
-            if (convenioNombre) resumenFinalStr += ` [Convenio: ${convenioNombre}${esDeudaConvenio ? ' (A Cuenta/Deuda)' : ''}]`;
-            if (pct > 0) resumenFinalStr += ` [Desc: ${pct}%]`;
-            if (propina > 0) resumenFinalStr += ` [Propina: +$${propina.toFixed(2)}]`;
-
-            const facturaData = {
-                id: Date.now(),
-                codigoTicket: codigoTicket,
-                usuario: usuarioNombre,
-                total: totalIngresadoCaja,
-                consumo: totalVenta,
-                propina: propina,
-                esDeudaConvenio: esDeudaConvenio,
-                convenioNombre: convenioNombre,
-                resumen: resumenFinalStr,
-                fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
-            };
-
-            database.ref('facturas').push(facturaData);
-
-            if (esDeudaConvenio && idConvenioSel && convenioObjeto) {
-                const nuevaDeuda = numSeguro(convenioObjeto.saldoDeuda) + totalVenta;
-                const idConsumo = Date.now().toString();
-                const consumoItem = {
-                    id: idConsumo,
-                    descripcion: resumenArray.join(', '),
-                    monto: totalVenta,
-                    usuario: usuarioNombre,
-                    fecha: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + ahora.toLocaleDateString()
-                };
-                database.ref(`convenios/${idConvenioSel}/saldoDeuda`).set(nuevaDeuda);
-                database.ref(`convenios/${idConvenioSel}/historialConsumos/${idConsumo}`).set(consumoItem);
-            }
-
-            copiarTextoPortapapeles(generarFormatoDiscord(usuarioNombre, codigoTicket, resumenArray.join(', '), subtotalBase, descuentoMonto, pct, convenioNombre, totalVenta, propina, esDeudaConvenio));
-
-            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {};
-            document.getElementById('input-porcentaje-venta').value = '0';
-            document.getElementById('select-convenio-venta').value = '';
-            document.getElementById('input-efectivo-entregado').value = '';
-            renderizarTodo();
-        });
-
-        document.getElementById('btn-limpiar-venta').addEventListener('click', () => {
-            ventaComida = {}; ventaBebidaNormal = {}; ventaBebidaAlcohol = {}; ventaMenus = {}; ventaPlatosNPC = {}; ventaProductos = {};
-            document.getElementById('input-porcentaje-venta').value = '0';
-            document.getElementById('select-convenio-venta').value = '';
-            document.getElementById('input-efectivo-entregado').value = '';
-            renderizarTodo();
-        });
 
         document.getElementById('form-nuevo-pedido-eeuu').addEventListener('submit', function(e) {
             e.preventDefault();
